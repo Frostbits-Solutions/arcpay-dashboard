@@ -14,7 +14,11 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@agoralabs-sh/algorand-provider": "^1.1.0",
     "@supabase/supabase-js": "^2.42.0",
+    "@walletconnect/modal-sign-html": "^2.6.2",
+    "@walletconnect/web3wallet": "^1.11.1",
+    "algosdk": "^2.7.0",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
