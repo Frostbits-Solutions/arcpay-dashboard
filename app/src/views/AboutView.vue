@@ -1,12 +1,13 @@
 <template>
   <div class="about">
-    <TransactionModal :contract="CONTRACT_ID.pay"/>
+    <TransactionModal :transactionType="TRANSACTION_TYPE.buy"
+                      :conventionType ="CONVENTION_TYPE.AlgoARC72"/>
   </div>
 </template>
 
 <script lang="ts" setup>
 import TransactionModal from '@/lib/web3/transactions/TransactionModal.vue'
-import { CONTRACT_ID } from '@/lib/web3/transactions/constants'
+import { TRANSACTION_TYPE, CONVENTION_TYPE } from '@/lib/web3/transactions/constants'
 </script>
 
 <style>

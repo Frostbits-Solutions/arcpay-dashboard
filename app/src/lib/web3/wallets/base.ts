@@ -1,6 +1,5 @@
 import type _algosdk from 'algosdk'
-import type { Wallet } from '../types/wallet'
-import type { ConfirmedTxn } from '../types/node'
+import type { Wallet, ConfirmedTxn, RawTxnResponse } from '../types'
 import { Transaction } from 'algosdk'
 
 abstract class BaseClient {
@@ -36,6 +35,26 @@ abstract class BaseClient {
     return isSigned
       ? this.algosdk.decodeSignedTransaction(new Uint8Array(Buffer.from(txn, 'base64'))).txn
       : this.algosdk.decodeUnsignedTransaction(new Uint8Array(Buffer.from(txn, 'base64')))
+  }
+
+  async sendRawTransactions(transactions: Uint8Array[], waitRoundsToConfirm?: number) {
+    const sentTransaction = (await this.algodClient
+      .sendRawTransaction(transactions)
+      .do()) as RawTxnResponse
+
+    if (!sentTransaction) {
+      throw new Error('Transaction failed.')
+    }
+
+    const decodedTxn = this.algosdk.decodeSignedTransaction(transactions[0])
+    const waitRounds = waitRoundsToConfirm || decodedTxn.txn.lastRound - decodedTxn.txn.firstRound
+
+    const confirmedTransaction = await this.waitForConfirmation(sentTransaction.txId, waitRounds)
+
+    return {
+      id: sentTransaction.txId,
+      ...confirmedTransaction
+    }
   }
 
   logEncodedTransaction(txn: string, isSigned: boolean) {

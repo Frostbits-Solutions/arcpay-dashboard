@@ -16,6 +16,7 @@ export const getAlgodClient = (
     port = DEFAULT_NODE_PORT,
     headers
   ] = algodClientOptions || []
+  console.log(baseServer)
 
   return new algosdk.Algodv2(tokenOrBaseClient, baseServer, port, headers)
 }

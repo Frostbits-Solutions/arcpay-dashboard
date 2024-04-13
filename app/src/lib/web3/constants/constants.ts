@@ -1,4 +1,4 @@
-import type { Network } from '../types/node'
+import type { Network } from '../types'
 import { ICON as iconKibisis } from '../wallets/kibisis/constants'
 import { ICON as iconWalletconnect } from '../wallets/walletConnect/constants'
 import kibisis from '@/lib/web3/wallets/kibisis'

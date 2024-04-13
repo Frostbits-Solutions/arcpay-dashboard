@@ -5,8 +5,6 @@ import type {
   WalletConnectModalSignOptions,
   WalletConnectModalSignSession } from '@walletconnect/modal-sign-html'
 
-import type { Wallet } from '@/lib/web3/types/wallet'
-import type { IBaseResult, IEnableResult, ISignTxnsResult } from '@agoralabs-sh/algorand-provider'
 import _algosdk, { assignGroupID, Transaction } from 'algosdk'
 import BaseClient from '@/lib/web3/wallets/base'
 import { DEFAULT_NETWORK, GEMS_PAY_METADA, PROVIDER_ID } from '@/lib/web3/constants'
