@@ -1,3 +1,5 @@
+import { ABIMethod } from 'algosdk'
+
 export function longToByteArray (long: number) {
   const byteArray = [0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -18,4 +20,32 @@ export function base64ToArrayBuffer (base64: string) {
     bytes[i] = binaryString.charCodeAt(i)
   }
   return bytes
+}
+
+
+export function fromHexString (hexString:string): Uint8Array
+export function fromHexString (hexString: string, radix = 16): Uint8Array {
+  // @ts-ignore
+  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, radix)))
+}
+
+export function toHexString (bytes: Uint8Array): string
+export function toHexString (bytes: Uint8Array, n = 16): string {
+  // @ts-ignore
+  return bytes.reduce((str, byte) => str + byte.toString(n).padStart(2, '0'), '');
+}
+
+export function encodeAppArgs (abiMethod: ABIMethod,  args: any[]) {
+  const appArgs = args.map((arg, index) => {
+    // @ts-ignore
+    return abiMethod.args[index].type.encode(arg);
+  });
+  return [abiMethod.getSelector(), ...appArgs]
+}
+
+export function concatUint8Array (a: Uint8Array, b: Uint8Array): Uint8Array {
+  const t = new Uint8Array(a.length + b.length)
+  t.set(a, 0)
+  t.set(b, a.length)
+  return t
 }

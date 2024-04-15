@@ -3,7 +3,10 @@
   <img :src="PROVIDER_ICONS[web3Store.account.providerId]">
   <div>from:</div>
   <div>{{web3Store.account.address}}</div>
-  <button @click="pay">Pay</button>
+  <div>price:</div>
+  <input type="number" v-model="price"/>
+  <button @click="update">Update</button>
+  {{steps[currentStep]}}
 </div>
 </template>
 
@@ -11,12 +14,31 @@
 import { useWeb3Store } from '@/stores/web3'
 import { PROVIDER_ICONS } from '@/lib/web3/constants'
 import { longToByteArray } from '@/lib/web3/transactions/utils'
+import { ref } from 'vue'
+import type { Account } from '@/lib/web3/types'
 
 const web3Store = useWeb3Store()
-console.log(web3Store.wallet)
-async function pay() {
+
+const props = defineProps<{
+  account: Account,
+}>()
+
+const price = ref(1)
+const currentStep = ref(0)
+const steps = [
+  'Input price',
+  'Signing update',
+  'Sending the transaction',
+  'Done'
+]
+
+async function update() {
   if (web3Store.provider === null) {
     throw {message: 'no provider initiated'}
+  }
+  const parameters = {
+    appIndex: 40424703,
+    feesAddress: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
   }
 
   const algosdk = web3Store.provider.algosdk
@@ -26,19 +48,25 @@ async function pay() {
 
   const appArgs = [
     new TextEncoder().encode('update_price'),
-    longToByteArray(props.price)]
-  const accounts = [fees_address]
+    longToByteArray(price.value)]
+  const accounts = [parameters.feesAddress]
 
   const txn = algosdk.makeApplicationCallTxnFromObject({
     accounts: accounts,
     appArgs: appArgs,
-    appIndex: appIndex,
-    from: props.from,
+    appIndex: parameters.appIndex,
+    from: props.account.address,
     onComplete: algosdk.OnApplicationComplete.NoOpOC,
     suggestedParams
   })
+  currentStep.value++
 
-  await web3Store.provider.signTransactions([txn], false)
+  const signedTxn = await web3Store.provider.signTransactions([txn], false)
+  currentStep.value++
+
+  const confirmationSendFund = await web3Store.provider.sendRawTransactions(signedTxn)
+  currentStep.value++
+  console.log(confirmationSendFund)
 }
 </script>
 
@@ -57,7 +85,13 @@ img {
   grid-gap: 10px;
 }
 
-.two-columns > *:nth-child(even) {
+.two-columns > div:nth-child(even) {
   text-align: right;
+}
+
+.two-columns button {
+  grid-column: span 2;
+  width: 100px;
+  margin: auto;
 }
 </style>

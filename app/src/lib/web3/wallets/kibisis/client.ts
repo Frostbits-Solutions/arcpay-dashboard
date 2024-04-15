@@ -20,12 +20,21 @@ import type {
 
 import type { Wallet, Account } from '@/lib/web3/types'
 import {
+  ARC_0027_CHANNEL_NAME, ARC_0027_PROVIDER_ID, ARC_0027_SIGN_TXNS_REQUEST, DEFAULT_REQUEST_TIMEOUT,
   ICON,
-  KIBISIS_NOT_INSTALLED,
+  KIBISIS_NOT_INSTALLED, METHOD_TIMED_OUT_ERROR,
   NO_ALGO_WALLET_INSTALLED, UNKNOWN_ERROR
 } from '@/lib/web3/wallets/kibisis/constants'
 import { PROVIDER_ID } from '@/lib/web3/constants'
 import Algod from '@/lib/web3/algod'
+import type {
+  ProviderMethods, RequestMessage,
+  ResponseError,
+  ResponseMessage,
+  SendRequestWithTimeoutOptions, SignTxnsParams, SignTxnsResult
+} from '@/lib/web3/wallets/kibisis/type'
+import { generateUuid } from '@/lib/web3/wallets/kibisis/utils'
+import { base64ToArrayBuffer } from '@/lib/web3/transactions/utils'
 
 class Kibisis extends BaseClient {
   genesisHash: string|undefined
@@ -35,6 +44,68 @@ class Kibisis extends BaseClient {
   static async init () {
     const algoD = await Algod.init()
     return new Kibisis(algoD.algosdk, algoD.algodClient)
+  }
+
+  static async sendRequestWithTimeout<Params, Result>({ method,
+                                                        params,
+                                                        timeout,
+                                                        reference
+                                                      }: SendRequestWithTimeoutOptions<Params>): Promise<Result | undefined> {
+    return new Promise<Result | undefined>((resolve, reject) => {
+      const channel = new BroadcastChannel(ARC_0027_CHANNEL_NAME)
+      const requestId = generateUuid()
+      // eslint-disable-next-line prefer-const
+      let timer: number
+
+      // listen to responses
+      channel.onmessage = (message: MessageEvent<ResponseMessage<Result>>) => {
+        // if the response's request id does not match the intended request, just ignore
+        if (!message.data || message.data.requestId !== requestId) {
+          return
+        }
+
+        // clear the timer, we can handle it from here
+        window.clearTimeout(timer)
+
+        // if there is an error, reject
+        if (message.data.error) {
+          reject(message.data.error)
+
+          // close the channel, we are done here
+          return channel.close()
+        }
+
+        // return the result
+        resolve(message.data.result)
+
+        // close the channel, we are done here
+        return channel.close()
+      }
+
+      timer = window.setTimeout(() => {
+        // close the channel connection
+        channel.close()
+
+        reject({
+          code: METHOD_TIMED_OUT_ERROR,
+          data: {
+            method
+          },
+          message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+          providerId: ARC_0027_PROVIDER_ID
+        } as ResponseError<{ method: ProviderMethods }>)
+      }, timeout || DEFAULT_REQUEST_TIMEOUT)
+
+      // broadcast the request on the next tick
+      // this allows the channel to be ready before the request is sent
+      window.setTimeout(() => {
+        channel.postMessage({
+          id: requestId,
+          params,
+          reference
+        } as RequestMessage<Params>)
+      }, 0)
+    })
   }
 
   constructor(
@@ -115,17 +186,16 @@ class Kibisis extends BaseClient {
           //signers: [], // an empty array instructs the wallet to skip signing this transaction
         })
       }
-
-      // @ts-ignore
-      let result: IBaseResult & ISignTxnsResult = await window.algorand.signTxns(txns);
-      let signedTransactionBytes: Uint8Array[] = []
-      for (let stxn of result.stxns) {
+      // // @ts-ignore
+      const result: IBaseResult & ISignTxnsResult = await window.algorand.signTxns({
+        txns
+      });
+      const signedTransactionBytes: Uint8Array[] = []
+      for (const stxn of result.stxns) {
         if (typeof stxn === 'string'){
-          signedTransactionBytes.push(base64ToBytes(stxn))
+          signedTransactionBytes.push(base64ToArrayBuffer(stxn))
         }
       }
-
-      console.log(result);
       /*
       {
         id: 'awesome-wallet',

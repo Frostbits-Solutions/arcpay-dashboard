@@ -1,9 +1,10 @@
 <template>
 <div>
-<button v-for="provider of providers" @click="() => chooseWallet(provider.providerId)">
-  <img :src="provider.icon">
-  <p>{{provider.name}}</p>
-</button>
+  <h2>Choose your wallet</h2>
+  <button v-for="provider of providers" @click="() => chooseWallet(provider.providerId)">
+    <img :src="provider.icon">
+    <p>{{provider.name}}</p>
+  </button>
 </div>
 </template>
 
@@ -23,7 +24,13 @@ const providers =
     }) ;
 
 function chooseWallet (wallet: string) {
+  localStorage.setItem('gemsPayWallet', wallet)
   emit('wallet', wallet)
+}
+
+const ls = localStorage.getItem('gemsPayWallet')
+if (ls) {
+  emit('wallet', ls)
 }
 </script>
 

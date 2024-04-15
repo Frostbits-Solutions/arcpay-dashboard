@@ -1,6 +1,6 @@
 <template>
 <div class="flex-column">
-  <button v-for="account of accounts" @click="() => emits('account', account)">
+  <button v-for="account of accounts" @click="() => chooseAccount(account)">
     {{getShortAddress(account.address)}}
   </button>
 </div>
@@ -14,6 +14,17 @@ const emits = defineEmits(['account'])
 
 function getShortAddress (address: string) {
   return `${address.slice(0,10)}...${address.slice(address.length-3)}`
+}
+
+function chooseAccount (account: Account) {
+  localStorage.setItem('gemsPayAccount', JSON.stringify(account))
+  emits('account', account)
+}
+
+const acc = localStorage.getItem('gemsPayAccount')
+if (acc) {
+  const t = JSON.parse(acc)
+  emits('account', t)
 }
 </script>
 
