@@ -1,7 +1,8 @@
-import kibisis from '@/lib/web3/wallets/kibisis'
-import walletConnect from '@/lib/web3/wallets/walletConnect'
+import { TransactionModal } from './transactions/'
+import { TRANSACTION_TYPE, CONVENTION_TYPE } from '@/lib/web3/transactions/constants'
 
-export default {
-  kibisis,
-  walletconnect: walletConnect
+export {
+  TransactionModal,
+  TRANSACTION_TYPE,
+  CONVENTION_TYPE,
 }

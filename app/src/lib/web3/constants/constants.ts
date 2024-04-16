@@ -1,7 +1,13 @@
 import type { Network } from '../types'
 import { ICON as iconKibisis } from '../wallets/kibisis/constants'
 import { ICON as iconWalletconnect } from '../wallets/walletConnect/constants'
-import kibisis from '@/lib/web3/wallets/kibisis'
+import Kibisis from '@/lib/web3/wallets/kibisis'
+import WalletConnect from '@/lib/web3/wallets/walletConnect'
+
+export const PROVIDER = {
+  'kibisis': Kibisis,
+  'walletconnect': WalletConnect
+}
 
 export enum PROVIDER_ID {
   KIBISIS = 'kibisis',
