@@ -46,6 +46,7 @@ async function create() {
       longToByteArray(price.value),
       algosdk.decodeAddress(props.parameters.feesAddress).publicKey]
 
+    console.log(appArgs)
     const txn = algosdk.makeApplicationCreateTxn(
       props.account.address,
       suggestedParams,

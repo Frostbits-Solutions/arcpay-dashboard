@@ -1,7 +1,8 @@
 import { ABIMethod } from 'algosdk'
 
-export function longToByteArray (long: number) {
+export function longToByteArray (long: number, n = 8) {
   const byteArray = [0, 0, 0, 0, 0, 0, 0, 0]
+
 
   for (let index = byteArray.length - 1; index >= 0; index--) {
     const byte = long & 0xff

@@ -2,6 +2,7 @@ export interface BuyTransactionParameters {
   seller: string,
   appIndex: number,
   nftAppID: number,
+  nftID: number,
   price: number,
   feesAddress: string,
 }
@@ -15,8 +16,7 @@ export interface CancelTransactionParameters {
 export interface CreateTransactionParameters {
   nftAppID: number,
   nftID: number,
-  feesAddress: string,
-  receiverAddress: string
+  feesAddress: string
 }
 
 export interface UpdateTransactionParameters {

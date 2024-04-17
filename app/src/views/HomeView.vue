@@ -1,30 +1,31 @@
 <script setup lang="ts">
 import { TransactionModal, TRANSACTION_TYPE, CONVENTION_TYPE  } from '@/lib/web3'
 import { ref } from 'vue'
+import { fromHexString, toHexString } from '@/lib/web3/transactions/utils'
 
 const transactionType = ref(TRANSACTION_TYPE.buy)
 
 const parameters = {
   [TRANSACTION_TYPE.buy]: {
     seller: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
-    appIndex: 40424703,
+    appIndex: 40428838,
     nftAppID: 29105406,
-    price: 4 * 1_000_000,
+    price: 1 * 1_000_000,
     feesAddress: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
+    nftID: 603,
   },
   [TRANSACTION_TYPE.cancel]: {
     seller: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
-    appIndex: 40424703,
+    appIndex: 40427317,
     nftAppID: 29105406,
   },
   [TRANSACTION_TYPE.create]: {
     nftAppID: 29105406,
-    nftID: 584,
+    nftID: 603,
     feesAddress: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
-    receiverAddress: "6J4RO7U2WYQWOGWXQOZUTBBA46W4QSFL5HTHJWC5BZR53RSYRAOPAY7KPM"
   },
   [TRANSACTION_TYPE.update]: {
-    appIndex: 40424703,
+    appIndex: 40427317,
     feesAddress: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
   }
 }
