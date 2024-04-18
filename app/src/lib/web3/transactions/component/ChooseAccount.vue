@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 import type { Account } from '@/lib/web3/types'
+import { onMounted } from 'vue'
 
 defineProps<{ accounts: Account[]}>()
 const emits = defineEmits(['account'])
@@ -21,11 +22,16 @@ function chooseAccount (account: Account) {
   emits('account', account)
 }
 
-const acc = localStorage.getItem('gemsPayAccount')
-if (acc) {
-  const t = JSON.parse(acc)
-  emits('account', t)
+function onMountedHook () {
+  const acc = localStorage.getItem('gemsPayAccount')
+  if (acc) {
+    const t = JSON.parse(acc)
+    emits('account', t)
+  }
 }
+
+// @ts-ignore
+onMounted(onMountedHook)
 </script>
 
 <style scoped>

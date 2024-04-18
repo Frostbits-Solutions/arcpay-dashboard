@@ -1,7 +1,11 @@
-import { ABIMethod } from 'algosdk'
+import algosdk, { ABIMethod, Transaction } from 'algosdk'
 
-export function longToByteArray (long: number, n = 8) {
-  const byteArray = [0, 0, 0, 0, 0, 0, 0, 0]
+export function longToByteArray (long: number): Uint8Array
+export function longToByteArray (long: number, n = 32) {
+  const byteArray = []
+  for (let i = 0; i < n; i++) {
+    byteArray.push(0)
+  }
 
 
   for (let index = byteArray.length - 1; index >= 0; index--) {
@@ -49,4 +53,43 @@ export function concatUint8Array (a: Uint8Array, b: Uint8Array): Uint8Array {
   t.set(a, 0)
   t.set(b, a.length)
   return t
+}
+
+export async function simulateTxn (
+  transactions: {
+    appCallObjs: object[],
+    paymentObjs: object[]
+  },
+  algodClient: algosdk.Algodv2) {
+  const txns = []
+  for (const obj of transactions.appCallObjs) {
+    //@ts-ignore
+    txns.push(algosdk.makeApplicationCallTxnFromObject(obj))
+  }
+  for (const obj of transactions.paymentObjs) {
+    //@ts-ignore
+    txns.push(algosdk.makePaymentTxnWithSuggestedParamsFromObject(obj))
+  }
+
+  const txngroup = algosdk.assignGroupID(txns);
+  // Sign the transaction
+  const stxns = txns.map(algosdk.encodeUnsignedSimulateTransaction)
+  // Construct the simulation request
+  const request = new algosdk.modelsv2.SimulateRequest({
+    txnGroups: [
+      new algosdk.modelsv2.SimulateRequestTransactionGroup({
+        //@ts-ignore
+        txns: stxns.map(algosdk.decodeObj),
+      }),
+    ],
+    allowUnnamedResources: true,
+    allowEmptySignatures: true,
+  });
+
+  // Simulate the transaction group
+  const response = await algodClient
+    .simulateTransactions(request)
+    .do();
+
+  return response
 }

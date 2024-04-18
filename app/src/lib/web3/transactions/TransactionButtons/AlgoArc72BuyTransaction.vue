@@ -6,7 +6,13 @@
 import type { Account, BuyTransactionParameters } from '@/lib/web3/types'
 import type { BoxReference } from 'algosdk'
 import { useWeb3Store } from '@/stores/web3'
-import { concatUint8Array, encodeAppArgs, longToByteArray, toHexString } from '@/lib/web3/transactions/utils'
+import {
+  concatUint8Array,
+  encodeAppArgs,
+  longToByteArray,
+  simulateTxn,
+  toHexString
+} from '@/lib/web3/transactions/utils'
 import { arc72Schema } from '@/lib/web3/transactions/abi/arc72'
 
 const web3Store = useWeb3Store()
@@ -28,63 +34,88 @@ async function buy() {
 
   const appAddress = algosdk.getApplicationAddress(props.parameters.appIndex)
 
-  const accounts = [
-    props.parameters.seller,
-    props.parameters.feesAddress,
-  ]
-  const foreignApps = [props.parameters.nftAppID]
-
-  const preValidateAppArgs = [new TextEncoder().encode('pre_validate')]
-  const preValidateTxn = algosdk.makeApplicationCallTxnFromObject({
-    accounts: accounts,
-    appArgs: preValidateAppArgs,
-    appIndex: props.parameters.appIndex,
-    from: props.account.address,
-    foreignApps: foreignApps,
-    onComplete: algosdk.OnApplicationComplete.NoOpOC,
-    suggestedParams: suggestedParams
-  })
-
-  const payTxn = algosdk.makePaymentTxnWithSuggestedParams(
-    props.account.address,
-    appAddress,
-    props.parameters.price,
-    undefined, undefined,
-    suggestedParams)
-
-  const appArgs = [new TextEncoder().encode('buy')]
-
   const abi = new algosdk.ABIContract(arc72Schema)
   const abiMethod = abi.getMethodByName('arc72_transferFrom')
   const encodedElements = encodeAppArgs(abiMethod, [props.account.address, appAddress, props.parameters.nftID])
   const boxes: BoxReference[] = [
     {
-      appIndex: 0,
+      appIndex: props.parameters.appIndex,
       name: concatUint8Array(new Uint8Array([110]), encodedElements[3])
     },
     {
-      appIndex: 0,
+      appIndex: props.parameters.appIndex,
       name: concatUint8Array(encodedElements[1],encodedElements[1])
     },
     {
-      appIndex: 0,
+      appIndex: props.parameters.appIndex,
       name: concatUint8Array(new Uint8Array([98]), encodedElements[1])
     },
     {
-      appIndex: 0,
+      appIndex: props.parameters.appIndex,
       name: concatUint8Array(new Uint8Array([98]), encodedElements[2])
     }
   ]
-  console.log(boxes.map(x => toHexString(x.name)))
-  const appCallTxn = algosdk.makeApplicationCallTxnFromObject({
-    appArgs: appArgs,
-    appIndex: props.parameters.appIndex,
+
+  const preValidateAppArgs = [new TextEncoder().encode('pre_validate')]
+  const preValidateObj = {
     from: props.account.address,
-    foreignApps: foreignApps,
+    appIndex: props.parameters.appIndex,
     onComplete: algosdk.OnApplicationComplete.NoOpOC,
+    appArgs: preValidateAppArgs,
+    accounts: [
+      props.parameters.seller,
+      props.parameters.feesAddress,
+    ],
+    foreignApps: [props.parameters.nftAppID],
     suggestedParams: suggestedParams,
-    boxes
+  }
+
+
+  const payObj = {
+    from: props.account.address,
+    to: appAddress,
+    amount: props.parameters.price * 1_000_000,
+    suggestedParams
+  }
+
+  const appArgs = [new TextEncoder().encode('buy')]
+
+  const appCallObj = {
+    from: props.account.address,
+    appIndex: props.parameters.appIndex,
+    onComplete: algosdk.OnApplicationComplete.NoOpOC,
+    appArgs: appArgs,
+    suggestedParams,
+    // boxes
+  }
+
+  //@ts-ignore
+  const results = await simulateTxn({ appCallObjs: [preValidateObj, appCallObj], paymentObjs: [payObj]}, algodClient)
+
+  //@ts-ignore
+  console.log(results)
+
+  if (results?.txnGroups[0]?.failureMessage) {
+    throw {message: results?.txnGroups[0]?.failureMessage}
+  }
+
+  const foreignApps: Array<number|bigint> = []
+  //@ts-ignore
+  appCallObj.boxes = results.txnGroups[0].unnamedResourcesAccessed.boxes.map((x) => {
+    if (x.app !== 0 && x.app !== props.parameters.appIndex && !foreignApps.includes(x.app)){
+      foreignApps.push(x.app)
+    }
+    return {
+      appIndex: x.app,
+      name: x.name,
+    }
   })
+  //@ts-ignore
+  appCallObj.foreignApps = foreignApps
+  console.log(foreignApps)
+  const preValidateTxn = algosdk.makeApplicationCallTxnFromObject(preValidateObj)
+  const payTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject(payObj)
+  const appCallTxn = algosdk.makeApplicationCallTxnFromObject(appCallObj)
 
   const signedTxn = await web3Store.provider.signTransactions([preValidateTxn, payTxn, appCallTxn], true)
   emits('nextStep')
@@ -93,6 +124,11 @@ async function buy() {
   emits('nextStep')
   emits('done', confirmationSendTxn)
 }
+
+
+//0x6e0000000000000000000000000000000000000000000000000000000000000267
+//  6e0000000000000000000000000000000000000000000000000000000000000267
+
 </script>
 
 <style scoped>

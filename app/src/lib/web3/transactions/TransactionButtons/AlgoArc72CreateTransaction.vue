@@ -8,7 +8,7 @@ import { useWeb3Store } from '@/stores/web3'
 import {
   base64ToArrayBuffer, concatUint8Array,
   encodeAppArgs,
-  longToByteArray,
+  longToByteArray, simulateTxn,
   toHexString
 } from '@/lib/web3/transactions/utils'
 import { approvalProgram, clearProgram } from '@/lib/web3/transactions/contracts/algoArc72'
@@ -33,6 +33,7 @@ async function create() {
       throw { message: 'no provider initiated' }
     }
     emits('start')
+    price.value = price.value * 1_000_000
 
     const algosdk = web3Store.provider.algosdk
     const algodClient = web3Store.provider.algodClient
@@ -41,9 +42,9 @@ async function create() {
 
     const appArgs = [
       algosdk.decodeAddress(props.account.address).publicKey,
-      longToByteArray(props.parameters.nftAppID),
-      longToByteArray(props.parameters.nftID),
-      longToByteArray(price.value),
+      longToByteArray(props.parameters.nftAppID, 8),
+      longToByteArray(props.parameters.nftID, 32),
+      longToByteArray(price.value, 8),
       algosdk.decodeAddress(props.parameters.feesAddress).publicKey]
 
     console.log(appArgs)
@@ -73,15 +74,13 @@ async function create() {
     const suggestedParamsFund = await algodClient.getTransactionParams().do()
     const fundingAmount = 100_000 + 10_000
 
-    const fundAppTxn = algosdk.makePaymentTxnWithSuggestedParams(
-      props.account.address,
-      appAddr,
-      fundingAmount,
-      undefined,
-      undefined,
-      suggestedParamsFund,
-      undefined,
-    )
+    const fundAppObj = {
+      from: props.account.address,
+      to: appAddr,
+      amount: fundingAmount,
+      suggestedParams: suggestedParamsFund,
+    }
+
 
     const abi = new algosdk.ABIContract(arc72Schema)
     const abiMethod = abi.getMethodByName('arc72_approve')
@@ -89,30 +88,34 @@ async function create() {
 
     const appArgsFund = encodeAppArgs(abiMethod, args)
 
-    const boxes: BoxReference[] = [
-      {
-        appIndex: 0,
-        name: concatUint8Array(new Uint8Array([110]), appArgsFund[2])
-      }
-    ]
-
-    console.log(boxes.map(x => toHexString(x.name)))
-
     const obj = {
       suggestedParams: suggestedParams,
       from: props.account.address,
       appIndex: props.parameters.nftAppID,
       appArgs: appArgsFund,
       foreignApps: [props.parameters.nftAppID],
-      boxes: boxes,
+      onComplete: algosdk.OnApplicationComplete.NoOpOC,
     }
 
-    const sendTokenTxn = algosdk.makeApplicationCallTxnFromObject({
-      ...obj,
-      // accounts: accounts,
-      onComplete: algosdk.OnApplicationComplete.NoOpOC,
-      suggestedParams
+    //@ts-ignore
+    const results = await simulateTxn({ appCallObjs: [obj], paymentObjs: [fundAppObj]}, algodClient)
+
+    if (results?.txnGroups[0]?.failureMessage) {
+      throw {message: results?.txnGroups[0]?.failureMessage}
+    }
+
+    //@ts-ignore
+    obj.boxes = results.txnGroups[0].unnamedResourcesAccessed.boxes.map((x) => {
+      return {
+        appIndex: x.app,
+        name: x.name,
+      }
     })
+
+    //@ts-ignore
+    console.log(obj.boxes)
+    const fundAppTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject(fundAppObj)
+    const sendTokenTxn = algosdk.makeApplicationCallTxnFromObject(obj)
 
     const signedFundAppTxn = await web3Store.provider.signTransactions([fundAppTxn, sendTokenTxn], true)
 
@@ -125,6 +128,15 @@ async function create() {
     console.error(e)
   }
 }
+
+// const boxes: BoxReference[] = [
+//   {
+//     appIndex: 0,
+//     name: concatUint8Array(new Uint8Array([110]), appArgsFund[2])
+//   }
+// ]
+//
+// console.log(boxes.map(x => toHexString(x.name)))
 </script>
 
 <style scoped>

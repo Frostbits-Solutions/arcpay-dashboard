@@ -10,6 +10,7 @@
 
 <script setup lang="ts">
 import { PROVIDER_ID, PROVIDER_ICONS } from '@/lib/web3/constants'
+import { onMounted } from 'vue'
 
 const emit = defineEmits(['wallet'])
 
@@ -28,10 +29,15 @@ function chooseWallet (wallet: string) {
   emit('wallet', wallet)
 }
 
-const ls = localStorage.getItem('gemsPayWallet')
-if (ls) {
-  emit('wallet', ls)
+function onMountedHook () {
+  const ls = localStorage.getItem('gemsPayWallet')
+  if (ls) {
+    emit('wallet', ls)
+  }
 }
+
+// @ts-ignore
+onMounted(onMountedHook)
 </script>
 
 <style scoped>
