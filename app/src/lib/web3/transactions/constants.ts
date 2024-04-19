@@ -14,27 +14,27 @@ export enum CONVENTION_TYPE {
 export const TRANSACTIONS_STEPS = {
     [CONVENTION_TYPE.AlgoARC72]: {
       [TRANSACTION_TYPE.buy]: [
-        'Signing transaction',
-        'Sending the transaction',
-        'Done'
+        'Initiating purchase transaction, awaiting signature',
+        'Processing purchase transaction',
+        'Transaction complete, asset acquired'
       ],
       [TRANSACTION_TYPE.create]: [
-        'Creation of the application',
-        'Sending the transaction',
-        'Funding the application',
-        'Sending the funds',
-        'Done'
+        'Initiating listing creation, awaiting signature',
+        'Transmitting listing data',
+        'Allocating funds for listing, awaiting signature',
+        'Processing listing funding',
+        'Listing creation successful'
       ],
       [TRANSACTION_TYPE.cancel]: [
-        'Signing transaction',
-        'Sending the transaction',
-        'Done'
+        'Initiating cancellation transaction, awaiting signature',
+        'Processing cancellation request',
+        'Cancellation complete, listing removed'
       ],
       [TRANSACTION_TYPE.update]: [
-        'Input price',
-        'Signing update',
-        'Sending the transaction',
-        'Done'
+        'Enter new listing price', //This may be irrelevant because price is entered before clicking the button
+        'Initiating price update, awaiting signature',
+        'Processing price update transaction',
+        'Price update successful, listing modified'
       ],
   }
 }
