@@ -1,7 +1,6 @@
 import BaseClient from '../base';
 
 import {
-  base64ToBytes,
   bytesToBase64
 } from '@agoralabs-sh/algorand-provider'
 import type {
@@ -31,7 +30,7 @@ import type {
   ProviderMethods, RequestMessage,
   ResponseError,
   ResponseMessage,
-  SendRequestWithTimeoutOptions, SignTxnsParams, SignTxnsResult
+  SendRequestWithTimeoutOptions,
 } from '@/lib/web3/wallets/kibisis/type'
 import { generateUuid } from '@/lib/web3/wallets/kibisis/utils'
 import { base64ToArrayBuffer } from '@/lib/web3/transactions/utils'
@@ -186,7 +185,7 @@ class Kibisis extends BaseClient {
           //signers: [], // an empty array instructs the wallet to skip signing this transaction
         })
       }
-      // // @ts-ignore
+      //@ts-ignore
       const result: IBaseResult & ISignTxnsResult = await window.algorand.signTxns({
         txns
       });

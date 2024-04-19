@@ -1,6 +1,3 @@
-import type algosdk from 'algosdk'
-import type { Metadata, Network } from '../../types'
-
 export interface Arc0001SignTxns {
   authAddr?: string
   multisig?: string
@@ -12,15 +9,6 @@ export interface Arc0001SignTxns {
 export interface Arc0027Account {
   address: string
   name?: string
-}
-
-export interface KibisisClientConstructor {
-  metadata: Metadata
-  algosdk: typeof algosdk
-  algodClient: algosdk.Algodv2
-  genesisHash: string
-  methods: ProviderMethods[]
-  network: Network
 }
 
 export interface NetworkConfiguration {

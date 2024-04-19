@@ -4,26 +4,28 @@
 </template>
 
 <script setup lang="ts">
+import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
+
+import type { Account, CreateTransactionParameters } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'
+import { ref } from 'vue'
 import {
-  base64ToArrayBuffer, concatUint8Array,
+  base64ToArrayBuffer,
   encodeAppArgs,
-  longToByteArray, simulateTxn,
-  toHexString
+  longToByteArray
 } from '@/lib/web3/transactions/utils'
 import { approvalProgram, clearProgram } from '@/lib/web3/transactions/contracts/algoArc72'
-import { ref } from 'vue'
-import type { Account, CreateTransactionParameters } from '@/lib/web3/types'
 import { arc72Schema } from '@/lib/web3/transactions/abi/arc72'
-import type { BoxReference } from 'algosdk'
-import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
+import { Transaction } from '@/lib/web3/transactions/transaction'
+import type { AppCreateObject } from '@/lib/web3/types'
+import _algosdk from 'algosdk'
 
 const web3Store = useWeb3Store()
 const props = defineProps<{
     account: Account,
     parameters: CreateTransactionParameters
   }>()
-const emits = defineEmits(['start', 'nextStep', 'done'])
+const emits = defineEmits(['start', 'nextStep', 'done', 'error'])
 const price = ref(1)
 
 
@@ -32,35 +34,43 @@ async function create() {
     if (web3Store.provider === null) {
       throw { message: 'no provider initiated' }
     }
-    emits('start')
-    price.value = price.value * 1_000_000
-
     const algosdk = web3Store.provider.algosdk
-    const algodClient = web3Store.provider.algodClient
+    const algodClient = web3Store.provider.algodClient as _algosdk.Algodv2
 
+    emits('start')
+
+    /*** Creation of the application ***/
+    const _price = price.value * 1_000_000
     const suggestedParams = await algodClient.getTransactionParams().do()
-
     const appArgs = [
       algosdk.decodeAddress(props.account.address).publicKey,
       longToByteArray(props.parameters.nftAppID, 8),
       longToByteArray(props.parameters.nftID, 32),
-      longToByteArray(price.value, 8),
+      longToByteArray(_price, 8),
       algosdk.decodeAddress(props.parameters.feesAddress).publicKey]
 
-    console.log(appArgs)
-    const txn = algosdk.makeApplicationCreateTxn(
-      props.account.address,
-      suggestedParams,
-      algosdk.OnApplicationComplete.NoOpOC,
-      base64ToArrayBuffer(approvalProgram),
-      base64ToArrayBuffer(clearProgram),
-      0, 0, 7, 7,
-      appArgs
-    )
+    const appCreateObj =
+      {
+        from: props.account.address,
+        onComplete: algosdk.OnApplicationComplete.NoOpOC,
+        suggestedParams,
+        appArgs,
+        approvalProgram: base64ToArrayBuffer(approvalProgram),
+        clearProgram: base64ToArrayBuffer(clearProgram),
+        numGlobalInts: 7,
+        numGlobalByteSlices: 7,
+        numLocalInts: 0,
+        numLocalByteSlices: 0,
+      } as AppCreateObject
 
-    const signedTxn = await web3Store.provider.signTransactions([txn], false)
-    console.log(signedTxn)
+    const txns =
+      await new Transaction(
+        {
+          appCreates: [appCreateObj]
+        })
+        .createTxns(algosdk, algodClient)
 
+    const signedTxn = await web3Store.provider.signTransactions(txns, false)
     emits('nextStep')
 
     const confirmation = await web3Store.provider.sendRawTransactions(signedTxn)
@@ -68,9 +78,9 @@ async function create() {
     // @ts-ignore
     console.log(confirmation, confirmation['application-index'])
 
+    /*** Funding the application ***/
     // @ts-ignore
-    const appAddr = algosdk.getApplicationAddress(confirmation['application-index']
-    )
+    const appAddr = algosdk.getApplicationAddress(confirmation['application-index'])
     const suggestedParamsFund = await algodClient.getTransactionParams().do()
     const fundingAmount = 100_000 + 10_000
 
@@ -81,14 +91,12 @@ async function create() {
       suggestedParams: suggestedParamsFund,
     }
 
-
     const abi = new algosdk.ABIContract(arc72Schema)
     const abiMethod = abi.getMethodByName('arc72_approve')
     const args = [appAddr, props.parameters.nftID]
-
     const appArgsFund = encodeAppArgs(abiMethod, args)
 
-    const obj = {
+    const appCallObj = {
       suggestedParams: suggestedParams,
       from: props.account.address,
       appIndex: props.parameters.nftAppID,
@@ -97,46 +105,25 @@ async function create() {
       onComplete: algosdk.OnApplicationComplete.NoOpOC,
     }
 
-    //@ts-ignore
-    const results = await simulateTxn({ appCallObjs: [obj], paymentObjs: [fundAppObj]}, algodClient)
+    const txns2 =
+      await new Transaction(
+        {
+          appCalls: [appCallObj],
+          payments: [fundAppObj]
+        })
+        .createTxns(algosdk, algodClient)
 
-    if (results?.txnGroups[0]?.failureMessage) {
-      throw {message: results?.txnGroups[0]?.failureMessage}
-    }
 
-    //@ts-ignore
-    obj.boxes = results.txnGroups[0].unnamedResourcesAccessed.boxes.map((x) => {
-      return {
-        appIndex: x.app,
-        name: x.name,
-      }
-    })
-
-    //@ts-ignore
-    console.log(obj.boxes)
-    const fundAppTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject(fundAppObj)
-    const sendTokenTxn = algosdk.makeApplicationCallTxnFromObject(obj)
-
-    const signedFundAppTxn = await web3Store.provider.signTransactions([fundAppTxn, sendTokenTxn], true)
+    const signedFundAppTxn = await web3Store.provider.signTransactions(txns2, true)
 
     emits('nextStep')
 
     const confirmationSendFund = await web3Store.provider.sendRawTransactions(signedFundAppTxn)
-    emits('nextStep')
     emits('done', confirmationSendFund)
   } catch (e) {
-    console.error(e)
+    emits('error', e)
   }
 }
-
-// const boxes: BoxReference[] = [
-//   {
-//     appIndex: 0,
-//     name: concatUint8Array(new Uint8Array([110]), appArgsFund[2])
-//   }
-// ]
-//
-// console.log(boxes.map(x => toHexString(x.name)))
 </script>
 
 <style scoped>

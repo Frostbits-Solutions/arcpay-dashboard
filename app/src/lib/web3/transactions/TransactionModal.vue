@@ -9,6 +9,15 @@
     v-else-if="web3Store.account === null"
     @account="setAccount"/>
 
+  <done-information
+    :information="doneInformation"
+    v-else-if="doneInformation !== null"
+  />
+  <error-information
+    :information="errorInformation"
+    v-else-if="errorInformation !== null"
+  />
+
   <template v-else>
     <div class="flex-colum">
       <img :src="PROVIDER_ICONS[web3Store.account.providerId]">
@@ -20,7 +29,8 @@
       :parameters="parameters"
       @start="currentTransactionStep = 0"
       @next-step="currentTransactionStep++"
-      @done="console.log"
+      @done="(d) => doneInformation = d"
+      @error="(e) => errorInformation = e"
       v-show="currentTransactionStep === null"
     />
     <TransactionStepsPreview
@@ -38,23 +48,27 @@
 </template>
 
 <script setup lang="ts">
+import ChooseWallet from '@/lib/web3/transactions/component/ChooseWallet.vue'
+import ChooseAccount from '@/lib/web3/transactions/component/ChooseAccount.vue'
+import TransactionStepsPreview from '@/lib/web3/transactions/component/TransactionStepsPreview.vue'
+import DoneInformation from '@/lib/web3/transactions/component/DoneInformation.vue'
+import ErrorInformation from '@/lib/web3/transactions/component/ErrorInformation.vue'
+
 import type { PROVIDER_ID } from '@/lib/web3/constants'
 import type { Account } from '@/lib/web3/types'
 import type { TransactionParameters } from '@/lib/web3/types/transactions'
 import type { Ref } from 'vue'
 
-import ChooseWallet from '@/lib/web3/transactions/component/ChooseWallet.vue'
-import ChooseAccount from '@/lib/web3/transactions/component/ChooseAccount.vue'
+import { ref } from 'vue'
+import { useWeb3Store } from '@/stores/web3.js'
 import {
   TRANSACTION_TYPE,
   CONVENTION_TYPE,
   TRANSACTIONS_BUTTONS,
   TRANSACTIONS_STEPS
 } from '@/lib/web3/transactions/constants'
-import { ref } from 'vue'
-import { useWeb3Store } from '@/stores/web3.js'
 import { PROVIDER, PROVIDER_ICONS } from '@/lib/web3/constants'
-import TransactionStepsPreview from '@/lib/web3/transactions/component/TransactionStepsPreview.vue'
+
 
 defineProps < {
   transactionType: TRANSACTION_TYPE,
@@ -65,6 +79,8 @@ defineProps < {
 const web3Store = useWeb3Store()
 const reload = ref(0)
 const currentTransactionStep: Ref<null | number> = ref(null)
+const doneInformation: Ref<null | object> = ref(null)
+const errorInformation: Ref<null | object> = ref(null)
 
 async function setWalletId (_walletId: PROVIDER_ID) {
   const provider = await PROVIDER[_walletId].init()
@@ -100,7 +116,6 @@ function resetWallet () {
 function getShortAddress (address: string): string {
   return `${address.slice(0,4)}...${address.slice(address.length - 5, address.length - 1)}`
 }
-
 </script>
 
 <style scoped>

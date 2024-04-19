@@ -8,7 +8,7 @@ const transactionType = ref(TRANSACTION_TYPE.buy)
 const parameters = {
   [TRANSACTION_TYPE.buy]: {
     seller: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
-    appIndex: 40429952,
+    appIndex: 40432228,
     nftAppID: 29105406,
     price: 1,
     feesAddress: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
@@ -21,7 +21,7 @@ const parameters = {
   },
   [TRANSACTION_TYPE.create]: {
     nftAppID: 29105406,
-    nftID: 609,
+    nftID: 605,
     feesAddress: "UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY",
   },
   [TRANSACTION_TYPE.update]: {

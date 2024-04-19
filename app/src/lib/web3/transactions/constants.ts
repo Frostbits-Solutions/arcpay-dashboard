@@ -48,3 +48,5 @@ export const TRANSACTIONS_BUTTONS = {
     [TRANSACTION_TYPE.update]: AlgoArc72UpdateTransaction,
   }
 }
+
+export const SIMULATION_ERROR = 4010
