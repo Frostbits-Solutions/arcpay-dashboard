@@ -91,7 +91,7 @@ class Kibisis extends BaseClient {
           data: {
             method
           },
-          message: `no response from provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
+          message: `No response from wallet provider "${PROVIDER_ID.KIBISIS.toUpperCase()}"`,
           providerId: ARC_0027_PROVIDER_ID
         } as ResponseError<{ method: ProviderMethods }>)
       }, timeout || DEFAULT_REQUEST_TIMEOUT)
@@ -120,7 +120,7 @@ class Kibisis extends BaseClient {
     if (!window.algorand) {
       throw {
         code: NO_ALGO_WALLET_INSTALLED,
-        message: 'no algowallet installed as an extension of the browser'.toUpperCase()
+        message: 'No compatible browser extension wallet installed'// This error is thrown even if there is a compatible extension installed. Tested using Edge with Kibisis.
       };
     }
 
@@ -129,7 +129,7 @@ class Kibisis extends BaseClient {
     if (!wallets.includes('kibisis')){
       throw {
         code: KIBISIS_NOT_INSTALLED,
-        message: 'kibisis not installed or detected'.toUpperCase()
+        message: 'Kibisis not installed or detected'
       };
     }
 
@@ -161,7 +161,7 @@ class Kibisis extends BaseClient {
       }
     } catch (error) {
       console.log(error)
-      throw new Error('Connection to Kibisis failed');
+      throw new Error('Kibisis connection failed');
     }
   }
 
