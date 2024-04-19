@@ -70,7 +70,7 @@ async function setWalletId (_walletId: PROVIDER_ID) {
   const provider = await PROVIDER[_walletId].init()
   const wallet = await provider.connect(() => {})
   if (wallet.accounts.length === 0) {
-    throw { message: 'account does not have any address'}
+    throw { message: 'Wallet does not have any accounts'}
   } else if (wallet.accounts.length === 1) {
     setAccount(wallet.accounts[0])
   }
