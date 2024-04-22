@@ -33,9 +33,10 @@ async function update() {
 
     const suggestedParams = await algodClient.getTransactionParams().do()
 
+    const _price = price.value * 1_000_000
     const appArgs = [
       new TextEncoder().encode('update_price'),
-      longToByteArray(price.value)]
+      longToByteArray(_price, 8)]
     const accounts = [props.parameters.feesAddress]
 
     const appCallObj: AppCallObject = {
