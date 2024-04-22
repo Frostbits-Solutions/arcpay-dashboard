@@ -1,18 +1,32 @@
-import { VoiArc72BuyTransaction, VoiArc72CancelTransaction, VoiArc72CreateTransaction, VoiArc72UpdateTransaction } from './TransactionButtons'
+import {
+  VoiArc72SaleBuyTransaction,
+  VoiArc72SaleCancelTransaction,
+  VoiArc72SaleCreateTransaction,
+  VoiArc72SaleUpdateTransaction
+} from './TransactionButtons'
 
 export enum TRANSACTION_TYPE {
   buy,
   create,
   cancel,
-  update
+  update,
+  bid
 }
 
 export enum CONVENTION_TYPE {
-  AlgoARC72
+  VoiARC72,
+  Arc200Arc72
+}
+
+export enum CONTRACT_TYPE {
+  Auction,
+  Sale,
+  Dutch
 }
 
 export const TRANSACTIONS_STEPS = {
-    [CONVENTION_TYPE.AlgoARC72]: {
+  [CONVENTION_TYPE.VoiARC72]: {
+    [CONTRACT_TYPE.Sale]: {
       [TRANSACTION_TYPE.buy]: [
         'Initiating purchase transaction, awaiting signature',
         'Processing purchase transaction',
@@ -36,16 +50,18 @@ export const TRANSACTIONS_STEPS = {
         'Processing price update transaction',
         'Price update successful, listing modified'
       ],
+    }
   }
 }
 
 export const TRANSACTIONS_BUTTONS = {
-
-  [CONVENTION_TYPE.AlgoARC72]: {
-    [TRANSACTION_TYPE.buy]: VoiArc72BuyTransaction,
-    [TRANSACTION_TYPE.cancel]: VoiArc72CancelTransaction,
-    [TRANSACTION_TYPE.create]: VoiArc72CreateTransaction,
-    [TRANSACTION_TYPE.update]: VoiArc72UpdateTransaction,
+  [CONVENTION_TYPE.VoiARC72]: {
+    [CONTRACT_TYPE.Sale]: {
+      [TRANSACTION_TYPE.buy]: VoiArc72SaleBuyTransaction,
+      [TRANSACTION_TYPE.cancel]: VoiArc72SaleCancelTransaction,
+      [TRANSACTION_TYPE.create]: VoiArc72SaleCreateTransaction,
+      [TRANSACTION_TYPE.update]: VoiArc72SaleUpdateTransaction,
+    }
   }
 }
 

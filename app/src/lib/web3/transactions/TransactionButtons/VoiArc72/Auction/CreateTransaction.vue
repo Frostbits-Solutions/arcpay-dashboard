@@ -10,7 +10,7 @@ import type { Account, AppCallObject, AppCreateObject, CreateTransactionParamete
 import { useWeb3Store } from '@/stores/web3'
 import { ref } from 'vue'
 import { base64ToArrayBuffer, encodeAppArgs, longToByteArray } from '@/lib/web3/transactions/utils'
-import { approvalProgram, clearProgram } from '@/lib/web3/transactions/contracts/voiArc72'
+import { approvalProgram, clearProgram } from './contract'
 import { arc72Schema } from '@/lib/web3/transactions/abi/arc72'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'

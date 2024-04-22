@@ -1,11 +1,11 @@
-import VoiArc72BuyTransaction from './VoiArc72BuyTransaction.vue'
-import VoiArc72CancelTransaction from './VoiArc72CancelTransaction.vue'
-import VoiArc72CreateTransaction from './VoiArc72CreateTransaction.vue'
-import VoiArc72UpdateTransaction from './VoiArc72UpdateTransaction.vue'
+import VoiArc72SaleBuyTransaction from './VoiArc72/Sale/BuyTransaction.vue'
+import VoiArc72SaleCancelTransaction from './VoiArc72/Sale/CancelTransaction.vue'
+import VoiArc72SaleCreateTransaction from './VoiArc72/Sale/CreateTransaction.vue'
+import VoiArc72SaleUpdateTransaction from './VoiArc72/Sale/UpdateTransaction.vue'
 
 export {
-  VoiArc72BuyTransaction,
-  VoiArc72CancelTransaction,
-  VoiArc72CreateTransaction,
-  VoiArc72UpdateTransaction
+  VoiArc72SaleBuyTransaction,
+  VoiArc72SaleCancelTransaction,
+  VoiArc72SaleCreateTransaction,
+  VoiArc72SaleUpdateTransaction
 }

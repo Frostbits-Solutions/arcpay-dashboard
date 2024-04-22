@@ -24,7 +24,7 @@
       <div>{{getShortAddress(web3Store.account.address)}}</div>
     </div>
     <component
-      :is="TRANSACTIONS_BUTTONS[conventionType][transactionType]"
+      :is="TRANSACTIONS_BUTTONS[conventionType][contractType][transactionType]"
       :account="web3Store.account"
       :parameters="parameters"
       @start="currentTransactionStep = 0"
@@ -35,7 +35,7 @@
     />
     <TransactionStepsPreview
       :current-step="currentTransactionStep"
-      :steps="TRANSACTIONS_STEPS[conventionType][transactionType]"
+      :steps="TRANSACTIONS_STEPS[conventionType][contractType][transactionType]"
       v-if="currentTransactionStep !== null"
     />
   </template>
@@ -65,7 +65,7 @@ import {
   TRANSACTION_TYPE,
   CONVENTION_TYPE,
   TRANSACTIONS_BUTTONS,
-  TRANSACTIONS_STEPS
+  TRANSACTIONS_STEPS, CONTRACT_TYPE
 } from '@/lib/web3/transactions/constants'
 import { PROVIDER, PROVIDER_ICONS } from '@/lib/web3/constants'
 
@@ -73,6 +73,7 @@ import { PROVIDER, PROVIDER_ICONS } from '@/lib/web3/constants'
 defineProps < {
   transactionType: TRANSACTION_TYPE,
   conventionType: CONVENTION_TYPE,
+  contractType: CONTRACT_TYPE,
   parameters: TransactionParameters
   }> ()
 
