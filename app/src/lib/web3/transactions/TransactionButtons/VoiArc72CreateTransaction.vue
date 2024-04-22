@@ -6,12 +6,11 @@
 <script setup lang="ts">
 import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
 
-import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters } from '@/lib/web3/types'
-import { PaymentObject } from '@/lib/web3/types'
+import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters, PaymentObject } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'
 import { ref } from 'vue'
 import { base64ToArrayBuffer, encodeAppArgs, longToByteArray } from '@/lib/web3/transactions/utils'
-import { approvalProgram, clearProgram } from '@/lib/web3/transactions/contracts/algoArc72'
+import { approvalProgram, clearProgram } from '@/lib/web3/transactions/contracts/voiArc72'
 import { arc72Schema } from '@/lib/web3/transactions/abi/arc72'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'

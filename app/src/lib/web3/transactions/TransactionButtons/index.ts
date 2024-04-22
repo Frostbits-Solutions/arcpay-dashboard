@@ -1,11 +1,11 @@
-import AlgoArc72BuyTransaction from './AlgoArc72BuyTransaction.vue'
-import AlgoArc72CancelTransaction from './AlgoArc72CancelTransaction.vue'
-import AlgoArc72CreateTransaction from './AlgoArc72CreateTransaction.vue'
-import AlgoArc72UpdateTransaction from './AlgoArc72UpdateTransaction.vue'
+import VoiArc72BuyTransaction from './VoiArc72BuyTransaction.vue'
+import VoiArc72CancelTransaction from './VoiArc72CancelTransaction.vue'
+import VoiArc72CreateTransaction from './VoiArc72CreateTransaction.vue'
+import VoiArc72UpdateTransaction from './VoiArc72UpdateTransaction.vue'
 
 export {
-  AlgoArc72BuyTransaction,
-  AlgoArc72CancelTransaction,
-  AlgoArc72CreateTransaction,
-  AlgoArc72UpdateTransaction
+  VoiArc72BuyTransaction,
+  VoiArc72CancelTransaction,
+  VoiArc72CreateTransaction,
+  VoiArc72UpdateTransaction
 }

@@ -1,4 +1,4 @@
-import { AlgoArc72BuyTransaction, AlgoArc72CancelTransaction, AlgoArc72CreateTransaction, AlgoArc72UpdateTransaction } from './TransactionButtons'
+import { VoiArc72BuyTransaction, VoiArc72CancelTransaction, VoiArc72CreateTransaction, VoiArc72UpdateTransaction } from './TransactionButtons'
 
 export enum TRANSACTION_TYPE {
   buy,
@@ -42,10 +42,10 @@ export const TRANSACTIONS_STEPS = {
 export const TRANSACTIONS_BUTTONS = {
 
   [CONVENTION_TYPE.AlgoARC72]: {
-    [TRANSACTION_TYPE.buy]: AlgoArc72BuyTransaction,
-    [TRANSACTION_TYPE.cancel]: AlgoArc72CancelTransaction,
-    [TRANSACTION_TYPE.create]: AlgoArc72CreateTransaction,
-    [TRANSACTION_TYPE.update]: AlgoArc72UpdateTransaction,
+    [TRANSACTION_TYPE.buy]: VoiArc72BuyTransaction,
+    [TRANSACTION_TYPE.cancel]: VoiArc72CancelTransaction,
+    [TRANSACTION_TYPE.create]: VoiArc72CreateTransaction,
+    [TRANSACTION_TYPE.update]: VoiArc72UpdateTransaction,
   }
 }
 
