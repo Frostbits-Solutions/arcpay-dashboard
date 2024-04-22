@@ -6,19 +6,16 @@
 <script setup lang="ts">
 import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
 
-import type { Account, CreateTransactionParameters } from '@/lib/web3/types'
+import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters } from '@/lib/web3/types'
+import { PaymentObject } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'
 import { ref } from 'vue'
-import {
-  base64ToArrayBuffer,
-  encodeAppArgs,
-  longToByteArray
-} from '@/lib/web3/transactions/utils'
+import { base64ToArrayBuffer, encodeAppArgs, longToByteArray } from '@/lib/web3/transactions/utils'
 import { approvalProgram, clearProgram } from '@/lib/web3/transactions/contracts/algoArc72'
 import { arc72Schema } from '@/lib/web3/transactions/abi/arc72'
 import { Transaction } from '@/lib/web3/transactions/transaction'
-import type { AppCreateObject } from '@/lib/web3/types'
 import _algosdk from 'algosdk'
+import { TransactionType } from 'algosdk/src/types/transactions'
 
 const web3Store = useWeb3Store()
 const props = defineProps<{
@@ -51,6 +48,7 @@ async function create() {
 
     const appCreateObj =
       {
+        type: TransactionType.appl,
         from: props.account.address,
         onComplete: algosdk.OnApplicationComplete.NoOpOC,
         suggestedParams,
@@ -64,10 +62,7 @@ async function create() {
       } as AppCreateObject
 
     const txns =
-      await new Transaction(
-        {
-          appCreates: [appCreateObj]
-        })
+      await new Transaction([appCreateObj])
         .createTxns(algosdk, algodClient)
 
     const signedTxn = await web3Store.provider.signTransactions(txns, false)
@@ -84,7 +79,8 @@ async function create() {
     const suggestedParamsFund = await algodClient.getTransactionParams().do()
     const fundingAmount = 100_000 + 10_000
 
-    const fundAppObj = {
+    const fundAppObj: PaymentObject = {
+      type: TransactionType.pay,
       from: props.account.address,
       to: appAddr,
       amount: fundingAmount,
@@ -96,7 +92,8 @@ async function create() {
     const args = [appAddr, props.parameters.nftID]
     const appArgsFund = encodeAppArgs(abiMethod, args)
 
-    const appCallObj = {
+    const appCallObj: AppCallObject = {
+      type: TransactionType.appl,
       suggestedParams: suggestedParams,
       from: props.account.address,
       appIndex: props.parameters.nftAppID,
@@ -106,11 +103,7 @@ async function create() {
     }
 
     const txns2 =
-      await new Transaction(
-        {
-          appCalls: [appCallObj],
-          payments: [fundAppObj]
-        })
+      await new Transaction([fundAppObj, appCallObj])
         .createTxns(algosdk, algodClient)
 
 

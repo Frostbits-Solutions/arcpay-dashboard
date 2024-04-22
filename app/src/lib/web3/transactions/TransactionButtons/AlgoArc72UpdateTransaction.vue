@@ -8,9 +8,10 @@ import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
 import { useWeb3Store } from '@/stores/web3'
 import { longToByteArray } from '@/lib/web3/transactions/utils'
 import { ref } from 'vue'
-import type { Account, UpdateTransactionParameters } from '@/lib/web3/types'
+import type { Account, AppCallObject, UpdateTransactionParameters } from '@/lib/web3/types'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'
+import { TransactionType } from 'algosdk/src'
 
 const web3Store = useWeb3Store()
 
@@ -37,7 +38,8 @@ async function update() {
       longToByteArray(price.value)]
     const accounts = [props.parameters.feesAddress]
 
-    const appCallObj = {
+    const appCallObj: AppCallObject = {
+      type: TransactionType.appl,
       appIndex: props.parameters.appIndex,
       from: props.account.address,
       onComplete: algosdk.OnApplicationComplete.NoOpOC,
@@ -45,7 +47,7 @@ async function update() {
       accounts,
       suggestedParams
     }
-    const txns = await new Transaction({appCalls: [appCallObj]}).createTxns(algosdk, algodClient)
+    const txns = await new Transaction([appCallObj]).createTxns(algosdk, algodClient)
     emits('nextStep')
 
     const signedTxn = await web3Store.provider.signTransactions(txns, false)

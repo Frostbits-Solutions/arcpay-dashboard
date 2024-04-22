@@ -7,6 +7,7 @@ import type { Account, BuyTransactionParameters } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'
+import { TransactionType } from 'algosdk/src/types/transactions'
 
 
 const web3Store = useWeb3Store()
@@ -31,6 +32,7 @@ async function buy() {
 
     const preValidateAppArgs = [new TextEncoder().encode('pre_validate')]
     const preValidateObj = {
+      type: TransactionType.appl,
       from: props.account.address,
       appIndex: props.parameters.appIndex,
       onComplete: algosdk.OnApplicationComplete.NoOpOC,
@@ -44,6 +46,7 @@ async function buy() {
     }
 
     const payObj = {
+      type: TransactionType.pay,
       from: props.account.address,
       to: appAddress,
       amount: props.parameters.price * 1_000_000,
@@ -51,8 +54,8 @@ async function buy() {
     }
 
     const appArgs = [new TextEncoder().encode('buy')]
-
     const appCallObj = {
+      type: TransactionType.appl,
       from: props.account.address,
       appIndex: props.parameters.appIndex,
       onComplete: algosdk.OnApplicationComplete.NoOpOC,
@@ -60,10 +63,7 @@ async function buy() {
       suggestedParams,
     }
 
-    const txns = await new Transaction({
-      appCalls: [preValidateObj, appCallObj],
-      payments: [payObj]
-    }).createTxns(algosdk, algodClient)
+    const txns = await new Transaction([preValidateObj, payObj, appCallObj]).createTxns(algosdk, algodClient)
 
     const signedTxn = await web3Store.provider.signTransactions(txns, true)
     emits('nextStep')

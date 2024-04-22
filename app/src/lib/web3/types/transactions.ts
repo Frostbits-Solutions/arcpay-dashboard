@@ -1,6 +1,8 @@
-import type { SuggestedParams } from 'algosdk'
+import type { BoxReference, SuggestedParams } from 'algosdk'
 import type { Expand, RenameProperties } from 'algosdk/src/types/utils'
 import type { AppCreateTxn, MustHaveSuggestedParams } from 'algosdk/src/types/transactions'
+import { TransactionType } from 'algosdk/src/types/transactions'
+import { OnApplicationComplete } from 'algosdk'
 
 export interface BuyTransactionParameters {
   seller: string,
@@ -35,6 +37,7 @@ export type TransactionParameters =
   UpdateTransactionParameters
 
 export type PaymentObject = {
+  type: TransactionType; // TransactionType.pay
   from: string;
   note?: Uint8Array | undefined;
   suggestedParams: SuggestedParams;
@@ -44,109 +47,58 @@ export type PaymentObject = {
   rekeyTo?: string | undefined; }
 
 export type TransfertObject = {
+  type: TransactionType; // TransactionType.axfer
   from: string;
-  note?: Uint8Array | undefined;
   suggestedParams: SuggestedParams;
   to: string;
   amount: number | bigint;
+  note?: Uint8Array | undefined;
   closeRemainderTo?: string | undefined;
   rekeyTo?: string | undefined;
   assetIndex: number;
   revocationTarget?: string | undefined;
 }
 
-export type AppCallObject = Expand<
-  Pick<
-    RenameProperties<
-      MustHaveSuggestedParams<AppCreateTxn>,
-      {
-        appOnComplete: 'onComplete';
-        appAccounts: 'accounts';
-        appForeignApps: 'foreignApps';
-        appForeignAssets: 'foreignAssets';
-        reKeyTo: 'rekeyTo';
-      }
-    >,
-    | 'from'
-    | 'suggestedParams'
-    | 'appIndex'
-    | 'onComplete'
-    | 'appArgs'
-    | 'accounts'
-    | 'foreignApps'
-    | 'foreignAssets'
-    | 'boxes'
-    | 'note'
-    | 'lease'
-    | 'rekeyTo'
-    | 'extraPages'
-  > &
-  Partial<
-    Pick<
-      RenameProperties<
-        MustHaveSuggestedParams<AppCreateTxn>,
-        {
-          appApprovalProgram: 'approvalProgram';
-          appClearProgram: 'clearProgram';
-          appLocalInts: 'numLocalInts';
-          appLocalByteSlices: 'numLocalByteSlices';
-          appGlobalInts: 'numGlobalInts';
-          appGlobalByteSlices: 'numGlobalByteSlices';
-        }
-      >,
-      | 'approvalProgram'
-      | 'clearProgram'
-      | 'numLocalInts'
-      | 'numLocalByteSlices'
-      | 'numGlobalInts'
-      | 'numGlobalByteSlices'
-    >
-  >
->
-
-export type AppCreateObject = Expand<
-  Pick<
-    RenameProperties<
-      MustHaveSuggestedParams<AppCreateTxn>,
-      {
-        appOnComplete: 'onComplete';
-        appApprovalProgram: 'approvalProgram';
-        appClearProgram: 'clearProgram';
-        appLocalInts: 'numLocalInts';
-        appLocalByteSlices: 'numLocalByteSlices';
-        appGlobalInts: 'numGlobalInts';
-        appGlobalByteSlices: 'numGlobalByteSlices';
-        appAccounts: 'accounts';
-        appForeignApps: 'foreignApps';
-        appForeignAssets: 'foreignAssets';
-        reKeyTo: 'rekeyTo';
-      }
-    >,
-    | 'from'
-    | 'suggestedParams'
-    | 'onComplete'
-    | 'approvalProgram'
-    | 'clearProgram'
-    | 'numLocalInts'
-    | 'numLocalByteSlices'
-    | 'numGlobalInts'
-    | 'numGlobalByteSlices'
-    | 'appArgs'
-    | 'accounts'
-    | 'foreignApps'
-    | 'foreignAssets'
-    | 'boxes'
-    | 'note'
-    | 'lease'
-    | 'rekeyTo'
-    | 'extraPages'
-  >
->
-
-
-export interface TransactionObjects {
-  appCalls?: AppCallObject[],
-  appCreates?: AppCreateObject[]
-  payments?: PaymentObject[],
-  transfers?: TransfertObject[]
+export type AppCallObject = {
+  type: TransactionType; // TransactionType.appl
+  from: string;
+  suggestedParams: SuggestedParams;
+  appIndex: number;
+  onComplete: OnApplicationComplete;
+  appArgs?: Uint8Array[];
+  accounts?: string[];
+  foreignApps?: number[];
+  foreignAssets?: number[];
+  boxes?: BoxReference[];
+  lease?: Uint8Array;
+  rekeyTo?: string,
+  note?: Uint8Array | undefined;
+  extraPages?: number;
 }
+
+export type AppCreateObject =
+  {
+    type: TransactionType, // TransactionType.appl
+    from: string;
+    suggestedParams: SuggestedParams;
+    onComplete: OnApplicationComplete;
+    numLocalInts: number;
+    numLocalByteSlices: number;
+    numGlobalInts: number;
+    numGlobalByteSlices: number;
+    approvalProgram: Uint8Array;
+    clearProgram: Uint8Array;
+    note?: Uint8Array | undefined;
+    appArgs?: Uint8Array[];
+    accounts?: string[];
+    foreignApps?: number[];
+    foreignAssets?: number[];
+    boxes?: BoxReference[];
+    lease?: Uint8Array;
+    rekeyTo?: string,
+    extraPages?: number;
+  }
+
+
+export type AppObject = AppCallObject | AppCreateObject
+export type TransactionObject = AppCallObject|AppCreateObject|PaymentObject|TransfertObject

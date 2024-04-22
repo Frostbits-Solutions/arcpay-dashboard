@@ -1,25 +1,21 @@
-import type {
-  TransactionObjects,
-  PaymentObject,
-  TransfertObject,
-  AppCallObject,
-  AppCreateObject
-} from '@/lib/web3/types'
 import type { BoxReference } from 'algosdk'
 import _algosdk from 'algosdk'
 import { SIMULATION_ERROR } from '@/lib/web3/transactions/constants'
+import { TransactionType } from 'algosdk/src/types/transactions'
+import type {
+  AppCallObject,
+  AppCreateObject,
+  PaymentObject,
+  TransactionObject,
+  TransfertObject,
+  AppObject
+} from '@/lib/web3/types'
 
 export class Transaction {
-  appCalls: AppCallObject[]
-  appCreates: AppCreateObject[]
-  payments: PaymentObject[]
-  transfers: TransfertObject[]
-  constructor (transactionsObj: TransactionObjects) {
 
-    this.appCalls = transactionsObj.appCalls ?? []
-    this.appCreates = transactionsObj.appCreates ?? []
-    this.payments = transactionsObj.payments ?? []
-    this.transfers = transactionsObj.transfers ?? []
+  objs: TransactionObject[]
+  constructor (transactionsObjs: TransactionObject[]) {
+    this.objs = transactionsObjs
   }
 
   async createTxns (algosdk: typeof _algosdk, algodClient: _algosdk.Algodv2) {
@@ -35,15 +31,21 @@ export class Transaction {
     console.log(results)
 
     if (results?.txnGroups[0]?.unnamedResourcesAccessed?.boxes) {
-      for (const obj of this.appCalls) {
+      for (const obj of this.objs) {
+        if (obj.type !== TransactionType.appl) {
+          continue
+        }
+        const appObj = obj as AppObject
         const foreignApps: Array<number> = []
-        obj.boxes = results
+
+        appObj.boxes = results
           .txnGroups[0]
           .unnamedResourcesAccessed
           .boxes
           .map((x) => {
             if (x.app !== 0 &&
-                x.app !== obj.appIndex &&
+                //@ts-ignore
+                x.app !== appObj?.appIndex &&
                 !foreignApps.includes(x.app as number)){
               foreignApps.push(x.app as number)
             }
@@ -52,32 +54,16 @@ export class Transaction {
               name: x.name,
             } as BoxReference
           })
-        if (obj.foreignApps) {
-          obj.foreignApps = [...obj.foreignApps, ...foreignApps]
+        if (appObj.foreignApps) {
+          appObj.foreignApps = [...appObj.foreignApps, ...foreignApps]
         } else {
-          obj.foreignApps = foreignApps
+          appObj.foreignApps = foreignApps
         }
-        console.log(obj.boxes, obj.foreignApps)
+        console.log(appObj.boxes, appObj.foreignApps)
       }
     }
 
-    const txns = []
-
-    for (const obj of this.payments) {
-      txns.push(algosdk.makePaymentTxnWithSuggestedParamsFromObject(obj))
-    }
-
-    for (const obj of this.transfers) {
-      txns.push(algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject(obj))
-    }
-
-    for (const obj of this.appCalls) {
-      txns.push(algosdk.makeApplicationCallTxnFromObject(obj))
-    }
-
-    for (const obj of this.appCreates) {
-      txns.push(algosdk.makeApplicationCreateTxnFromObject(obj))
-    }
+    const txns = this.objs.map(this._getTxn)
 
     return txns
   }
@@ -85,24 +71,8 @@ export class Transaction {
 
   async simulateTxn (algosdk: typeof _algosdk, algodClient: _algosdk.Algodv2) {
 
-    const txns = []
-
-    for (const obj of this.payments) {
-      txns.push(algosdk.makePaymentTxnWithSuggestedParamsFromObject(obj))
-    }
-
-    for (const obj of this.transfers) {
-      txns.push(algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject(obj))
-    }
-
-    for (const obj of this.appCalls) {
-      txns.push(algosdk.makeApplicationCallTxnFromObject(obj))
-    }
-
-    for (const obj of this.appCreates) {
-      txns.push(algosdk.makeApplicationCreateTxnFromObject(obj))
-    }
-
+    const txns = this.objs.map(this._getTxn)
+    console.log(txns)
     const txngroup = algosdk.assignGroupID(txns);
     // Sign the transaction
     const stxns = txns.map(algosdk.encodeUnsignedSimulateTransaction)
@@ -123,7 +93,27 @@ export class Transaction {
       .simulateTransactions(request)
       .do();
 
+    console.log(txns, stxns, response)
     return response
   }
 
+  _getTxn (obj: TransactionObject) {
+    switch (obj.type) {
+      case TransactionType.appl:
+        //@ts-ignore
+        if (obj?.appIndex) {
+          return _algosdk.makeApplicationCallTxnFromObject(obj as AppCallObject)
+        } else {
+          return _algosdk.makeApplicationCreateTxnFromObject(obj as AppCreateObject)
+        }
+      case TransactionType.pay:
+        return _algosdk.makePaymentTxnWithSuggestedParamsFromObject(obj as PaymentObject)
+      case TransactionType.axfer:
+        return _algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject(obj as TransfertObject)
+      default:
+        throw {
+          message: `transaction type ${obj.type} not implemented`
+        }
+    }
+  }
 }
