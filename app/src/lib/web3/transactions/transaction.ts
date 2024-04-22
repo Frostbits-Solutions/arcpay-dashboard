@@ -8,8 +8,9 @@ import type {
   PaymentObject,
   TransactionObject,
   TransfertObject,
-  AppObject
+  AppObject, AppDeleteObject
 } from '@/lib/web3/types'
+import { OnApplicationComplete } from 'algosdk/src/types/transactions/base'
 
 export class Transaction {
 
@@ -101,8 +102,10 @@ export class Transaction {
     switch (obj.type) {
       case TransactionType.appl:
         //@ts-ignore
-        if (obj?.appIndex) {
+        if ((obj as AppObject).appIndex) {
           return _algosdk.makeApplicationCallTxnFromObject(obj as AppCallObject)
+        } else if ((obj as AppObject).onComplete === OnApplicationComplete.DeleteApplicationOC) {
+          return _algosdk.makeApplicationDeleteTxnFromObject(obj as AppDeleteObject)
         } else {
           return _algosdk.makeApplicationCreateTxnFromObject(obj as AppCreateObject)
         }

@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { useWeb3Store } from '@/stores/web3'
-import type { Account, AppCallObject, CancelTransactionParameters } from '@/lib/web3/types'
+import type { Account, AppCallObject, AppDeleteObject, CancelTransactionParameters } from '@/lib/web3/types'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src'
@@ -32,11 +32,11 @@ async function cancel() {
     const foreignApps = [props.parameters.appIndex, props.parameters.nftAppID]
 
     const appArgs = [new TextEncoder().encode('cancel')]
-    const appCallObj: AppCallObject = {
+    const appCallObj: AppDeleteObject = {
       type: TransactionType.appl,
       from: props.account.address,
       appIndex: props.parameters.appIndex,
-      onComplete: algosdk.OnApplicationComplete.NoOpOC,
+      onComplete: algosdk.OnApplicationComplete.DeleteApplicationOC,
       accounts,
       appArgs,
       foreignApps,

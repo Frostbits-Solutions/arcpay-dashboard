@@ -71,7 +71,7 @@ export type AppCallObject = {
   foreignAssets?: number[];
   boxes?: BoxReference[];
   lease?: Uint8Array;
-  rekeyTo?: string,
+  rekeyTo?: string;
   note?: Uint8Array | undefined;
   extraPages?: number;
 }
@@ -95,10 +95,26 @@ export type AppCreateObject =
     foreignAssets?: number[];
     boxes?: BoxReference[];
     lease?: Uint8Array;
-    rekeyTo?: string,
+    rekeyTo?: string;
     extraPages?: number;
   }
 
+export type AppDeleteObject =
+{
+  type: TransactionType; // TransactionType.appl
+  from: string;
+  appIndex: number;
+  suggestedParams: SuggestedParams;
+  onComplete: OnApplicationComplete;
+  note?: Uint8Array | undefined;
+  appArgs?: Uint8Array[];
+  accounts?: string[];
+  foreignApps?: number[];
+  foreignAssets?: number[];
+  boxes?: BoxReference[];
+  lease?: Uint8Array;
+  rekeyTo?: string;
+}
 
-export type AppObject = AppCallObject | AppCreateObject
+export type AppObject = AppCallObject | AppCreateObject | AppDeleteObject
 export type TransactionObject = AppCallObject|AppCreateObject|PaymentObject|TransfertObject
