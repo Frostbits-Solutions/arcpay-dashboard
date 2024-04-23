@@ -34,10 +34,9 @@ export function fromHexString (hexString: string, radix = 16): Uint8Array {
   return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, radix)))
 }
 
-export function toHexString (bytes: Uint8Array): string
-export function toHexString (bytes: Uint8Array, n = 16): string {
+export function toHexString (bytes: Uint8Array): string {
   // @ts-ignore
-  return bytes.reduce((str, byte) => str + byte.toString(n).padStart(2, '0'), '');
+  return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
 }
 
 export function encodeAppArgs (abiMethod: ABIMethod,  args: any[]) {

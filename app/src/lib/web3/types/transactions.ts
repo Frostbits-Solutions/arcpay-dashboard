@@ -13,6 +13,10 @@ export interface BuyTransactionParameters {
   feesAddress: string,
 }
 
+export interface BuyWArc200TransactionParameters extends BuyTransactionParameters {
+  arc200AppID: number,
+}
+
 export interface CancelTransactionParameters {
   seller: string,
   appIndex: number,
