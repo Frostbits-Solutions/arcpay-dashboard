@@ -11,7 +11,7 @@ export const INVALID_GROUP_ID_ERROR = 4201
 
 export const ALGORAND_CHAINS: { [key in PublicNetwork]: string } = {
   mainnet: 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k',
-  testnet: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDe',
+  testnet: 'algorand:IXnoWtviVVJW5LGivNFc0Dq14V3kqaXu',
   betanet: 'algorand:mFgazF-2uRS1tMiL9dsj01hJGySEmPN2'
 }
 

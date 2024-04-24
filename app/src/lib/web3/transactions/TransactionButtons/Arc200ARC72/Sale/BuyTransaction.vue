@@ -9,7 +9,7 @@
 import type { Account, BuyWArc200TransactionParameters, AppCallObject } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'
 import { Transaction } from '@/lib/web3/transactions/transaction'
-import _algosdk from 'algosdk'
+import _algosdk, { AtomicTransactionComposer } from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
 import { encodeAppArgs, fromHexString, toHexString } from '@/lib/web3/transactions/utils'
 import arc200Schema from '@/lib/web3/transactions/abi/arc200'
@@ -39,6 +39,7 @@ async function buy() {
     const abiMethod = abi.getMethodByName('arc200_transfer')
     const args = [appAddress, props.parameters.price]
     const arc200AppArgs = encodeAppArgs(abiMethod, args)
+
 
     const fundArc200Obj = {
       type: TransactionType.pay,
@@ -83,7 +84,12 @@ async function buy() {
       suggestedParams,
     }
 //[arc200ApproveObj, preValidateObj, appCallObj]
-    const txns = await new Transaction([fundArc200Obj, arc200ApproveObj, preValidateObj, appCallObj]).createTxns(algosdk, algodClient)
+    const txns = await new Transaction([
+      fundArc200Obj,
+      arc200ApproveObj,
+      preValidateObj,
+      appCallObj
+    ]).createTxns(algosdk, algodClient)
 
     const signedTxn = await web3Store.provider.signTransactions(txns, true)
     emits('nextStep')

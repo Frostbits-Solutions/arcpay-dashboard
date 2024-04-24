@@ -27,7 +27,7 @@ const props = defineProps<{
   }>()
 const emits = defineEmits(['start', 'nextStep', 'done', 'error'])
 const price = ref(1)
-const arc200AppID = ref(6795477)
+const arc200AppID = ref(40427782)
 
 async function create() {
   try {
@@ -47,7 +47,7 @@ async function create() {
       longToByteArray(props.parameters.nftAppID, 8),
       longToByteArray(props.parameters.nftID, 32),
       longToByteArray(arc200AppID.value, 8),
-      longToByteArray(_price, 8),
+      longToByteArray(_price, 32),
       algosdk.decodeAddress(props.parameters.feesAddress).publicKey,
       algosdk.decodeAddress(algosdk.getApplicationAddress(arc200AppID.value)).publicKey
     ]

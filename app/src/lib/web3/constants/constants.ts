@@ -19,10 +19,10 @@ export const PROVIDER_ICONS: {[key: string]: string} = {
   walletconnect: iconWalletconnect,
 }
 
-export const GEMS_PAY_METADA = {
-  name: 'Gems pay',
+export const ARC_PAY_METADA = {
+  name: 'ARC pay',
   description: 'Example Dapp',
-  url: '#',
+  url: '#1',
   icons: ['https://walletconnect.com/walletconnect-logo.png']
 }
 

@@ -32,6 +32,7 @@ export class Transaction {
     console.log(results)
 
     if (results?.txnGroups[0]?.unnamedResourcesAccessed?.boxes) {
+      let boxesStart = 0
       for (const obj of this.objs) {
         if (obj.type !== TransactionType.appl) {
           continue
@@ -56,14 +57,19 @@ export class Transaction {
             } as BoxReference
           })
         if (appObj.foreignApps) {
-          appObj.foreignApps = [...appObj.foreignApps, ...foreignApps]
+          appObj.foreignApps = Array.from(new Set([...appObj.foreignApps, ...foreignApps]))
         } else {
           appObj.foreignApps = foreignApps
         }
-        console.log(appObj.boxes, appObj.foreignApps)
+        if (appObj.boxes.length + (appObj.accounts?.length || 0) + appObj.foreignApps.length > 8) {
+          const nextStart = boxesStart + 8 - ((appObj.accounts?.length || 0) + appObj.foreignApps.length)
+          console.log(nextStart)
+          appObj.boxes = appObj.boxes.slice(boxesStart, nextStart)
+          boxesStart = nextStart
+        }
+        console.log(appObj.boxes, appObj.foreignApps, appObj.accounts)
       }
     }
-
     const txns = this.objs.map(this._getTxn)
 
     return txns

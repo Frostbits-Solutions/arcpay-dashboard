@@ -7,15 +7,17 @@ import type {
 
 import _algosdk, { assignGroupID, Transaction } from 'algosdk'
 import BaseClient from '@/lib/web3/wallets/base'
-import { DEFAULT_NETWORK, GEMS_PAY_METADA, PROVIDER_ID } from '@/lib/web3/constants'
+import { DEFAULT_NETWORK, ARC_PAY_METADA, PROVIDER_ID } from '@/lib/web3/constants'
 import { ALGORAND_CHAINS, ICON } from './constants'
 import type { WalletProvider } from '../../types'
 import { base64ToBytes, bytesToBase64 } from '@agoralabs-sh/algorand-provider'
 import { formatJsonRpcRequest } from '@/lib/web3/wallets/walletConnect/utils'
 import Algod from '@/lib/web3/algod'
 
+let client;
+
 class WalletConnect extends BaseClient {
-  #client: WalletConnectModalSign
+  client: WalletConnectModalSign
   metadata: WalletProvider
   chain: string
 
@@ -28,16 +30,19 @@ class WalletConnect extends BaseClient {
     algodClient: _algosdk.Algodv2
   ) {
     super(algosdk, algodClient)
-    this.#client = new WalletConnectModalSign(  {
-        projectId: 'c9e0989a78ab0eda6ef031f0954475ff',
-        metadata: GEMS_PAY_METADA
+    this.client = new WalletConnectModalSign(  {
+        projectId: '6d7fb9e0cab661a9f36d9b29584ff120',
+        metadata: ARC_PAY_METADA
       })
+    client = this.client
     this.metadata = {
       id: PROVIDER_ID.WALLETCONNECT,
       name: PROVIDER_ID.WALLETCONNECT.toUpperCase(),
       icon: ICON,
       isWalletConnect: false,
     }
+    // @ts-ignore
+    console.log(ALGORAND_CHAINS[DEFAULT_NETWORK])
     // @ts-ignore
     this.chain = ALGORAND_CHAINS[DEFAULT_NETWORK]
   }
@@ -46,13 +51,13 @@ class WalletConnect extends BaseClient {
   async connect(onDisconnect: () => void, args?: any) {
     const requiredNamespaces = {
       algorand: {
-        chains: ['algorand:testnet'],
+        chains: [this.chain],
         methods: ['algo_signTxn'],
         events: []
       }
     }
 
-    const session = await this.#client.connect({
+    const session = await this.client.connect({
       requiredNamespaces
     })
     const { accounts } = session.namespaces.algorand
@@ -65,9 +70,12 @@ class WalletConnect extends BaseClient {
 
   async disconnect() {
     try {
-      const session = await this.#getSession()
+      const session = await this.client.getSession()
+      if (typeof session === 'undefined') {
+        throw new Error('Session is not connected')
+      }
 
-      await this.#client.disconnect({
+      await this.client.disconnect({
         topic: session.topic,
         // replicates getSdkError('USER_DISCONNECTED') from @walletconnect/utils
         reason: {
@@ -81,7 +89,7 @@ class WalletConnect extends BaseClient {
   }
 
   async reconnect(onDisconnect: () => void) {
-    const session: WalletConnectModalSignSession | undefined = await this.#client.getSession()
+    const session: WalletConnectModalSignSession | undefined = await this.client.getSession()
     if (typeof session === 'undefined') {
       return null
     }
@@ -95,6 +103,8 @@ class WalletConnect extends BaseClient {
   }
 
   async signTransactions(transactions: Transaction[], isAtomicTransactions: Boolean) {
+    // @ts-ignore
+    console.log(this, client)
     if (isAtomicTransactions) {
       assignGroupID(transactions);
     }
@@ -108,18 +118,21 @@ class WalletConnect extends BaseClient {
     }
 
     const request = formatJsonRpcRequest('algo_signTxn', [txns])
-
-    const session = await this.#getSession()
-
-    const response = await this.#client.request<Array<string | null>>({
+// @ts-ignore
+    const session = await client.getSession()
+    if (typeof session === 'undefined') {
+      throw new Error('Session is not connected')
+    }
+// @ts-ignore
+    const response = await client.request<Array<string | null>>({
       chainId: this.chain,
       topic: session.topic,
       request
     })
     console.log(response)
 
-    let signedTransactionBytes: Uint8Array[] = []
-    for (let stxn of response) {
+    const signedTransactionBytes: Uint8Array[] = []
+    for (const stxn of response) {
       if (typeof stxn === 'string'){
         signedTransactionBytes.push(base64ToBytes(stxn))
       }
@@ -128,13 +141,13 @@ class WalletConnect extends BaseClient {
     return signedTransactionBytes
   }
 
-  async #getSession() {
-    const session: WalletConnectModalSignSession | undefined = await this.#client.getSession()
-    if (typeof session === 'undefined') {
-      throw new Error('Session is not connected')
-    }
-    return session
-  }
+  // async #getSession() {
+  //   const session: WalletConnectModalSignSession | undefined = await this.client.getSession()
+  //   if (typeof session === 'undefined') {
+  //     throw new Error('Session is not connected')
+  //   }
+  //   return session
+  // }
 
   #mapAccounts(accounts: string[]) {
     return accounts.map((accountStr, index) => ({
