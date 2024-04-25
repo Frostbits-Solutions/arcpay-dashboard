@@ -31,7 +31,7 @@ class WalletConnect extends BaseClient {
   ) {
     super(algosdk, algodClient)
     this.client = new WalletConnectModalSign(  {
-        projectId: '6d7fb9e0cab661a9f36d9b29584ff120',
+        projectId: import.meta.env.WALLET_CONNECT_PROJECT_ID,
         metadata: ARC_PAY_METADA
       })
     client = this.client

@@ -29,7 +29,7 @@ export class Transaction {
         message: results?.txnGroups[0]?.failureMessage
       }
     }
-    console.log(results)
+    console.log(results, results?.txnGroups[0]?.unnamedResourcesAccessed?.boxes)
 
     if (results?.txnGroups[0]?.unnamedResourcesAccessed?.boxes) {
       let boxesStart = 0
@@ -40,6 +40,10 @@ export class Transaction {
         const appObj = obj as AppObject
         const foreignApps: Array<number> = []
 
+        console.log(results
+          .txnGroups[0]
+          .unnamedResourcesAccessed
+          .boxes)
         appObj.boxes = results
           .txnGroups[0]
           .unnamedResourcesAccessed

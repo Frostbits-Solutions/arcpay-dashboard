@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { TransactionModal, TRANSACTION_TYPE, CONVENTION_TYPE } from '@/lib/web3'
 import { ref } from 'vue'
-import { fromHexString, toHexString } from '@/lib/web3/transactions/utils'
+import { CONTRACT_TYPE } from '@/lib/web3/transactions/constants'
 
 const transactionType = ref(TRANSACTION_TYPE.buy)
 
 const parameters = {
     [TRANSACTION_TYPE.buy]: {
         seller: 'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
-        appIndex: 40429952,
+        appIndex: 42034509,
         nftAppID: 29105406,
-        price: 1,
-        feesAddress:
-            'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
-        nftID: 609,
+        price: 2,
+        feesAddress: 'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
+        nftID: 602,
     },
     [TRANSACTION_TYPE.cancel]: {
         seller: 'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
@@ -22,7 +21,7 @@ const parameters = {
     },
     [TRANSACTION_TYPE.create]: {
         nftAppID: 29105406,
-        nftID: 609,
+        nftID: 602,
         feesAddress:
             'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
     },
@@ -38,7 +37,8 @@ const parameters = {
     <main>
         <TransactionModal
             :transactionType="transactionType"
-            :conventionType="CONVENTION_TYPE.AlgoARC72"
+            :conventionType="CONVENTION_TYPE.VoiARC72"
+            :contractType="CONTRACT_TYPE.Dutch"
             :parameters="parameters[transactionType]"
         />
 

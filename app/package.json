@@ -21,6 +21,7 @@
     "@walletconnect/web3wallet": "^1.11.1",
     "algosdk": "^2.7.0",
     "arccjs": "^2.7.6",
+    "flowbite": "^2.3.0",
     "open-props": "^1.7.3",
     "pinia": "^2.1.7",
     "ulujs": "^0.3.4",

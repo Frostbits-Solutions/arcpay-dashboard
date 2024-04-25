@@ -1,5 +1,7 @@
 <template>
-  <ChoosePrice v-model="price"/>
+  <ChoosePrice v-model="priceMin"/>
+  <ChoosePrice v-model="priceMax"/>
+  <input type="number" v-model="endDate">h
   <button @click="create">Create</button>
 </template>
 
@@ -22,7 +24,9 @@ const props = defineProps<{
     parameters: CreateTransactionParameters
   }>()
 const emits = defineEmits(['start', 'nextStep', 'done', 'error'])
-const price = ref(1)
+const priceMin = ref(1)
+const priceMax = ref(2)
+const endDate = ref(1)
 
 
 async function create() {
@@ -36,14 +40,19 @@ async function create() {
     emits('start')
 
     /*** Creation of the application ***/
-    const _price = price.value * 1_000_000
+    const _priceMin = priceMin.value * 1_000_000
+    const _priceMax = priceMax.value * 1_000_000
     const suggestedParams = await algodClient.getTransactionParams().do()
     const appArgs = [
       algosdk.decodeAddress(props.account.address).publicKey,
       longToByteArray(props.parameters.nftAppID, 8),
       longToByteArray(props.parameters.nftID, 32),
-      longToByteArray(_price, 8),
-      algosdk.decodeAddress(props.parameters.feesAddress).publicKey]
+      longToByteArray(_priceMax, 8),
+      longToByteArray(_priceMin, 8),
+      algosdk.decodeAddress(props.parameters.feesAddress).publicKey,
+      longToByteArray(Date.now() / 1_000, 8),
+      longToByteArray((Date.now() + endDate.value * 3_600_000) / 1_000, 8),
+    ]
 
     const appCreateObj =
       {
@@ -73,7 +82,7 @@ async function create() {
     console.log(confirmation, confirmation['application-index'])
 
     /*** Funding the application ***/
-    // @ts-ignore
+      // @ts-ignore
     const appAddr = algosdk.getApplicationAddress(confirmation['application-index'])
     const suggestedParamsFund = await algodClient.getTransactionParams().do()
     const fundingAmount = 100_000 + 10_000
