@@ -97,11 +97,11 @@ onMounted(() => {
 <template>
   <main class="min-h-dvh pl-16 pt-16">
     <div class="max-w-screen-xl mx-auto p-10">
-      <h4 class="text-2xl font-bold dark:text-white">Account settings</h4>
+      <h4 class="text-2xl font-bold dark:text-white">Organization settings</h4>
 
       <!-- account details -->
       <AccountSettingsCard>
-        <template #title>Account name</template>
+        <template #title>Organization name</template>
         <template #body>
           <div class="relative my-4">
             <input id="account-name" type="text" class="col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" :value="accounts?.active?.name" disabled readonly>
@@ -112,7 +112,7 @@ onMounted(() => {
       <!-- account members -->
       <AccountSettingsCard>
         <template #title>Users</template>
-        <template #description>Users can login to the account to create and manage listings. Only owner and admins can change accounts settings.</template>
+        <template #description>Users can login to the organization's account to create and manage listings. Only owner and admins can change the organization settings.</template>
         <template #body>
           <div class="relative">
             <div class="flex items-center justify-between pb-4">
@@ -249,7 +249,7 @@ onMounted(() => {
       <!-- account addresses -->
       <AccountSettingsCard>
         <template #title>Addresses</template>
-        <template #description>Link addresses to you account to create listings.</template>
+        <template #description>Link addresses to you organization to create listings from these addresses.</template>
         <template #body>
           <div class="relative">
             <div class="flex items-center justify-between pb-4">

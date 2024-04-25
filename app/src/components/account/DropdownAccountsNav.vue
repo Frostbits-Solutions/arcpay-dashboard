@@ -35,12 +35,12 @@ function showCreateAccountModal(hide: (() => void) | undefined) {
             </a>
           </li>
           <li v-if="!accounts.all.length" class="px-4 py-2 text-xs">
-            Create an account to get started
+            Create an organization to get started
           </li>
         </ul>
         <button @click="showCreateAccountModal(slotProps?.hide)" class="flex w-full items-center p-3 text-xs font-medium text-blue-600 border-t border-gray-200 rounded-b-lg dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-blue-500 hover:underline">
           <IconPlus class="w-4 h-4 me-2"/>
-          Create new account
+          Create new organization
         </button>
     </template>
   </DropdownComponent>
