@@ -35,7 +35,7 @@
     />
     <TransactionStepsPreview
       :current-step="currentTransactionStep"
-      :steps="TRANSACTIONS_STEPS[conventionType][contractType][transactionType]"
+      :steps="TRANSACTIONS_STEPS[transactionType]"
       v-if="currentTransactionStep !== null"
     />
   </template>

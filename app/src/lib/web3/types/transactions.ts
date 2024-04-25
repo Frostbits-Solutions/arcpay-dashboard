@@ -17,6 +17,15 @@ export interface BuyWArc200TransactionParameters extends BuyTransactionParameter
   arc200AppID: number,
 }
 
+export interface BidTransactionParameters {
+  seller: string,
+  appIndex: number,
+  nftAppID: number,
+  nftID: number,
+  minPrice: number,
+  feesAddress: string,
+}
+
 export interface CancelTransactionParameters {
   seller: string,
   appIndex: number,

@@ -31,6 +31,20 @@ export class Transaction {
     }
     console.log(results, results?.txnGroups[0]?.unnamedResourcesAccessed?.boxes)
 
+    if (results?.txnGroups[0]?.unnamedResourcesAccessed?.accounts) {
+      for (const obj of this.objs) {
+        if (obj.type !== TransactionType.appl) {
+          continue
+        }
+        const appObj = obj as AppObject
+        const accounts = results?.txnGroups[0]?.unnamedResourcesAccessed?.accounts
+        if (appObj.accounts) {
+          appObj.accounts = Array.from(new Set([...appObj.accounts, ...accounts]))
+        } else {
+          appObj.accounts = accounts
+        }
+      }
+    }
     if (results?.txnGroups[0]?.unnamedResourcesAccessed?.boxes) {
       let boxesStart = 0
       for (const obj of this.objs) {

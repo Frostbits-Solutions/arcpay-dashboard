@@ -1,25 +1,21 @@
 <template>
-  <ChoosePrice :min="parameters.minPrice" v-model="price"/>
-  <button @click="buy">bid</button>
+  <button @click="buy">buy</button>
 </template>
 
 <script setup lang="ts">
-import type { Account, BidTransactionParameters } from '@/lib/web3/types'
+import type { Account, BuyTransactionParameters } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
-import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
-import { ref } from 'vue'
 
 
 const web3Store = useWeb3Store()
 const props = defineProps<{
   account: Account,
-  parameters: BidTransactionParameters
+  parameters: BuyTransactionParameters
 }>()
 const emits = defineEmits(['start', 'nextStep', 'done', 'error'])
-const price = ref(props.parameters.minPrice)
 
 async function buy() {
   try {
@@ -34,15 +30,16 @@ async function buy() {
 
     const appAddress = algosdk.getApplicationAddress(props.parameters.appIndex)
 
+
     const payObj = {
       type: TransactionType.pay,
       from: props.account.address,
       to: appAddress,
-      amount: price.value * 1_000_000,
+      amount: props.parameters.price * 1_000_000,
       suggestedParams
     }
 
-    const appArgs = [new TextEncoder().encode('bid')]
+    const appArgs = [new TextEncoder().encode('buy')]
     const appCallObj = {
       type: TransactionType.appl,
       from: props.account.address,

@@ -1,6 +1,7 @@
 <template>
-  <ChoosePrice v-model="reserve"/>
-  <ChoosePrice v-model="endDate"/>
+  <ChoosePrice v-model="price"/>
+  <input type="text" v-model="name">
+  <input type="text" v-model="description">
   <button @click="create">Create</button>
 </template>
 
@@ -23,9 +24,9 @@ const props = defineProps<{
     parameters: CreateTransactionParameters
   }>()
 const emits = defineEmits(['start', 'nextStep', 'done', 'error'])
-const reserve = ref(1)
-const endDate = ref(1)
-
+const price = ref(1)
+const name = ref('test_name')
+const description = ref('test_description')
 
 async function create() {
   try {
@@ -38,15 +39,14 @@ async function create() {
     emits('start')
 
     /*** Creation of the application ***/
-    const _reserve = reserve.value * 1_000_000
+    const _price = price.value * 1_000_000
     const suggestedParams = await algodClient.getTransactionParams().do()
     const appArgs = [
       algosdk.decodeAddress(props.account.address).publicKey,
-      longToByteArray(props.parameters.nftAppID, 8),
-      longToByteArray(props.parameters.nftID, 32),
-      longToByteArray(_reserve, 8),
+      longToByteArray(_price, 8),
       algosdk.decodeAddress(props.parameters.feesAddress).publicKey,
-      longToByteArray((Date.now() + endDate.value * 3_600_000) / 1_000, 8)
+      new TextEncoder().encode(name.value),
+      new TextEncoder().encode(description.value)
     ]
 
     const appCreateObj =
@@ -90,23 +90,8 @@ async function create() {
       suggestedParams: suggestedParamsFund,
     }
 
-    const abi = new algosdk.ABIContract(arc72Schema)
-    const abiMethod = abi.getMethodByName('arc72_approve')
-    const args = [appAddr, props.parameters.nftID]
-    const appArgsFund = encodeAppArgs(abiMethod, args)
-
-    const appCallObj: AppCallObject = {
-      type: TransactionType.appl,
-      suggestedParams: suggestedParams,
-      from: props.account.address,
-      appIndex: props.parameters.nftAppID,
-      appArgs: appArgsFund,
-      foreignApps: [props.parameters.nftAppID],
-      onComplete: algosdk.OnApplicationComplete.NoOpOC,
-    }
-
     const txns2 =
-      await new Transaction([fundAppObj, appCallObj])
+      await new Transaction([fundAppObj])
         .createTxns(algosdk, algodClient)
 
 
