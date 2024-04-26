@@ -108,13 +108,14 @@ export async function removeAccountUser(id: string, email: string) {
   return { data, error }
 }
 
-export async function addAccountAddress(account_id: number, address: string, name: string) {
+export async function addAccountAddress(account_id: number, address: string, name: string, chain: 'voi:testnet'|'voi:mainnet') {
   const { data, error } = await supabase
     .from('accounts_addresses')
     .insert({
       account_id,
       address,
-      name
+      name,
+      chain
     })
     .select()
   return { data, error }

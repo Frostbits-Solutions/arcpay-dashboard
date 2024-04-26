@@ -58,6 +58,32 @@ CREATE TYPE "public"."listings_types" AS ENUM (
 
 ALTER TYPE "public"."listings_types" OWNER TO "postgres";
 
+CREATE TYPE "public"."auctions_type" AS ENUM (
+    'english',
+    'dutch'
+);
+
+ALTER TYPE "public"."auctions_type" OWNER TO "postgres";
+
+CREATE TYPE "public"."chains" AS ENUM (
+    'voi:testnet',
+    'voi:mainnet'
+);
+
+ALTER TYPE "public"."chains" OWNER TO "postgres";
+
+CREATE TYPE "public"."transaction_type" AS ENUM (
+    'create',
+    'fund',
+    'buy',
+    'bid',
+    'close',
+    'update',
+    'cancel'
+);
+
+ALTER TYPE "public"."transaction_type" OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."get_administrated_accounts_for_user"("user_email" "text") RETURNS SETOF bigint
     LANGUAGE "sql" STABLE SECURITY DEFINER
     AS $_$select id from accounts where owner_email = $1 union select account_id from accounts_users_association where user_email = $1 and role = 'admin'$_$;
@@ -96,6 +122,7 @@ ALTER TABLE "public"."accounts" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "public"."accounts_addresses" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "address" text NOT NULL,
+    "chain" "public"."chains" NOT NULL,
     "name" text,
     "account_id" bigint NOT NULL
 );
@@ -139,7 +166,7 @@ CREATE TABLE IF NOT EXISTS "public"."auctions" (
     "start_price" double precision NOT NULL,
     "min_increment" double precision NOT NULL,
     "duration" integer NOT NULL,
-    "type" text NOT NULL
+    "type" "public"."auctions_type" NOT NULL
 );
 
 ALTER TABLE "public"."auctions" OWNER TO "postgres";
@@ -157,6 +184,7 @@ CREATE TABLE IF NOT EXISTS "public"."currencies" (
     "id" text NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone,
+    "chain" "public"."chains" NOT NULL,
     "name" text NOT NULL,
     "ticker" text NOT NULL
 );
@@ -169,12 +197,13 @@ CREATE TABLE IF NOT EXISTS "public"."listings" (
     "updated_at" timestamp with time zone,
     "account_id" bigint NOT NULL,
     "status" "public"."listings_statuses" NOT NULL,
+    "chain" "public"."chains" NOT NULL,
     "seller_address" text NOT NULL,
+    "listing_name" text NOT NULL,
     "listing_currency" text NOT NULL,
     "listing_type" "public"."listings_types" NOT NULL,
-    "contract_address" text NOT NULL,
+    "app_id" bigint NOT NULL,
     "asset_id" text NOT NULL,
-    "asset_name" text NOT NULL,
     "asset_thumbnail" text,
     "asset_type" "public"."assets_types" NOT NULL,
     "asset_qty" double precision DEFAULT '1'::double precision NOT NULL,
@@ -232,10 +261,12 @@ CREATE TABLE IF NOT EXISTS "public"."transactions" (
     "id" text NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "from_address" text NOT NULL,
-    "contract_address" text NOT NULL,
-    "type" text NOT NULL,
+    "chain" "public"."chains" NOT NULL,
+    "app_id" bigint NOT NULL,
+    "type" "public"."transaction_type" NOT NULL,
     "amount" double precision NOT NULL,
-    "currency" text NOT NULL
+    "currency" text NOT NULL,
+    "note" text
 );
 
 ALTER TABLE "public"."transactions" OWNER TO "postgres";
@@ -308,7 +339,9 @@ ALTER TABLE ONLY "public"."listings"
 ALTER TABLE ONLY "public"."sales"
     ADD CONSTRAINT "public_sales_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE;
 
-CREATE POLICY "Enable insert for authenticated users only" ON "public"."accounts" FOR INSERT TO "authenticated" WITH CHECK (true);
+CREATE POLICY "Members can read accounts" ON "public"."accounts" FOR SELECT TO "authenticated" USING ((id IN ( SELECT "public"."get_administrated_accounts_for_user"(auth.email()) AS "get_member_accounts_for_user")));
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."accounts" FOR INSERT TO "authenticated" WITH CHECK ((auth.email() = owner_email));
 
 CREATE POLICY "Enable select for users based on user_email" ON "public"."accounts_users_association" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."email"() AS "email") = "user_email"));
 
