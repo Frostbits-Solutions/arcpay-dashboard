@@ -1,7 +1,5 @@
 <template>
-    <div
-        class="my-5 w-full rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900"
-    >
+    <div class="my-8 w-full rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
         <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
             <slot name="title"></slot>
         </h2>

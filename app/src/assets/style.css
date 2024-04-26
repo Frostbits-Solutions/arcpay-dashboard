@@ -2,3 +2,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.apexcharts-tooltip, .apexcharts-xaxistooltip {
+    background: white !important;
+    border-color: rgb(229 231 235) !important;
+}
+.apexcharts-xaxistooltip::before {
+    border-bottom-color: rgb(229 231 235) !important;
+}
+
+.apexcharts-xaxistooltip::after {
+    border-bottom-color: white !important;
+}
+
+.dark .apexcharts-tooltip, .dark .apexcharts-xaxistooltip {
+    background: rgb(55 65 81) !important;
+    border-color: rgb(55 65 81) !important;
+    color: var(--gray-5) !important;
+}
+
+.dark .apexcharts-tooltip .apexcharts-tooltip-text-y-value {
+    color: white !important;
+}
+
+.dark .apexcharts-xaxistooltip::before {
+    border: none!important;
+}
+
+.dark .apexcharts-xaxistooltip::after {
+    border-bottom-color: rgb(55 65 81) !important;
+}

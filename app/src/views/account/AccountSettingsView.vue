@@ -33,7 +33,7 @@ const modals = useModalsStore()
 const data = ref<AccountData>({})
 
 async function fetchAccountSettings() {
-  if (accounts.active?.id) {
+  if (typeof accounts.active?.id === 'number') {
     const { data: settings, error } = await getAccount(accounts.active?.id)
     if (!settings || error) {
       console.error(error)
@@ -44,7 +44,7 @@ async function fetchAccountSettings() {
 }
 
 async function fetchAccountUsers() {
-  if (accounts.active?.id) {
+  if (typeof accounts.active?.id === 'number') {
     const { data: users, error } = await getAccountUsers(accounts.active?.id)
     if (!users || error) {
       console.error(error)
@@ -55,7 +55,7 @@ async function fetchAccountUsers() {
 }
 
 async function fetchAccountKeys() {
-  if (accounts.active?.id) {
+  if (typeof accounts.active?.id === 'number') {
     const { data: keys, error } = await getAccountApiKeys(accounts.active?.id)
     if (!keys || error) {
       console.error(error)
@@ -66,7 +66,7 @@ async function fetchAccountKeys() {
 }
 
 async function fetchAccountAddresses() {
-  if (accounts.active?.id) {
+  if (typeof accounts.active?.id === 'number') {
     const { data: addresses, error } = await getAccountAddresses(accounts.active?.id)
     if (!addresses || error) {
       console.error(error)
