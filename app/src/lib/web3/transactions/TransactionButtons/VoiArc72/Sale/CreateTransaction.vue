@@ -39,7 +39,6 @@ async function create() {
     const _price = price.value * 1_000_000
     const suggestedParams = await algodClient.getTransactionParams().do()
     const appArgs = [
-      algosdk.decodeAddress(props.account.address).publicKey,
       longToByteArray(props.parameters.nftAppID, 8),
       longToByteArray(props.parameters.nftID, 32),
       longToByteArray(_price, 8),
