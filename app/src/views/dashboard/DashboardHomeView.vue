@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import ChartTransactionHistory from '@/components/dashboard/ChartTransactionHistory.vue'
-import ChartRevenuesDonut from '@/components/dashboard/ChartRevenuesDonut.vue'
 </script>
 
 <template>
