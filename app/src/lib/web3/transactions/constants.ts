@@ -5,7 +5,7 @@ import {
   Arc200Arc72SaleUpdateTransaction,
   VoiArc72AuctionBidTransaction,
   VoiArc72AuctionCancelTransaction,
-  VoiArc72AuctionCreateTransaction, VoiArc72AuctionUpdateTransaction,
+  VoiArc72AuctionCreateTransaction,
   VoiArc72DutchBuyTransaction,
   VoiArc72DutchCancelTransaction,
   VoiArc72DutchCreateTransaction,
