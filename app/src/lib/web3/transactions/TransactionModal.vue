@@ -38,6 +38,8 @@
       :steps="TRANSACTIONS_STEPS[transactionType]"
       v-if="currentTransactionStep !== null"
     />
+
+    <button @click="test">test</button>
   </template>
 
   <div class="change-parameters">

@@ -21,8 +21,8 @@ export const PROVIDER_ICONS: {[key: string]: string} = {
 
 export const ARC_PAY_METADA = {
   name: 'ARC pay',
-  description: 'Example Dapp',
-  url: '#1',
+  description: '',
+  url: '#',
   icons: ['https://walletconnect.com/walletconnect-logo.png']
 }
 

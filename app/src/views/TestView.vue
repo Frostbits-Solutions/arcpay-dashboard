@@ -29,7 +29,7 @@ const parameters = {
     },
     [TRANSACTION_TYPE.create]: {
         nftAppID: 29105406,
-        nftID: 685,
+        nftID: 602,
         feesAddress:
             'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
     },
@@ -45,8 +45,8 @@ const parameters = {
     <main>
         <TransactionModal
             :transactionType="transactionType"
-            :conventionType="CONVENTION_TYPE.VoiARC72"
-            :contractType="CONTRACT_TYPE.Auction"
+            :conventionType="CONVENTION_TYPE.VoiArc72"
+            :contractType="CONTRACT_TYPE.Sale"
             :parameters="parameters[transactionType]"
         />
 
