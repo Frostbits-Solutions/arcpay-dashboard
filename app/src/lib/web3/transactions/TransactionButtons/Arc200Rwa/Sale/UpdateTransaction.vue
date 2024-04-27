@@ -38,7 +38,7 @@ async function update() {
     const _price = price.value * 1
     const appArgs = [
       new TextEncoder().encode('update_price'),
-      longToByteArray(_price, 32)]
+      longToByteArray(_price, 8)]
     const accounts = [props.parameters.feesAddress]
 
     const appCallObj: AppCallObject = {
