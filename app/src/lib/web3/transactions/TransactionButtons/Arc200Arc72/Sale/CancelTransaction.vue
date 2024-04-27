@@ -5,9 +5,6 @@
 </template>
 
 <script setup lang="ts">
-/***
- * ARC 200 -> ARC 72
- * ***/
 import { useWeb3Store } from '@/stores/web3'
 import type { Account, AppCallObject, AppDeleteObject, CancelTransactionParameters } from '@/lib/web3/types'
 import { Transaction } from '@/lib/web3/transactions/transaction'

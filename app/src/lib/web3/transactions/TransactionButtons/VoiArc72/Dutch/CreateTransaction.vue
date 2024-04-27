@@ -50,7 +50,6 @@ async function create() {
       longToByteArray(props.parameters.nftID, 32),
       longToByteArray(_priceMax, 8),
       longToByteArray(_priceMin, 8),
-      algosdk.decodeAddress(props.parameters.feesAddress).publicKey,
       longToByteArray((Date.now() + endDate.value * 3_600_000) / 1_000, 8),
     ]
 
