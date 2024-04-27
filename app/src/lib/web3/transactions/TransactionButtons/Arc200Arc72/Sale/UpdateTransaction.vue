@@ -1,5 +1,5 @@
 <template>
-  <ChoosePrice v-model="price"/>
+  <IntInput v-model="price"/>
   <button
     class="arc-pay-transaction-button"
     @click="update">Update</button>
@@ -9,7 +9,7 @@
 /***
  * ARC 200 -> ARC 72
  * ***/
-import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
+import IntInput from '@/lib/web3/transactions/component/IntInput.vue'
 import { useWeb3Store } from '@/stores/web3'
 import { longToByteArray } from '@/lib/web3/transactions/utils'
 import { ref } from 'vue'

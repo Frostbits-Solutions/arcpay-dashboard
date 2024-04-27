@@ -1,6 +1,6 @@
 <template>
-  <input type="number" v-model="arc200AppID" />
-  <ChoosePrice v-model="price"/>
+  <IntInput v-model="arc200AppID"/>
+  <IntInput v-model="price"/>
   <button
     class="arc-pay-transaction-button"
     @click="create">Create</button>
@@ -10,7 +10,7 @@
 /***
  * ARC 200 -> ARC 72
  * ***/
-import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
+import IntInput from '@/lib/web3/transactions/component/IntInput.vue'
 
 import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters, PaymentObject } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'

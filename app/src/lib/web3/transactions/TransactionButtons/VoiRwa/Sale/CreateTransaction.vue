@@ -1,14 +1,14 @@
 <template>
-  <ChoosePrice v-model="price"/>
-  <input type="text" v-model="name">
-  <input type="text" v-model="description">
+  <IntInput v-model="price"/>
+  <TextInput v-model="name"/>
+  <TextInput v-model="description"/>
   <button
     class="arc-pay-transaction-button"
     @click="create">Create</button>
 </template>
 
 <script setup lang="ts">
-import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
+import IntInput from '@/lib/web3/transactions/component/IntInput.vue'
 
 import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters, PaymentObject } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'
@@ -19,6 +19,7 @@ import { arc72Schema } from '@/lib/web3/transactions/abi/arc72'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
+import TextInput from '@/lib/web3/transactions/component/TextInput.vue'
 
 const web3Store = useWeb3Store()
 const props = defineProps<{

@@ -1,14 +1,14 @@
 <template>
-  <ChoosePrice v-model="priceMin"/>
-  <ChoosePrice v-model="priceMax"/>
-  <input type="number" v-model="endDate">h
+  <IntInput v-model="priceMin" :max="priceMax - 1"/>
+  <IntInput v-model="priceMax" :min="priceMin + 1"/>
+  <IntInput v-model="endDate"/>h
   <button
     class="arc-pay-transaction-button"
     @click="create">Create</button>
 </template>
 
 <script setup lang="ts">
-import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
+import IntInput from '@/lib/web3/transactions/component/IntInput.vue'
 
 import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters, PaymentObject } from '@/lib/web3/types'
 import { useWeb3Store } from '@/stores/web3'

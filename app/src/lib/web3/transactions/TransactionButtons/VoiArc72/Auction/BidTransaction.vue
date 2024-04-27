@@ -1,5 +1,5 @@
 <template>
-  <ChoosePrice :min="parameters.minPrice" v-model="price"/>
+  <IntInput :min="parameters.minPrice" v-model="price"/>
   <button
     class="arc-pay-transaction-button"
     @click="bid">bid</button>
@@ -11,7 +11,7 @@ import { useWeb3Store } from '@/stores/web3'
 import { Transaction } from '@/lib/web3/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
-import ChoosePrice from '@/lib/web3/transactions/component/ChoosePrice.vue'
+import IntInput from '@/lib/web3/transactions/component/IntInput.vue'
 import { ref } from 'vue'
 
 
