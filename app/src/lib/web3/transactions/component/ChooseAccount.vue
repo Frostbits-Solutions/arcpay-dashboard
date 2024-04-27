@@ -1,5 +1,5 @@
 <template>
-<div class="flex-column">
+<div class="space-y-6 border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
   <button v-for="account of accounts" @click="() => chooseAccount(account)">
     {{getShortAddress(account.address)}}
   </button>

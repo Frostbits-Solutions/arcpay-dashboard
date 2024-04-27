@@ -43,7 +43,7 @@ const parameters = {
 </script>
 
 <template>
-    <main>
+    <main class="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
         <TransactionModal
             :transactionType="transactionType"
             :conventionType="CONVENTION_TYPE.Arc200Arc72"
@@ -51,6 +51,7 @@ const parameters = {
             :parameters="parameters[transactionType]"
         />
 
+      <div class="test-parameters-containers">
         <p>Test contract:</p>
         <select v-model="transactionType">
           <option :value="TRANSACTION_TYPE.buy">buy</option>
@@ -59,11 +60,22 @@ const parameters = {
           <option :value="TRANSACTION_TYPE.cancel">cancel</option>
           <option :value="TRANSACTION_TYPE.update">update</option>
         </select>
+      </div>
     </main>
 </template>
 
 <style scoped>
 main {
     text-align: center;
+}
+
+.test-parameters-containers {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  padding: 10px;
+  background: white;
+  border: 1px solid black;
 }
 </style>

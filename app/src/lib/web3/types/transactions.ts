@@ -45,6 +45,8 @@ export interface UpdateTransactionParameters {
 
 export type TransactionParameters =
   BuyTransactionParameters |
+  BuyWArc200TransactionParameters |
+  BidTransactionParameters |
   CancelTransactionParameters |
   CreateTransactionParameters |
   UpdateTransactionParameters

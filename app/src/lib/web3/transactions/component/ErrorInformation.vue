@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="space-y-6 border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
     <h2>Error</h2>
     <div v-if="information.message">
       {{information.message}}

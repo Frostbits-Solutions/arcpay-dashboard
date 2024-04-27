@@ -1,5 +1,12 @@
 <template>
-<div class="transaction-modal" :key="reload">
+<div
+  class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-4 shadow-xl sm:p-6 md:p-8 dark:border-gray-700 dark:bg-gray-800 animate-modal"
+  :key="reload">
+  <div class="mb-8 flex items-center justify-center">
+    <img src="@/assets/logo.png" alt="Logo" class="w-12 h-12" />
+    <h1 class="text-4xl ml-2 dark:text-white">arcpay</h1>
+  </div>
+
   <choose-wallet
     v-if="web3Store.walletId === null"
     @wallet="setWalletId"/>
@@ -18,10 +25,20 @@
     v-else-if="errorInformation !== null"
   />
 
-  <template v-else>
-    <div class="flex-colum">
-      <img :src="PROVIDER_ICONS[web3Store.account.providerId]">
-      <div>{{getShortAddress(web3Store.account.address)}}</div>
+  <div class="space-y-6 border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200 flex flex-col items-center" v-else>
+    <div class="grid grid-cols-2 gap-x-3">
+      <img
+        class="w-8 h-8 rounded-full justify-self-end"
+        :src="PROVIDER_ICONS[web3Store.account.providerId]">
+      <div class="text-left self-center">{{getShortAddress(web3Store.account.address)}}</div>
+      <template v-for="parameter of parameterArray" :key="`parameter-${parameter.key}`">
+        <div class="text-right">
+          {{parameter.key}}
+        </div>
+        <div class="text-left">
+          {{parameter.value}}
+        </div>
+      </template>
     </div>
     <component
       :is="TRANSACTIONS_BUTTONS[conventionType][contractType][transactionType]"
@@ -38,9 +55,7 @@
       :steps="TRANSACTIONS_STEPS[transactionType]"
       v-if="currentTransactionStep !== null"
     />
-
-    <button @click="test">test</button>
-  </template>
+  </div>
 
   <div class="change-parameters">
     <button @click="resetWallet">Change Wallet</button>
@@ -61,7 +76,7 @@ import type { Account } from '@/lib/web3/types'
 import type { TransactionParameters } from '@/lib/web3/types/transactions'
 import type { Ref } from 'vue'
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useWeb3Store } from '@/stores/web3.js'
 import {
   TRANSACTION_TYPE,
@@ -71,8 +86,7 @@ import {
 } from '@/lib/web3/transactions/constants'
 import { PROVIDER, PROVIDER_ICONS } from '@/lib/web3/constants'
 
-
-defineProps < {
+const props = defineProps < {
   transactionType: TRANSACTION_TYPE,
   conventionType: CONVENTION_TYPE,
   contractType: CONTRACT_TYPE,
@@ -84,6 +98,28 @@ const reload = ref(0)
 const currentTransactionStep: Ref<null | number> = ref(null)
 const doneInformation: Ref<null | object> = ref(null)
 const errorInformation: Ref<null | object> = ref(null)
+
+
+const parameterArray = computed(() => {
+  const parameterKeys = [
+    'nftID',
+    'minPrice',
+    'price',
+    'seller',
+    'appIndex',
+    //'nftAppID',
+    //'arc200AppID',
+    'feesAddress',
+  ]
+  const pArray: Array<{key: string, value: string|number}> = []
+  for (const key of parameterKeys) {
+    if (props.parameters[key as keyof TransactionParameters]) {
+      pArray.push(formatParameters(key, props.parameters[key as keyof TransactionParameters]))
+    }
+  }
+
+  return pArray
+})
 
 async function setWalletId (_walletId: PROVIDER_ID) {
   const provider = await PROVIDER[_walletId].init()
@@ -119,41 +155,57 @@ function resetWallet () {
 function getShortAddress (address: string): string {
   return `${address.slice(0,4)}...${address.slice(address.length - 5, address.length - 1)}`
 }
+
+function formatParameters (key: string, value: number|string) {
+  switch (key) {
+    case 'appIndex':
+      return {
+        key: 'Application ID',
+        value: value
+      }
+    case 'nftID':
+      return {
+        key: 'NFT ID',
+        value: value
+      }
+    case 'minPrice':
+      return {
+        key: 'Minimum bid price',
+        value: value
+      }
+    case 'price':
+      return {
+        key: 'Price',
+        value: value
+      }
+    case 'seller':
+      return {
+        key: 'NFT Seller',
+        value:getShortAddress(value as string)
+      }
+    case 'nftAppID':
+      return {
+        key: 'Sold NFT Application ID',
+        value: value
+      }
+    case 'arc200AppID':
+      return {
+        key: 'ARC 200 NFT Application ID',
+        value: value
+      }
+    case 'feesAddress':
+      return {
+        key: 'Fees address',
+        value:getShortAddress(value as string)
+      }
+    default:
+      return {
+        key,
+        value
+      }
+  }
+}
 </script>
 
 <style scoped>
-.transaction-modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid white;
-  border-radius: 10px;
-  padding: 10px;
-  width: 100vw;
-  height: 100vh;
-  max-width: 400px;
-  max-height: 600px;
-  margin: auto;
-  position: relative;
-}
-
-img {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  grid-column: span 2;
-  margin: auto;
-}
-
-.flex-colum {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.change-parameters {
-  position: absolute;
-  bottom: 0;
-  padding: 5px;
-}
 </style>
