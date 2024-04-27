@@ -8,7 +8,7 @@ const transactionType = ref(TRANSACTION_TYPE.buy)
 const parameters = {
     [TRANSACTION_TYPE.buy]: {
         seller: '6J4RO7U2WYQWOGWXQOZUTBBA46W4QSFL5HTHJWC5BZR53RSYRAOPAY7KPM',
-        appIndex: 42037589,
+        appIndex: 42037609,
         nftAppID: 29105406,
         arc200AppID:40427782,
         price: 2,
@@ -35,7 +35,7 @@ const parameters = {
             'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
     },
     [TRANSACTION_TYPE.update]: {
-        appIndex: 40427317,
+        appIndex: 42037609,
         feesAddress:
             'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
     },

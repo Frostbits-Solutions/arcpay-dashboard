@@ -70,6 +70,7 @@ async function buy() {
         props.parameters.seller,
         props.parameters.feesAddress,
       ],
+      foreignApps: [props.parameters.arc200AppID, props.parameters.appIndex],
       suggestedParams: suggestedParams,
     }
 
