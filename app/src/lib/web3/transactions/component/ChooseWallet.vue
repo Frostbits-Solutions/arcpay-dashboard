@@ -1,16 +1,27 @@
 <template>
-<div class="space-y-6 border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
-  <h2>Choose your wallet</h2>
-  <button v-for="provider of providers" @click="() => chooseWallet(provider.providerId)">
-    <img :src="provider.icon">
-    <p>{{provider.name}}</p>
-  </button>
+<div class="border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
+  <h2 class="font-bold text-lg">Choose your wallet</h2>
+  <div class="mx-auto w-fit">
+    <button
+      class="flex items-center w-full hover:bg-gray-100 p-2 rounded"
+      v-for="provider of providers"
+      @click="() => chooseWallet(provider.providerId)"
+      :key="provider.name"
+    >
+      <img
+        class="mr-2 w-8 h-8 rounded-full"
+        :src="provider.icon">
+      {{provider.name}}
+      <IconChevronNext class="inline-block ml-auto"/>
+    </button>
+  </div>
 </div>
 </template>
 
 <script setup lang="ts">
 import { PROVIDER_ID, PROVIDER_ICONS } from '@/lib/web3/constants'
 import { onMounted } from 'vue'
+import IconChevronNext from '@/components/icons/IconChevronNext.vue'
 
 const emit = defineEmits(['wallet'])
 
@@ -30,13 +41,6 @@ function chooseWallet (wallet: string) {
 </script>
 
 <style scoped>
-img {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-}
-
 button {
   border: none;
   background: transparent;

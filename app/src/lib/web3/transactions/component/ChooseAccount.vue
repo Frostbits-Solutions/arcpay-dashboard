@@ -1,7 +1,24 @@
 <template>
-<div class="space-y-6 border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
-  <button v-for="account of accounts" @click="() => chooseAccount(account)">
-    {{getShortAddress(account.address)}}
+<div class="border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
+  <h2 class="font-bold text-lg">Choose your account</h2>
+  <button
+    class="flex items-center w-full hover:bg-gray-100 p-2 rounded"
+    v-for="account of accounts"
+    @click="() => chooseAccount(account)"
+    :key="account.address"
+  >
+    <span>
+      <template v-if="account.name">
+        <b>{{account.name}}</b>
+        <span class="text-gray-500 dark:text-gray-100 text-sm ml-2">
+          {{getShortAddress(account.address)}}
+        </span>
+      </template>
+      <template v-else>
+        <b>{{getShortAddress(account.address)}}</b>
+      </template>
+    </span>
+    <IconChevronNext class="inline-block ml-auto"/>
   </button>
 </div>
 </template>
@@ -9,6 +26,7 @@
 <script setup lang="ts">
 import type { Account } from '@/lib/web3/types'
 import { onMounted } from 'vue'
+import IconChevronNext from '@/components/icons/IconChevronNext.vue'
 
 defineProps<{ accounts: Account[]}>()
 const emits = defineEmits(['account'])
@@ -35,8 +53,4 @@ onMounted(onMountedHook)
 </script>
 
 <style scoped>
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
 </style>

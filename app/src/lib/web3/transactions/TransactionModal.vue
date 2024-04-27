@@ -26,6 +26,7 @@
   />
 
   <div class="space-y-6 border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200 flex flex-col items-center" v-else>
+    <h2 class="font-bold text-lg">Transaction overview</h2>
     <div class="grid grid-cols-2 gap-x-3">
       <img
         class="w-8 h-8 rounded-full justify-self-end"
@@ -55,11 +56,15 @@
       :steps="TRANSACTIONS_STEPS[transactionType]"
       v-if="currentTransactionStep !== null"
     />
-  </div>
 
-  <div class="change-parameters">
-    <button @click="resetWallet">Change Wallet</button>
-    <button @click="resetAddress">Change Address</button>
+    <div class="space-y-6 border-t pt-8 dark:border-gray-700">
+      <button
+        class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        @click="resetWallet">Change Wallet</button>
+      <button
+        class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        @click="resetAddress">Change Address</button>
+    </div>
   </div>
 </div>
 </template>
