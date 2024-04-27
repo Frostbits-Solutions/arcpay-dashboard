@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Account } from '@/lib/web3/types'
+import type { Account } from '@/types'
 import { onMounted } from 'vue'
 import IconChevronNext from '@/components/icons/IconChevronNext.vue'
 

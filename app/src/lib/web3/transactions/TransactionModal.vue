@@ -73,15 +73,15 @@
 </template>
 
 <script setup lang="ts">
-import ChooseWallet from '@/lib/web3/transactions/component/ChooseWallet.vue'
-import ChooseAccount from '@/lib/web3/transactions/component/ChooseAccount.vue'
-import TransactionStepsPreview from '@/lib/web3/transactions/component/TransactionStepsPreview.vue'
-import DoneInformation from '@/lib/web3/transactions/component/DoneInformation.vue'
-import ErrorInformation from '@/lib/web3/transactions/component/ErrorInformation.vue'
+import ChooseWallet from '@/transactions/component/ChooseWallet.vue'
+import ChooseAccount from '@/transactions/component/ChooseAccount.vue'
+import TransactionStepsPreview from '@/transactions/component/TransactionStepsPreview.vue'
+import DoneInformation from '@/transactions/component/DoneInformation.vue'
+import ErrorInformation from '@/transactions/component/ErrorInformation.vue'
 
-import type { PROVIDER_ID } from '@/lib/web3/constants'
-import type { Account } from '@/lib/web3/types'
-import type { TransactionParameters } from '@/lib/web3/types/transactions'
+import type { PROVIDER_ID } from '@/constants'
+import type { Account } from '@/types'
+import type { TransactionParameters } from '@/types/transactions'
 import type { Ref } from 'vue'
 
 import { computed, ref } from 'vue'
@@ -91,8 +91,8 @@ import {
   CONVENTION_TYPE,
   TRANSACTIONS_BUTTONS,
   TRANSACTIONS_STEPS, CONTRACT_TYPE
-} from '@/lib/web3/transactions/constants'
-import { PROVIDER, PROVIDER_ICONS } from '@/lib/web3/constants'
+} from '@/transactions/constants'
+import { PROVIDER, PROVIDER_ICONS } from '@/constants'
 import IconChevronPrevious from '@/components/icons/IconChevronPrevious.vue'
 
 const props = defineProps < {

@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import type { Ref } from 'vue'
 import { defineStore } from 'pinia'
-import { PROVIDER_ID } from '@/lib/web3/constants'
-import type { Account, Wallet } from '@/lib/web3/types'
-import Kibisis from '@/lib/web3/wallets/kibisis'
-import WalletConnect from '@/lib/web3/wallets/walletConnect'
+import { PROVIDER_ID } from '@/constants'
+import type { Account, Wallet } from '@/types'
+import Kibisis from '@/wallets/kibisis'
+import WalletConnect from '@/wallets/walletConnect'
 
 
 export const useWeb3Store = defineStore('web3Store', () => {

@@ -17,23 +17,23 @@ import type {
   Transaction
 } from 'algosdk'
 
-import type { Wallet, Account } from '@/lib/web3/types'
+import type { Wallet, Account } from '@/types'
 import {
   ARC_0027_CHANNEL_NAME, ARC_0027_PROVIDER_ID, ARC_0027_SIGN_TXNS_REQUEST, DEFAULT_REQUEST_TIMEOUT,
   ICON,
   KIBISIS_NOT_INSTALLED, METHOD_TIMED_OUT_ERROR,
   NO_ALGO_WALLET_INSTALLED, UNKNOWN_ERROR
-} from '@/lib/web3/wallets/kibisis/constants'
-import { PROVIDER_ID } from '@/lib/web3/constants'
-import Algod from '@/lib/web3/algod'
+} from '@/wallets/kibisis/constants'
+import { PROVIDER_ID } from '@/constants'
+import Algod from '@/algod'
 import type {
   ProviderMethods, RequestMessage,
   ResponseError,
   ResponseMessage,
   SendRequestWithTimeoutOptions,
-} from '@/lib/web3/wallets/kibisis/type'
-import { generateUuid } from '@/lib/web3/wallets/kibisis/utils'
-import { base64ToArrayBuffer } from '@/lib/web3/transactions/utils'
+} from '@/wallets/kibisis/type'
+import { generateUuid } from '@/wallets/kibisis/utils'
+import { base64ToArrayBuffer } from '@/transactions/utils'
 
 class Kibisis extends BaseClient {
   genesisHash: string|undefined

@@ -8,13 +8,13 @@
 /***
  * ARC 200 -> ARC 72
  * ***/
-import type { Account, BuyWArc200TransactionParameters, AppCallObject } from '@/lib/web3/types'
+import type { Account, BuyWArc200TransactionParameters, AppCallObject } from '@/types'
 import { useWeb3Store } from '@/stores/web3'
-import { Transaction } from '@/lib/web3/transactions/transaction'
+import { Transaction } from '@/transactions/transaction'
 import _algosdk, { AtomicTransactionComposer } from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
-import { encodeAppArgs, fromHexString, toHexString } from '@/lib/web3/transactions/utils'
-import arc200Schema from '@/lib/web3/transactions/abi/arc200'
+import { encodeAppArgs, fromHexString, toHexString } from '@/transactions/utils'
+import arc200Schema from '@/transactions/abi/arc200'
 
 
 const web3Store = useWeb3Store()
