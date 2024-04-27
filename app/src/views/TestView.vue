@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { TransactionModal, TRANSACTION_TYPE, CONVENTION_TYPE } from '@/lib/web3'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { CONTRACT_TYPE } from '@/lib/web3/transactions/constants'
 
 const transactionType = ref(TRANSACTION_TYPE.buy)
+const conventionType = ref(CONVENTION_TYPE.VoiArc72)
+const contractType = ref(CONTRACT_TYPE.Sale)
 
 const parameters = {
     [TRANSACTION_TYPE.buy]: {
@@ -40,19 +42,61 @@ const parameters = {
             'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
     },
 }
+
+watch(transactionType, () => {
+  localStorage.setItem('arc-pay-test-transaction-type', (transactionType.value as number).toString())
+})
+watch(conventionType, () => {
+  localStorage.setItem('arc-pay-test-convention-type', (conventionType.value as number).toString())
+})
+watch(contractType, () => {
+  localStorage.setItem('arc-pay-test-contract-type', (contractType.value as number).toString())
+})
+
+function onMountedHook () {
+  const tT = localStorage.getItem('arc-pay-test-transaction-type')
+  if (tT !== null) {
+    transactionType.value = parseInt(tT) as TRANSACTION_TYPE
+  }
+  const cT = localStorage.getItem('arc-pay-test-convention-type')
+  if (cT !== null) {
+    conventionType.value = parseInt(cT) as CONVENTION_TYPE
+  }
+  const ctT = localStorage.getItem('arc-pay-test-contract-type')
+  if (ctT !== null) {
+    contractType.value = parseInt(ctT) as CONTRACT_TYPE
+  }
+}
+// @ts-ignore
+onMounted(onMountedHook)
 </script>
 
 <template>
     <main class="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
         <TransactionModal
             :transactionType="transactionType"
-            :conventionType="CONVENTION_TYPE.Arc200Rwa"
-            :contractType="CONTRACT_TYPE.Sale"
+            :conventionType="conventionType"
+            :contractType="contractType"
             :parameters="parameters[transactionType]"
         />
 
       <div class="test-parameters-containers">
-        <p>Test contract:</p>
+        <p>Convention</p>
+        <select v-model="conventionType">
+          <option :value="CONVENTION_TYPE.VoiArc72">Voi -> Arc72</option>
+          <option :value="CONVENTION_TYPE.VoiRwa">Voi -> RWA</option>
+          <option :value="CONVENTION_TYPE.Arc200Arc72">Arc200 -> Arc72</option>
+          <option :value="CONVENTION_TYPE.Arc200Rwa">Arc200 -> RWA</option>
+        </select>
+
+        <p>Contract</p>
+        <select v-model="contractType">
+          <option :value="CONTRACT_TYPE.Sale">Sale</option>
+          <option :value="CONTRACT_TYPE.Dutch">Dutch</option>
+          <option :value="CONTRACT_TYPE.Auction">Auction</option>
+        </select>
+
+        <p>Transaction:</p>
         <select v-model="transactionType">
           <option :value="TRANSACTION_TYPE.buy">buy</option>
           <option :value="TRANSACTION_TYPE.bid">bid</option>

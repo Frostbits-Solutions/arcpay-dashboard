@@ -1,5 +1,7 @@
 <template>
-  <IntInput v-model="price"/>
+  <IntInput
+    label="Sell price"
+    v-model="price"/>
   <button
     class="arc-pay-transaction-button"
     @click="create">Create</button>

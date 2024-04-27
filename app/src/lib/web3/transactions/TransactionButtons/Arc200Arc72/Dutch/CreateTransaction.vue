@@ -1,8 +1,8 @@
 <template>
-  <IntInput v-model="arc200AppID" min="0"/>
-  <IntInput v-model="priceMin" :max="priceMax - 1" min="0"/>
-  <IntInput v-model="priceMax" :min="priceMin + 1"/>
-  <IntInput v-model="endDate" min="0"/>h
+  <IntInput v-model="arc200AppID" label="Arc200 application id"/>
+  <IntInput v-model="priceMin" :max="priceMax - 1" label="Minimum price"/>
+  <IntInput v-model="priceMax" :min="priceMin + 1" label="Maximum price"/>
+  <IntInput v-model="endDate" label="Duration (in hours)"/>
   <button
     class="arc-pay-transaction-button"
     @click="create">Create</button>
