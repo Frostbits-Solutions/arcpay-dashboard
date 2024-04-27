@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Account, BuyTransactionParameters } from '@/lib/web3/types'
+import type { Account, BuyTransactionParameters } from '@/types'
 import { useWeb3Store } from '@/stores/web3'
-import { Transaction } from '@/lib/web3/transactions/transaction'
+import { Transaction } from '@/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
 

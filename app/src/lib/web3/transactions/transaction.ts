@@ -1,6 +1,6 @@
 import type { BoxReference } from 'algosdk'
 import _algosdk from 'algosdk'
-import { SIMULATION_ERROR } from '@/lib/web3/transactions/constants'
+import { SIMULATION_ERROR } from '@/transactions/constants'
 import { TransactionType } from 'algosdk/src/types/transactions'
 import type {
   AppCallObject,
@@ -9,7 +9,7 @@ import type {
   TransactionObject,
   TransfertObject,
   AppObject, AppDeleteObject
-} from '@/lib/web3/types'
+} from '@/types'
 import { OnApplicationComplete } from 'algosdk/src/types/transactions/base'
 
 export class Transaction {

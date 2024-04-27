@@ -1,4 +1,4 @@
-import type { PublicNetwork } from '@/lib/web3/types'
+import type { PublicNetwork } from '@/types'
 
 export const UNKNOWN_ERROR = 4000
 export const METHOD_CANCELED_ERROR = 4001

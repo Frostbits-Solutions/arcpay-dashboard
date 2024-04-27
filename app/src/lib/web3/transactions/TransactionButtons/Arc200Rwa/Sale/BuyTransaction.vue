@@ -5,14 +5,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Account, BuyWArc200TransactionParameters } from '@/lib/web3/types'
+import type { Account, BuyWArc200TransactionParameters } from '@/types'
 import { useWeb3Store } from '@/stores/web3'
-import { Transaction } from '@/lib/web3/transactions/transaction'
+import { Transaction } from '@/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
-import arc200Schema from '@/lib/web3/transactions/abi/arc200'
-import { encodeAppArgs } from '@/lib/web3/transactions/utils'
-import { AppCallObject } from '@/lib/web3/types'
+import arc200Schema from '@/transactions/abi/arc200'
+import { encodeAppArgs } from '@/transactions/utils'
+import { AppCallObject } from '@/types'
 
 
 const web3Store = useWeb3Store()

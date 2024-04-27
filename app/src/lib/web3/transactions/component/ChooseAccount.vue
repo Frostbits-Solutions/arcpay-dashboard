@@ -1,6 +1,6 @@
 <template>
 <div class="border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
-  <h2 class="font-bold text-lg">Choose your account</h2>
+  <h2 class="font-bold text-lg">Account to use</h2>
   <button
     class="flex items-center w-full hover:bg-gray-100 p-2 rounded"
     v-for="account of accounts"
@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Account } from '@/lib/web3/types'
+import type { Account } from '@/types'
 import { onMounted } from 'vue'
 import IconChevronNext from '@/components/icons/IconChevronNext.vue'
 

@@ -6,8 +6,8 @@
 
 <script setup lang="ts">
 import { useWeb3Store } from '@/stores/web3'
-import type { Account, AppCallObject, AppDeleteObject, CancelTransactionParameters } from '@/lib/web3/types'
-import { Transaction } from '@/lib/web3/transactions/transaction'
+import type { Account, AppCallObject, AppDeleteObject, CancelTransactionParameters } from '@/types'
+import { Transaction } from '@/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src'
 

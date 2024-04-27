@@ -5,13 +5,13 @@ import type {
   WalletConnectModalSignSession } from '@walletconnect/modal-sign-html'
 
 import _algosdk, { assignGroupID, Transaction } from 'algosdk'
-import BaseClient from '@/lib/web3/wallets/base'
-import { DEFAULT_NETWORK, ARC_PAY_METADA, PROVIDER_ID } from '@/lib/web3/constants'
+import BaseClient from '@/wallets/base'
+import { DEFAULT_NETWORK, ARC_PAY_METADA, PROVIDER_ID } from '@/constants'
 import { ALGORAND_CHAINS, ICON } from './constants'
 import type { WalletProvider } from '../../types'
 import { bytesToBase64 } from '@agoralabs-sh/algorand-provider'
-import { formatJsonRpcRequest } from '@/lib/web3/wallets/walletConnect/utils'
-import Algod from '@/lib/web3/algod'
+import { formatJsonRpcRequest } from '@/wallets/walletConnect/utils'
+import Algod from '@/algod'
 import { Buffer } from 'buffer'
 
 let client;

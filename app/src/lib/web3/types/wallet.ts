@@ -1,4 +1,4 @@
-import { PROVIDER_ID } from '@/lib/web3/constants'
+import { PROVIDER_ID } from '@/constants'
 
 export interface Account {
   providerId: PROVIDER_ID

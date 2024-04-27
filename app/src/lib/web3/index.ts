@@ -1,5 +1,5 @@
 import { TransactionModal } from './transactions/'
-import { TRANSACTION_TYPE, CONVENTION_TYPE } from '@/lib/web3/transactions/constants'
+import { TRANSACTION_TYPE, CONVENTION_TYPE } from '@/transactions/constants'
 
 export {
   TransactionModal,

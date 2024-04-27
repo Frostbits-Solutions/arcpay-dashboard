@@ -1,6 +1,6 @@
 <template>
 <div class="border-t pt-8 dark:border-gray-700 text-center text-gray-700 dark:text-gray-200">
-  <h2 class="font-bold text-lg">Choose your wallet</h2>
+  <h2 class="font-bold text-lg">VOI Wallet</h2>
   <div class="mx-auto w-fit">
     <button
       class="flex items-center w-full hover:bg-gray-100 p-2 rounded"
@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { PROVIDER_ID, PROVIDER_ICONS } from '@/lib/web3/constants'
+import { PROVIDER_ID, PROVIDER_ICONS } from '@/constants'
 import { onMounted } from 'vue'
 import IconChevronNext from '@/components/icons/IconChevronNext.vue'
 

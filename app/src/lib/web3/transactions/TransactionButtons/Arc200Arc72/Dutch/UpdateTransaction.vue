@@ -6,12 +6,12 @@
 </template>
 
 <script setup lang="ts">
-import IntInput from '@/lib/web3/transactions/component/IntInput.vue'
+import IntInput from '@/transactions/component/IntInput.vue'
 import { useWeb3Store } from '@/stores/web3'
-import { longToByteArray } from '@/lib/web3/transactions/utils'
+import { longToByteArray } from '@/transactions/utils'
 import { ref } from 'vue'
-import type { Account, AppCallObject, UpdateTransactionParameters } from '@/lib/web3/types'
-import { Transaction } from '@/lib/web3/transactions/transaction'
+import type { Account, AppCallObject, UpdateTransactionParameters } from '@/types'
+import { Transaction } from '@/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src'
 

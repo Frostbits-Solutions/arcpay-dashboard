@@ -1,23 +1,23 @@
 <template>
-  <IntInput v-model="arc200AppID" min="0"/>
-  <IntInput v-model="priceMin" :max="priceMax - 1" min="0"/>
-  <IntInput v-model="priceMax" :min="priceMin + 1"/>
-  <IntInput v-model="endDate" min="0"/>h
+  <IntInput v-model="arc200AppID" label="Arc200 application id"/>
+  <IntInput v-model="priceMin" :max="priceMax - 1" label="Minimum price"/>
+  <IntInput v-model="priceMax" :min="priceMin + 1" label="Maximum price"/>
+  <IntInput v-model="endDate" label="Duration (in hours)"/>
   <button
     class="arc-pay-transaction-button"
     @click="create">Create</button>
 </template>
 
 <script setup lang="ts">
-import IntInput from '@/lib/web3/transactions/component/IntInput.vue'
+import IntInput from '@/transactions/component/IntInput.vue'
 
-import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters, PaymentObject } from '@/lib/web3/types'
+import type { Account, AppCallObject, AppCreateObject, CreateTransactionParameters, PaymentObject } from '@/types'
 import { useWeb3Store } from '@/stores/web3'
 import { ref } from 'vue'
-import { base64ToArrayBuffer, encodeAppArgs, longToByteArray } from '@/lib/web3/transactions/utils'
+import { base64ToArrayBuffer, encodeAppArgs, longToByteArray } from '@/transactions/utils'
 import { approvalProgram, clearProgram } from './contract'
-import { arc72Schema } from '@/lib/web3/transactions/abi/arc72'
-import { Transaction } from '@/lib/web3/transactions/transaction'
+import { arc72Schema } from '@/transactions/abi/arc72'
+import { Transaction } from '@/transactions/transaction'
 import _algosdk from 'algosdk'
 import { TransactionType } from 'algosdk/src/types/transactions'
 

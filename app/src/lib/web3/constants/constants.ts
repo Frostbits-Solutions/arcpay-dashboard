@@ -1,8 +1,8 @@
 import type { Network } from '../types'
 import { ICON as iconKibisis } from '../wallets/kibisis/constants'
 import { ICON as iconWalletconnect } from '../wallets/walletConnect/constants'
-import Kibisis from '@/lib/web3/wallets/kibisis'
-import WalletConnect from '@/lib/web3/wallets/walletConnect'
+import Kibisis from '@/wallets/kibisis'
+import WalletConnect from '@/wallets/walletConnect'
 
 export const PROVIDER = {
   'kibisis': Kibisis,
