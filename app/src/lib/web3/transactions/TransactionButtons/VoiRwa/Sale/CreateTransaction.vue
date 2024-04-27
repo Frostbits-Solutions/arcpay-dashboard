@@ -2,7 +2,9 @@
   <ChoosePrice v-model="price"/>
   <input type="text" v-model="name">
   <input type="text" v-model="description">
-  <button @click="create">Create</button>
+  <button
+    class="arc-pay-transaction-button"
+    @click="create">Create</button>
 </template>
 
 <script setup lang="ts">

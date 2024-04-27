@@ -1,7 +1,9 @@
 <template>
   <ChoosePrice v-model="reserve"/>
   <ChoosePrice v-model="endDate"/>
-  <button @click="create">Create</button>
+  <button
+    class="arc-pay-transaction-button"
+    @click="create">Create</button>
 </template>
 
 <script setup lang="ts">

@@ -1,6 +1,8 @@
 <template>
   <ChoosePrice :min="parameters.minPrice" v-model="price"/>
-  <button @click="buy">bid</button>
+  <button
+    class="arc-pay-transaction-button"
+    @click="bid">bid</button>
 </template>
 
 <script setup lang="ts">
@@ -21,7 +23,7 @@ const props = defineProps<{
 const emits = defineEmits(['start', 'nextStep', 'done', 'error'])
 const price = ref(props.parameters.minPrice)
 
-async function buy() {
+async function bid() {
   try {
     if (web3Store.provider === null) {
       throw { message: 'no provider initiated' }

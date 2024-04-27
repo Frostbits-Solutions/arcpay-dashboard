@@ -1,6 +1,8 @@
 <template>
   <ChoosePrice v-model="price"/>
-  <button @click="update">Update</button>
+  <button
+    class="arc-pay-transaction-button"
+    @click="update">Update</button>
 </template>
 
 <script setup lang="ts">

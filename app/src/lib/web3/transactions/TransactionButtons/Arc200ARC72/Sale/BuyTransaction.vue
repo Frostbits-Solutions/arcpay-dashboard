@@ -1,5 +1,7 @@
 <template>
-  <button @click="buy">buy</button>
+  <button
+    class="arc-pay-transaction-button"
+    @click="buy">buy</button>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,7 @@
 <template>
-  <button @click="cancel">Cancel</button>
+  <button
+    class="arc-pay-transaction-button"
+    @click="cancel">Cancel</button>
 </template>
 
 <script setup lang="ts">

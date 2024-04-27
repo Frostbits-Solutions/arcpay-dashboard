@@ -1,7 +1,9 @@
 <template>
   <input type="number" v-model="arc200AppID" />
   <ChoosePrice v-model="price"/>
-  <button @click="create">Create</button>
+  <button
+    class="arc-pay-transaction-button"
+    @click="create">Create</button>
 </template>
 
 <script setup lang="ts">
