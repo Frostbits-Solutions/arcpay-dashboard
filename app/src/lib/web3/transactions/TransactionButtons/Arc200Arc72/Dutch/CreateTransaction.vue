@@ -89,7 +89,7 @@ async function create() {
       // @ts-ignore
     const appAddr = algosdk.getApplicationAddress(confirmation['application-index'])
     const suggestedParamsFund = await algodClient.getTransactionParams().do()
-    const fundingAmount = 100_000 + 10_000
+    const fundingAmount = 300_000 + 10_000
 
     const fundAppObj: PaymentObject = {
       type: TransactionType.pay,
