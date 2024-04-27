@@ -12,10 +12,15 @@ import VoiArc72AuctionBidTransaction from './VoiArc72/Auction/BidTransaction.vue
 import VoiArc72AuctionCancelTransaction from './VoiArc72/Auction/CancelTransaction.vue'
 import VoiArc72AuctionCreateTransaction from './VoiArc72/Auction/CreateTransaction.vue'
 
-import Arc200Arc72SaleBuyTransaction from './Arc200ARC72/Sale/BuyTransaction.vue'
-import Arc200Arc72SaleCancelTransaction from './Arc200ARC72/Sale/CancelTransaction.vue'
-import Arc200Arc72SaleCreateTransaction from './Arc200ARC72/Sale/CreateTransaction.vue'
-import Arc200Arc72SaleUpdateTransaction from './Arc200ARC72/Sale/UpdateTransaction.vue'
+import Arc200Arc72SaleBuyTransaction from './Arc200Arc72/Sale/BuyTransaction.vue'
+import Arc200Arc72SaleCancelTransaction from './Arc200Arc72/Sale/CancelTransaction.vue'
+import Arc200Arc72SaleCreateTransaction from './Arc200Arc72/Sale/CreateTransaction.vue'
+import Arc200Arc72SaleUpdateTransaction from './Arc200Arc72/Sale/UpdateTransaction.vue'
+
+import Arc200Arc72DutchBuyTransaction from './Arc200Arc72/Dutch/BuyTransaction.vue'
+import Arc200Arc72DutchCancelTransaction from './Arc200Arc72/Dutch/CancelTransaction.vue'
+import Arc200Arc72DutchCreateTransaction from './Arc200Arc72/Dutch/CreateTransaction.vue'
+import Arc200Arc72DutchUpdateTransaction from './Arc200Arc72/Dutch/UpdateTransaction.vue'
 
 import VoiRwaSaleBuyTransaction from './VoiRwa/Sale/BuyTransaction.vue'
 import VoiRwaSaleCancelTransaction from './VoiRwa/Sale/CancelTransaction.vue'
@@ -41,6 +46,11 @@ export {
   Arc200Arc72SaleCancelTransaction,
   Arc200Arc72SaleCreateTransaction,
   Arc200Arc72SaleUpdateTransaction,
+
+  Arc200Arc72DutchBuyTransaction,
+  Arc200Arc72DutchCancelTransaction,
+  Arc200Arc72DutchCreateTransaction,
+  Arc200Arc72DutchUpdateTransaction,
 
   VoiRwaSaleBuyTransaction,
   VoiRwaSaleCancelTransaction,

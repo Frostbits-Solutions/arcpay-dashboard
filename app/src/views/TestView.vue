@@ -7,10 +7,11 @@ const transactionType = ref(TRANSACTION_TYPE.buy)
 
 const parameters = {
     [TRANSACTION_TYPE.buy]: {
-        seller: 'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
-        appIndex: 42034631,
+        seller: '6J4RO7U2WYQWOGWXQOZUTBBA46W4QSFL5HTHJWC5BZR53RSYRAOPAY7KPM',
+        appIndex: 42037480,
         nftAppID: 29105406,
-        price: 1,
+        arc200AppID:40427782,
+        price: 2,
         feesAddress: 'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
         nftID: 602,
     },
@@ -45,8 +46,8 @@ const parameters = {
     <main>
         <TransactionModal
             :transactionType="transactionType"
-            :conventionType="CONVENTION_TYPE.VoiArc72"
-            :contractType="CONTRACT_TYPE.Sale"
+            :conventionType="CONVENTION_TYPE.Arc200Arc72"
+            :contractType="CONTRACT_TYPE.Dutch"
             :parameters="parameters[transactionType]"
         />
 

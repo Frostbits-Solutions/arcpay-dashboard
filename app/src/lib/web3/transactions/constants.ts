@@ -1,4 +1,8 @@
 import {
+  Arc200Arc72DutchBuyTransaction,
+  Arc200Arc72DutchCancelTransaction,
+  Arc200Arc72DutchCreateTransaction,
+  Arc200Arc72DutchUpdateTransaction,
   Arc200Arc72SaleBuyTransaction,
   Arc200Arc72SaleCancelTransaction,
   Arc200Arc72SaleCreateTransaction,
@@ -97,7 +101,13 @@ export const TRANSACTIONS_BUTTONS = {
       [TRANSACTION_TYPE.cancel]:Arc200Arc72SaleCancelTransaction,
       [TRANSACTION_TYPE.create]: Arc200Arc72SaleCreateTransaction,
       [TRANSACTION_TYPE.update]: Arc200Arc72SaleUpdateTransaction,
-    }
+    },
+    [CONTRACT_TYPE.Dutch]: {
+      [TRANSACTION_TYPE.buy]: Arc200Arc72DutchBuyTransaction,
+      [TRANSACTION_TYPE.cancel]: Arc200Arc72DutchCancelTransaction,
+      [TRANSACTION_TYPE.create]: Arc200Arc72DutchCreateTransaction,
+      [TRANSACTION_TYPE.update]: Arc200Arc72DutchUpdateTransaction,
+    },
   },
   [CONVENTION_TYPE.VoiRwa]: {
     [CONTRACT_TYPE.Sale]: {
