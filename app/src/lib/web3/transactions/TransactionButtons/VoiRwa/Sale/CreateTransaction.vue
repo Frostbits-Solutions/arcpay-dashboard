@@ -46,7 +46,6 @@ async function create() {
     const suggestedParams = await algodClient.getTransactionParams().do()
     const appArgs = [
       longToByteArray(_price, 8),
-      algosdk.decodeAddress(props.parameters.feesAddress).publicKey,
       new TextEncoder().encode(name.value),
       new TextEncoder().encode(description.value)
     ]
