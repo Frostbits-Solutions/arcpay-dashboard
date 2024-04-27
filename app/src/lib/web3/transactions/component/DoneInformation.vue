@@ -1,7 +1,9 @@
 <template>
 <div>
   done
-  {{information}}
+  Tx id: {{information.txId}}<br>
+  Confirmed round: {{information.confirmed-round}}<br>
+  <a :href="`https://voi.observer/explorer/transaction/${information.txId}`">See it on VOI explorer</a>
 </div>
 </template>
 
