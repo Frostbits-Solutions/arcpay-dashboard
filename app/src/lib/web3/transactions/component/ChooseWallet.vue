@@ -25,19 +25,8 @@ const providers =
     }) ;
 
 function chooseWallet (wallet: string) {
-  localStorage.setItem('gemsPayWallet', wallet)
   emit('wallet', wallet)
 }
-
-function onMountedHook () {
-  const ls = localStorage.getItem('gemsPayWallet')
-  if (ls) {
-    emit('wallet', ls)
-  }
-}
-
-// @ts-ignore
-onMounted(onMountedHook)
 </script>
 
 <style scoped>

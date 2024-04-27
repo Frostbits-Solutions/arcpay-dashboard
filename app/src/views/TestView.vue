@@ -2,7 +2,6 @@
 import { TransactionModal, TRANSACTION_TYPE, CONVENTION_TYPE } from '@/lib/web3'
 import { ref } from 'vue'
 import { CONTRACT_TYPE } from '@/lib/web3/transactions/constants'
-import { TransactionType } from 'algosdk/src/types/transactions'
 
 const transactionType = ref(TRANSACTION_TYPE.buy)
 
@@ -46,7 +45,7 @@ const parameters = {
     <main>
         <TransactionModal
             :transactionType="transactionType"
-            :conventionType="CONVENTION_TYPE.VoiARC72"
+            :conventionType="CONVENTION_TYPE.VoiArc72"
             :contractType="CONTRACT_TYPE.Sale"
             :parameters="parameters[transactionType]"
         />

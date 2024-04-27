@@ -29,7 +29,7 @@ export enum TRANSACTION_TYPE {
 }
 
 export enum CONVENTION_TYPE {
-  VoiARC72,
+  VoiArc72,
   Arc200Arc72,
   VoiRwa
 }
@@ -72,7 +72,7 @@ export const TRANSACTIONS_STEPS = {
 }
 
 export const TRANSACTIONS_BUTTONS = {
-  [CONVENTION_TYPE.VoiARC72]: {
+  [CONVENTION_TYPE.VoiArc72]: {
     [CONTRACT_TYPE.Sale]: {
       [TRANSACTION_TYPE.buy]: VoiArc72SaleBuyTransaction,
       [TRANSACTION_TYPE.cancel]: VoiArc72SaleCancelTransaction,
