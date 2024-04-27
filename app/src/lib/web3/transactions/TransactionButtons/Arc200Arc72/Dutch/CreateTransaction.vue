@@ -49,13 +49,12 @@ async function create() {
     const suggestedParams = await algodClient.getTransactionParams().do()
     const appArgs = [
       longToByteArray(props.parameters.nftAppID, 8),
-      longToByteArray(arc200AppID.value, 8),
       longToByteArray(props.parameters.nftID, 32),
       longToByteArray(_priceMax, 8),
       longToByteArray(_priceMin, 8),
-      algosdk.decodeAddress(props.parameters.feesAddress).publicKey,
-      algosdk.decodeAddress(algosdk.getApplicationAddress(arc200AppID.value)).publicKey,
       longToByteArray((Date.now() + endDate.value * 3_600_000) / 1_000, 8),
+      longToByteArray(arc200AppID.value, 8),
+      algosdk.decodeAddress(algosdk.getApplicationAddress(arc200AppID.value)).publicKey,
     ]
     console.log(appArgs)
     const appCreateObj =
@@ -89,7 +88,7 @@ async function create() {
       // @ts-ignore
     const appAddr = algosdk.getApplicationAddress(confirmation['application-index'])
     const suggestedParamsFund = await algodClient.getTransactionParams().do()
-    const fundingAmount = 300_000 + 10_000
+    const fundingAmount = 300_000
 
     const fundAppObj: PaymentObject = {
       type: TransactionType.pay,
