@@ -7,6 +7,9 @@ import {
   Arc200Arc72SaleCancelTransaction,
   Arc200Arc72SaleCreateTransaction,
   Arc200Arc72SaleUpdateTransaction,
+  Arc200RwaSaleBuyTransaction,
+  Arc200RwaSaleCancelTransaction,
+  Arc200RwaSaleCreateTransaction, Arc200RwaSaleUpdateTransaction,
   VoiArc72AuctionBidTransaction,
   VoiArc72AuctionCancelTransaction,
   VoiArc72AuctionCreateTransaction,
@@ -35,7 +38,8 @@ export enum TRANSACTION_TYPE {
 export enum CONVENTION_TYPE {
   VoiArc72,
   Arc200Arc72,
-  VoiRwa
+  VoiRwa,
+  Arc200Rwa
 }
 
 export enum CONTRACT_TYPE {
@@ -115,6 +119,14 @@ export const TRANSACTIONS_BUTTONS = {
       [TRANSACTION_TYPE.cancel]:VoiRwaSaleCancelTransaction,
       [TRANSACTION_TYPE.create]: VoiRwaSaleCreateTransaction,
       [TRANSACTION_TYPE.update]: VoiRwaSaleUpdateTransaction,
+    }
+  },
+  [CONVENTION_TYPE.Arc200Rwa]: {
+    [CONTRACT_TYPE.Sale]: {
+      [TRANSACTION_TYPE.buy]: Arc200RwaSaleBuyTransaction,
+        [TRANSACTION_TYPE.cancel]:Arc200RwaSaleCancelTransaction,
+        [TRANSACTION_TYPE.create]: Arc200RwaSaleCreateTransaction,
+        [TRANSACTION_TYPE.update]: Arc200RwaSaleUpdateTransaction,
     }
   }
 }

@@ -22,6 +22,11 @@ import Arc200Arc72DutchCancelTransaction from './Arc200Arc72/Dutch/CancelTransac
 import Arc200Arc72DutchCreateTransaction from './Arc200Arc72/Dutch/CreateTransaction.vue'
 import Arc200Arc72DutchUpdateTransaction from './Arc200Arc72/Dutch/UpdateTransaction.vue'
 
+import Arc200RwaSaleBuyTransaction from './Arc200Rwa/Sale/BuyTransaction.vue'
+import Arc200RwaSaleCancelTransaction from './Arc200Rwa/Sale/CancelTransaction.vue'
+import Arc200RwaSaleCreateTransaction from './Arc200Rwa/Sale/CreateTransaction.vue'
+import Arc200RwaSaleUpdateTransaction from './Arc200Rwa/Sale/UpdateTransaction.vue'
+
 import VoiRwaSaleBuyTransaction from './VoiRwa/Sale/BuyTransaction.vue'
 import VoiRwaSaleCancelTransaction from './VoiRwa/Sale/CancelTransaction.vue'
 import VoiRwaSaleCreateTransaction from './VoiRwa/Sale/CreateTransaction.vue'
@@ -51,6 +56,11 @@ export {
   Arc200Arc72DutchCancelTransaction,
   Arc200Arc72DutchCreateTransaction,
   Arc200Arc72DutchUpdateTransaction,
+
+  Arc200RwaSaleBuyTransaction,
+  Arc200RwaSaleCancelTransaction,
+  Arc200RwaSaleCreateTransaction,
+  Arc200RwaSaleUpdateTransaction,
 
   VoiRwaSaleBuyTransaction,
   VoiRwaSaleCancelTransaction,
