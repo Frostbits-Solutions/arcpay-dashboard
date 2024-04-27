@@ -2,6 +2,7 @@
 import { TransactionModal, TRANSACTION_TYPE, CONVENTION_TYPE } from '@/lib/web3'
 import { ref } from 'vue'
 import { CONTRACT_TYPE } from '@/lib/web3/transactions/constants'
+import { TransactionType } from 'algosdk/src/types/transactions'
 
 const transactionType = ref(TRANSACTION_TYPE.buy)
 
@@ -29,7 +30,7 @@ const parameters = {
     },
     [TRANSACTION_TYPE.create]: {
         nftAppID: 29105406,
-        nftID: 685,
+        nftID: 602,
         feesAddress:
             'UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY',
     },
@@ -46,7 +47,7 @@ const parameters = {
         <TransactionModal
             :transactionType="transactionType"
             :conventionType="CONVENTION_TYPE.VoiARC72"
-            :contractType="CONTRACT_TYPE.Auction"
+            :contractType="CONTRACT_TYPE.Sale"
             :parameters="parameters[transactionType]"
         />
 

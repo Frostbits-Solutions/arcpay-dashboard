@@ -2,7 +2,6 @@ import {
   WalletConnectModalSign
 } from '@walletconnect/modal-sign-html'
 import type {
-  WalletConnectModalSignOptions,
   WalletConnectModalSignSession } from '@walletconnect/modal-sign-html'
 
 import _algosdk, { assignGroupID, Transaction } from 'algosdk'
@@ -10,9 +9,10 @@ import BaseClient from '@/lib/web3/wallets/base'
 import { DEFAULT_NETWORK, ARC_PAY_METADA, PROVIDER_ID } from '@/lib/web3/constants'
 import { ALGORAND_CHAINS, ICON } from './constants'
 import type { WalletProvider } from '../../types'
-import { base64ToBytes, bytesToBase64 } from '@agoralabs-sh/algorand-provider'
+import { bytesToBase64 } from '@agoralabs-sh/algorand-provider'
 import { formatJsonRpcRequest } from '@/lib/web3/wallets/walletConnect/utils'
 import Algod from '@/lib/web3/algod'
+import { Buffer } from 'buffer'
 
 let client;
 
@@ -31,7 +31,7 @@ class WalletConnect extends BaseClient {
   ) {
     super(algosdk, algodClient)
     this.client = new WalletConnectModalSign(  {
-        projectId: import.meta.env.WALLET_CONNECT_PROJECT_ID,
+        projectId: import.meta.env.VITE_WC_PROJECT_ID,
         metadata: ARC_PAY_METADA
       })
     client = this.client
@@ -134,10 +134,10 @@ class WalletConnect extends BaseClient {
     const signedTransactionBytes: Uint8Array[] = []
     for (const stxn of response) {
       if (typeof stxn === 'string'){
-        signedTransactionBytes.push(base64ToBytes(stxn))
+        signedTransactionBytes.push(new Uint8Array(Buffer.from(stxn, 'base64')))
       }
     }
-
+    console.log(signedTransactionBytes)
     return signedTransactionBytes
   }
 
