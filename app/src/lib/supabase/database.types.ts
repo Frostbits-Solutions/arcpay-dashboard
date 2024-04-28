@@ -517,7 +517,7 @@ export type Database = {
         max_price: number | null
         increment: number | null
         duration: number | null
-        type: Database["public"]["Enums"]["auctions_type"] | null
+        auction_type: Database["public"]["Enums"]["auctions_type"] | null
         asking_price: number | null
       }
     }

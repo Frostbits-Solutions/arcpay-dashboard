@@ -4,7 +4,7 @@ import { Client, modal } from 'arcpay-sdk'
 import type { QueryData } from '@supabase/supabase-js'
 
 const listings = ref<QueryData<any> | null>(null)
-const arcpay = new Client({apiKey: '99f7882a-b061-4e41-845d-70398b2c9738'})
+const arcpay = new Client({apiKey: '54db68b9-7dfa-47fa-93ae-bd694ca5ba25'})
 
 onMounted(() => {
   nextTick(async () => {

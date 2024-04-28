@@ -362,14 +362,14 @@ create type "public"."composite_listing" as (
     "max_price" double precision,
     "increment" double precision,
     "duration" integer,
-    "type" "public"."auctions_type",
+    "auction_type" "public"."auctions_type",
     "asking_price" double precision
 );
 
 CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RETURNS "public"."composite_listing"
     LANGUAGE "sql" STABLE SECURITY DEFINER
     AS $function$
-        select l.id, l.created_at, l.updated_at, l.status, l.chain, l.seller_address, l.listing_name, l.listing_currency, l.listing_type, l.app_id, l.asset_id, l.asset_thumbnail, l.asset_type, l.asset_qty, l.asset_creator, l.tags, a.min_price, a.max_price, a.min_increment, a.duration, a.type, s.asking_price
+        select l.id, l.created_at, l.updated_at, l.status, l.chain, l.seller_address, l.listing_name, l.listing_currency, l.listing_type, l.app_id, l.asset_id, l.asset_thumbnail, l.asset_type, l.asset_qty, l.asset_creator, l.tags, a.min_price, a.max_price, a.min_increment, a.duration, a.type as auctions_type, s.asking_price
         from public.listings l left join public.auctions a on a.listing_id = get_listing_by_id.listing_id left join public.sales s on s.listing_id = get_listing_by_id.listing_id where l.id = get_listing_by_id.listing_id
     $function$;
 
