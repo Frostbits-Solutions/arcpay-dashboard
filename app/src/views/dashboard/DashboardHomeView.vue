@@ -1,6 +1,21 @@
 <script setup lang="ts">
 
 import ChartTransactionHistory from '@/components/dashboard/ChartTransactionHistory.vue'
+import { getListingsTransactions } from '@/lib/supabase/listings'
+import { nextTick, onMounted, ref } from 'vue'
+
+const transactions = ref<any[]>([])
+
+onMounted(() => {
+  nextTick(async () => {
+    const { data, error } = await getListingsTransactions()
+    if (data) {
+      transactions.value = data
+    } else {
+      console.log(error)
+    }
+  })
+})
 </script>
 
 <template>
@@ -19,6 +34,7 @@ import ChartTransactionHistory from '@/components/dashboard/ChartTransactionHist
             Real time
           </span>
         </h2>
+        {{ transactions }}
       </div>
     </div>
   </main>
