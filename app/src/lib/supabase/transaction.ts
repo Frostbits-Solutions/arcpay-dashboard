@@ -1,9 +1,21 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
 
-export async function getTransactions(contract_address: string) {
+export async function getTransactions(app_ids: string[]) {
     const { data, error } = await supabase
         .from('transactions')
         .select('*')
-        .eq('contract_address', contract_address)
+        .in('app_id', app_ids)
     return { data, error }
+}
+
+export async function subscribeToTransactions(account_id: number, callback: ()=>{}) {
+    supabase.channel(`transactions_feed`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'transactions' },
+        (payload) => {
+            console.log('Change received!', payload)
+        }
+      )
+      .subscribe()
 }
