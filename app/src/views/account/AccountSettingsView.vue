@@ -11,21 +11,17 @@ import ModalAccountAddKey from '@/components/account/ModalAccountAddKey.vue'
 import ClipboardInput from '@/components/common/InputClipboard.vue'
 import IconLink from '@/components/icons/IconLink.vue'
 import ModalAccountLinkAddress from '@/components/account/ModalAccountLinkAddress.vue'
+import type { Database } from '@/lib/supabase/database.types'
 
 interface AccountData {
-  settings?: {
-    created_at: string,
-    id: number,
-    name: string,
-    owner_email: string,
-    s_enable_secondary_sales: boolean,
-    s_secondary_sales_percentage_fee: number | null,
-    subscription_expiration_date: string | null,
-    subscription_id: number
-  } | null
-  users?: { role: 'admin' | 'moderator' | 'member', user_email: string }[] | null
-  keys?: {account_id: number | null, created_at: string, domain: string, key: string, name: string | null }[] | null
-  addresses?: {account_id: number, address: string, created_at: string, name: string | null}[] | null
+  settings?: Database["public"]["Tables"]["accounts"]["Row"] | null
+  users?: {
+    role: Database["public"]["Tables"]["accounts_users_association"]["Row"]["role"],
+    user_email: Database["public"]["Tables"]["accounts_users_association"]["Row"]["user_email"],
+    created_at: Database["public"]["Tables"]["accounts_users_association"]["Row"]["created_at"],
+  }[] | null
+  keys?: Database["public"]["Tables"]["accounts_api_keys"]["Row"][] | null
+  addresses?: Database["public"]["Tables"]["accounts_addresses"]["Row"][] | null
 }
 
 const accounts = useAccountsStore()
@@ -177,7 +173,7 @@ onMounted(() => {
       <!-- account API keys -->
       <AccountSettingsCard>
         <template #title>API Keys</template>
-        <template #description>API keys can be used for advanced integration to interact with our API.<br> To help prevent malicious use of your keys, you are strongly encouraged to only allow specific origins.</template>
+        <template #description>API keys can be used for advanced integration to interact with our API.<br> To help prevent malicious use of your keys, you are strongly encouraged to only allow specific origins. HTTP requests that don't have a matching Origin header will be blocked.</template>
         <template #body>
           <div class="relative">
             <div class="flex items-center justify-between pb-4">
@@ -192,7 +188,7 @@ onMounted(() => {
                     Key
                   </th>
                   <th scope="col" class="px-6 py-3">
-                    Allowed Domain
+                    Allowed Origin
                   </th>
                   <th scope="col" class="px-6 py-3">
                     Name
@@ -208,7 +204,7 @@ onMounted(() => {
                     <ClipboardInput :id="key.key" :value="key.key" class="min-w-64"/>
                   </td>
                   <td class="px-6 py-4 truncate">
-                    {{ key.domain }}
+                    {{ key.origin }}
                   </td>
                   <td class="px-6 py-4 truncate">
                     {{ key.name }}

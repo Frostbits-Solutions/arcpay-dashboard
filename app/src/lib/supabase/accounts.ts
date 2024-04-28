@@ -82,7 +82,7 @@ export async function addAccountUser(account_id: number, user_email: string, rol
 export async function getAccountUsers(id: number) {
   const { data, error } = await supabase
     .from('accounts_users_association')
-    .select('role, user_email')
+    .select('role, user_email, created_at')
     .eq('account_id', id)
   return { data, error }
 }
@@ -150,13 +150,13 @@ export async function removeAccountAddress(id: number, address: string) {
   return { data, error }
 }
 
-export async function createAccountApiKey(account_id: number, domain: string, name: string) {
+export async function createAccountApiKey(account_id: number, origin: string, name: string) {
   const { data, error } = await supabase
     .from('accounts_api_keys')
     .insert({
       account_id,
       name,
-      domain
+      origin
     })
     .select()
   return { data, error }
@@ -170,11 +170,11 @@ export async function getAccountApiKeys(account_id: number) {
   return { data, error }
 }
 
-export async function updateAccountApiKey(account_id: number, key: number, domain: string, name: string) {
+export async function updateAccountApiKey(account_id: number, key: number, origin: string, name: string) {
   const { data, error } = await supabase
     .from('accounts_api_keys')
     .update({
-      domain,
+      origin,
       name
     })
     .eq('account_id', account_id)
