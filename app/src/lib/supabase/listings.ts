@@ -1,21 +1,23 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
+import type { Database } from '@/lib/supabase/database.types'
 
 export async function createAuction(
-    account_id: number,
-    asset_creator: string | null,
-    asset_id: string,
-    asset_name: string,
-    asset_qty: number,
-    asset_thumbnail: string | null,
-    asset_type: 'ARC72' | 'OFFCHAIN',
-    contract_address: string,
-    listing_currency: string,
-    seller_address: string,
-    tags: string | null,
-    start_price: number,
-    min_increment: number,
-    duration: number,
-    type: string
+    account_id: Database["public"]["Tables"]["listings"]["Row"]["account_id"],
+    app_id: Database["public"]["Tables"]["listings"]["Row"]["app_id"],
+    asset_creator: Database["public"]["Tables"]["listings"]["Row"]["asset_creator"],
+    asset_id: Database["public"]["Tables"]["listings"]["Row"]["asset_id"],
+    asset_qty: Database["public"]["Tables"]["listings"]["Row"]["asset_qty"],
+    asset_thumbnail: Database["public"]["Tables"]["listings"]["Row"]["asset_thumbnail"],
+    asset_type: Database["public"]["Enums"]["assets_types"],
+    chain: Database["public"]["Enums"]["chains"],
+    listing_currency: Database["public"]["Tables"]["listings"]["Row"]["listing_currency"],
+    listing_name: Database["public"]["Tables"]["listings"]["Row"]["listing_name"],
+    seller_address: Database["public"]["Tables"]["listings"]["Row"]["seller_address"],
+    tags: Database["public"]["Tables"]["listings"]["Row"]["tags"],
+    duration: Database["public"]["Tables"]["auctions"]["Row"]["duration"],
+    min_increment: Database["public"]["Tables"]["auctions"]["Row"]["min_increment"],
+    start_price: Database["public"]["Tables"]["auctions"]["Row"]["start_price"],
+    type: Database["public"]["Enums"]["auctions_type"]
 ) {
     const { data: listingData, error: listingError } = await supabase
         .from('listings')
@@ -23,14 +25,15 @@ export async function createAuction(
             account_id,
             seller_address,
             listing_currency,
-            contract_address,
+            app_id,
             asset_id,
-            asset_name,
+            listing_name,
             asset_thumbnail,
             asset_type,
             asset_qty,
             asset_creator,
             tags,
+            chain,
             listing_type: 'auction',
             status: 'pending',
         })
@@ -61,18 +64,19 @@ export async function getAuctions(account_id: number) {
 }
 
 export async function createSale(
-    account_id: number,
-    asset_creator: string | null,
-    asset_id: string,
-    asset_name: string,
-    asset_qty: number,
-    asset_thumbnail: string | null,
-    asset_type: 'ARC72' | 'OFFCHAIN',
-    contract_address: string,
-    listing_currency: string,
-    seller_address: string,
-    tags: string | null,
-    asking_price: number
+    account_id: Database["public"]["Tables"]["listings"]["Row"]["account_id"],
+    app_id: Database["public"]["Tables"]["listings"]["Row"]["app_id"],
+    asset_creator: Database["public"]["Tables"]["listings"]["Row"]["asset_creator"],
+    asset_id: Database["public"]["Tables"]["listings"]["Row"]["asset_id"],
+    asset_qty: Database["public"]["Tables"]["listings"]["Row"]["asset_qty"],
+    asset_thumbnail: Database["public"]["Tables"]["listings"]["Row"]["asset_thumbnail"],
+    asset_type: Database["public"]["Enums"]["assets_types"],
+    chain: Database["public"]["Enums"]["chains"],
+    listing_currency: Database["public"]["Tables"]["listings"]["Row"]["listing_currency"],
+    listing_name: Database["public"]["Tables"]["listings"]["Row"]["listing_name"],
+    seller_address: Database["public"]["Tables"]["listings"]["Row"]["seller_address"],
+    tags: Database["public"]["Tables"]["listings"]["Row"]["tags"],
+    asking_price: Database["public"]["Tables"]["sales"]["Row"]["asking_price"]
 ) {
     const { data: listingData, error: listingError } = await supabase
         .from('listings')
@@ -80,14 +84,15 @@ export async function createSale(
             account_id,
             seller_address,
             listing_currency,
-            contract_address,
+            app_id,
             asset_id,
-            asset_name,
+            listing_name,
             asset_thumbnail,
             asset_type,
             asset_qty,
             asset_creator,
             tags,
+            chain,
             listing_type: 'sale',
             status: 'pending',
         })
@@ -120,4 +125,16 @@ export async function cancelListing(listing_id: string) {
         .update({ status: 'closed' })
         .eq('id', listing_id)
     return { data, error }
+}
+
+export async function getListingsTransactions() {
+    const { data, error } = await supabase
+        .from('listings')
+        .select('*, transactions( * )')
+    return { data, error }
+}
+
+export async function getListingById(listing_id: string) {
+  const { data, error } = await supabase.rpc('get_listing_by_id', { listing_id })
+  return { data, error }
 }
