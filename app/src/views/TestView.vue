@@ -4,19 +4,16 @@ import { createClient, getListings, buy } from 'arcpay-sdk'
 import type { QueryData } from '@supabase/supabase-js'
 
 const listings = ref<QueryData<any> | null>(null)
-
+const client = createClient('e95d6aac-db69-481b-8e40-9a5c8830459f')
 
 onMounted(() => {
   nextTick(async () => {
-    /* const client = createClient('e95d6aac-db69-481b-8e40-9a5c8830459f')
     const { data, error } = await getListings(client)
     if (data) {
       listings.value = data
     } else {
       console.log(error)
     }
-
-     */
   })
 })
 </script>
@@ -26,10 +23,9 @@ onMounted(() => {
       Listings
       <ul>
         <li v-for="listing in listings" :key="listing.id">
-          {{ listing.id }} - {{ listing.listing_type }} - {{ listing.status}}
+          {{ listing }} <button @click="buy(client, listing.id)" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buy</button>
         </li>
       </ul>
-      <button @click="buy">Buy</button>
     </main>
 </template>
 
