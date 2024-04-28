@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
-import { createClient, getListings, buy } from 'arcpay-sdk'
+import { Client, modal } from 'arcpay-sdk'
 import type { QueryData } from '@supabase/supabase-js'
 
 const listings = ref<QueryData<any> | null>(null)
-const client = createClient('99f7882a-b061-4e41-845d-70398b2c9738')
+const arcpay = new Client({apiKey: '99f7882a-b061-4e41-845d-70398b2c9738'})
 
 onMounted(() => {
   nextTick(async () => {
-    const { data, error } = await getListings(client)
+    const { data, error } = await arcpay.getListings()
     if (data) {
       listings.value = data
     } else {
@@ -23,7 +23,7 @@ onMounted(() => {
       Listings
       <ul>
         <li v-for="listing in listings" :key="listing.id">
-          {{ listing }} <button @click="buy(client, listing.id)" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buy</button>
+          {{ listing }} <button @click="arcpay.buy(listing.id)" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buy</button>
         </li>
       </ul>
     </main>
