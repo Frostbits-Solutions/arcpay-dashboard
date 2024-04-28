@@ -20,12 +20,19 @@ onMounted(() => {
 
 <template>
     <main>
-      Listings
-      <ul>
-        <li v-for="listing in listings" :key="listing.id">
-          {{ listing }} <button @click="arcpay.buy(listing.id)" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buy</button>
+      <h1 class="text-2xl mb-12">Test</h1>
+      <ul class="mb-12">
+        <li>
+          <button @click="arcpay.createListing()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">create listing</button>
         </li>
       </ul>
+      Account Listings
+      <ul>
+        <li v-for="listing in listings" :key="listing.id">
+          {{ listing.id }} - {{ listing.listing_type }} <button @click="arcpay[listing.listing_type === 'sale' ? 'buy' : 'bid'](listing.id)" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{ listing.listing_type === 'sale' ? 'buy' : 'bid' }}</button>
+        </li>
+      </ul>
+
     </main>
 </template>
 
