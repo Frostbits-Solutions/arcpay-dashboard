@@ -1,7 +1,7 @@
 insert into subscription_tiers (id, name, listing_flat_fee, sale_percentage_fee, allow_secondary_sales, allow_premium_contracts) values (0, 'free', 100, 2, false, false);
 insert into accounts (id, name, owner_email) values (0, 'Test', 'corentin@frostbits.solutions');
 insert into accounts_users_association (role, account_id, user_email) values ('admin', 0, 'wilder@frostbits.solutions');
-insert into accounts_api_keys (domain, name, account_id) values ('frostbits.solutions', 'Test Key', 0);
+insert into accounts_api_keys (origin, name, account_id) values ('http://localhost:5173', 'Dev Key', 0);
 insert into accounts_addresses (address, name, account_id, chain) values ('UVGMQYP246NIXHWFSLBNPFVXJ77HSXNLU3AFP3JQEUVJSTGZIMGJ3JFFZY', 'Test Wallet', 0, 'voi:testnet');
 insert into currencies (id, name, ticker, chain) values (0, 'voi', 'voi', 'voi:testnet');
 insert into listings

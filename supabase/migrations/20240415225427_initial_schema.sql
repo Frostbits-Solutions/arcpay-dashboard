@@ -96,11 +96,11 @@ CREATE OR REPLACE FUNCTION "public"."get_member_accounts_for_user"("user_email" 
 
 ALTER FUNCTION "public"."get_member_accounts_for_user"("user_email" "text") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."filter_public_listings"("listing_id" "uuid") RETURNS boolean
- LANGUAGE "sql" STABLE SECURITY DEFINER
- AS $_$EXISTS (SELECT 1 FROM listings WHERE id = listing_id)$_$;
+CREATE OR REPLACE FUNCTION "public"."get_key_account_id"("key" text, "origin" text) RETURNS bigint
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    AS $_$select account_id from accounts_api_keys where key::text = $1 and origin = $2$_$;
 
-ALTER FUNCTION "public"."filter_public_listings"("listing_id" "uuid") OWNER TO "postgres";
+ALTER FUNCTION "public"."get_key_account_id"("key" text, "origin" text) OWNER TO "postgres";
 
 SET default_tablespace = '';
 
@@ -132,7 +132,7 @@ ALTER TABLE "public"."accounts_addresses" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "public"."accounts_api_keys" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "key" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "domain" text NOT NULL,
+    "origin" text NOT NULL,
     "name" text,
     "account_id" bigint NOT NULL
 );
@@ -339,6 +339,51 @@ ALTER TABLE ONLY "public"."listings"
 ALTER TABLE ONLY "public"."sales"
     ADD CONSTRAINT "public_sales_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE;
 
+create type "public"."composite_listing" as (
+    "id" "uuid",
+    "created_at" timestamp,
+    "updated_at" timestamp,
+    "status" "public"."listings_statuses",
+    "chain" "public"."chains",
+    "seller_address" text,
+    "listing_name" text,
+    "listing_currency" text,
+    "listing_type" "public"."listings_types",
+    "app_id" bigint,
+    "asset_id" text,
+    "asset_thumbnail" text,
+    "asset_type" "public"."assets_types",
+    "asset_qty" double precision,
+    "asset_creator" text,
+    "tags" text,
+    "start_price" double precision,
+    "min_increment" double precision,
+    "duration" integer,
+    "type" "public"."auctions_type",
+    "asking_price" double precision
+);
+
+CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RETURNS "public"."composite_listing"
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    AS $function$
+        select l.id, l.created_at, l.updated_at, l.status, l.chain, l.seller_address, l.listing_name, l.listing_currency, l.listing_type, l.app_id, l.asset_id, l.asset_thumbnail, l.asset_type, l.asset_qty, l.asset_creator, l.tags, a.start_price, a.min_increment, a.duration, a.type, s.asking_price
+        from public.listings l left join public.auctions a on a.listing_id = get_listing_by_id.listing_id left join public.sales s on s.listing_id = get_listing_by_id.listing_id where l.id = get_listing_by_id.listing_id
+    $function$;
+
+ALTER FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."transactions"("public"."listings") RETURNS SETOF "public"."transactions"
+    LANGUAGE sql STABLE
+    AS $function$ select * from transactions where app_id = $1.app_id $function$;
+
+ALTER FUNCTION "public"."transactions"("public"."listings") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."listings"("public"."transactions") RETURNS SETOF "public"."listings"
+    LANGUAGE sql STABLE
+    AS $function$ select * from listings where app_id = $1.app_id $function$;
+
+ALTER FUNCTION "public"."listings"("public"."transactions") OWNER TO "postgres";
+
 CREATE POLICY "Members can read accounts" ON "public"."accounts" FOR SELECT TO "authenticated" USING ((id IN ( SELECT "public"."get_administrated_accounts_for_user"(auth.email()) AS "get_member_accounts_for_user")));
 
 CREATE POLICY "Enable insert for authenticated users only" ON "public"."accounts" FOR INSERT TO "authenticated" WITH CHECK ((auth.email() = owner_email));
@@ -357,17 +402,23 @@ CREATE POLICY "Owner can delete account" ON "public"."accounts" FOR DELETE TO "a
 
 CREATE POLICY "Members can manage listings" ON "public"."listings" FOR ALL TO "authenticated" USING (("account_id" IN ( SELECT "public"."get_member_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user")));
 
-CREATE POLICY "Anon can select one listing" ON "public"."listings" FOR SELECT TO "public" USING ("public"."filter_public_listings"("id"));
+CREATE POLICY "Enable read access for API keys" on "public"."listings" FOR SELECT TO "public" USING (("account_id" = ( SELECT "public"."get_key_account_id"((current_setting('request.headers'::text, true))::json ->> 'x-arcpay-key'::text, (current_setting('request.headers'::text, true))::json ->> 'origin'::text) AS "get_key_account_id")));
 
-CREATE POLICY "Anon can select one sale" ON "public"."sales" FOR SELECT TO "public" USING ("public"."filter_public_listings"("listing_id"));
-
-CREATE POLICY "Anon can select one auction" ON "public"."auctions" FOR SELECT TO "public" USING ("public"."filter_public_listings"("listing_id"));
+CREATE POLICY "Enable write access for API keys" on "public"."listings" FOR INSERT TO "public" WITH CHECK (("account_id" = ( SELECT "public"."get_key_account_id"((current_setting('request.headers'::text, true))::json ->> 'x-arcpay-key'::text, (current_setting('request.headers'::text, true))::json ->> 'origin'::text) AS "get_key_account_id")));
 
 CREATE POLICY "Enable read access for all users" ON "public"."currencies" FOR SELECT TO "public" USING (true);
 
 CREATE POLICY "Members can manage sales" ON "public"."sales" FOR ALL TO "authenticated" USING (("listing_id" IN ( SELECT "id" FROM "public"."listings" WHERE "account_id" IN ( SELECT "public"."get_member_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user"))));
 
+CREATE POLICY "Enable read access for API keys" on "public"."sales" FOR SELECT TO "public" USING (("listing_id" IN ( SELECT "id" FROM "public"."listings" WHERE "account_id" = ( SELECT "public"."get_key_account_id"((current_setting('request.headers'::text, true))::json ->> 'x-arcpay-key'::text, (current_setting('request.headers'::text, true))::json ->> 'origin'::text) AS "get_key_account_id"))));
+
+CREATE POLICY "Enable write access for API keys" on "public"."sales" FOR INSERT TO "public" WITH CHECK (("listing_id" IN ( SELECT "id" FROM "public"."listings" WHERE "account_id" = ( SELECT "public"."get_key_account_id"((current_setting('request.headers'::text, true))::json ->> 'x-arcpay-key'::text, (current_setting('request.headers'::text, true))::json ->> 'origin'::text) AS "get_key_account_id"))));
+
 CREATE POLICY "Members can manage auctions" ON "public"."auctions" FOR ALL TO "authenticated" USING (("listing_id" IN ( SELECT "id" FROM "public"."listings" WHERE "account_id" IN ( SELECT "public"."get_member_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user"))));
+
+CREATE POLICY "Enable read access for API keys" on "public"."auctions" FOR SELECT TO "public" USING (("listing_id" IN ( SELECT "id" FROM "public"."listings" WHERE "account_id" = ( SELECT "public"."get_key_account_id"((current_setting('request.headers'::text, true))::json ->> 'x-arcpay-key'::text, (current_setting('request.headers'::text, true))::json ->> 'origin'::text) AS "get_key_account_id"))));
+
+CREATE POLICY "Enable write access for API keys" on "public"."auctions" FOR INSERT TO "public" WITH CHECK (("listing_id" IN ( SELECT "id" FROM "public"."listings" WHERE "account_id" = ( SELECT "public"."get_key_account_id"((current_setting('request.headers'::text, true))::json ->> 'x-arcpay-key'::text, (current_setting('request.headers'::text, true))::json ->> 'origin'::text) AS "get_key_account_id"))));
 
 CREATE POLICY "Enable read access for all users" ON "public"."transactions" FOR SELECT TO "public" USING (true);
 

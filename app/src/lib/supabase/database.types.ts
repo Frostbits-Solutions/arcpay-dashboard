@@ -86,23 +86,23 @@ export type Database = {
         Row: {
           account_id: number
           created_at: string
-          domain: string
           key: string
           name: string | null
+          origin: string
         }
         Insert: {
           account_id: number
           created_at?: string
-          domain: string
           key?: string
           name?: string | null
+          origin: string
         }
         Update: {
           account_id?: number
           created_at?: string
-          domain?: string
           key?: string
           name?: string | null
+          origin?: string
         }
         Relationships: [
           {
@@ -233,6 +233,7 @@ export type Database = {
           status: Database["public"]["Enums"]["listings_statuses"]
           tags: string | null
           updated_at: string | null
+          transactions: unknown | null
         }
         Insert: {
           account_id: number
@@ -374,6 +375,7 @@ export type Database = {
           id: string
           note: string | null
           type: Database["public"]["Enums"]["transaction_type"]
+          listings: unknown | null
         }
         Insert: {
           amount: number
@@ -404,23 +406,70 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      filter_public_listings: {
-        Args: {
-          listing_id: string
-        }
-        Returns: boolean
-      }
       get_administrated_accounts_for_user: {
         Args: {
           user_email: string
         }
         Returns: number[]
       }
+      get_key_account_id: {
+        Args: {
+          key: string
+          origin: string
+        }
+        Returns: number
+      }
+      get_listing_by_id: {
+        Args: {
+          listing_id: string
+        }
+        Returns: Database["public"]["CompositeTypes"]["composite_listing"]
+      }
       get_member_accounts_for_user: {
         Args: {
           user_email: string
         }
         Returns: number[]
+      }
+      listings: {
+        Args: {
+          "": unknown
+        }
+        Returns: {
+          account_id: number
+          app_id: number
+          asset_creator: string | null
+          asset_id: string
+          asset_qty: number
+          asset_thumbnail: string | null
+          asset_type: Database["public"]["Enums"]["assets_types"]
+          chain: Database["public"]["Enums"]["chains"]
+          created_at: string
+          id: string
+          listing_currency: string
+          listing_name: string
+          listing_type: Database["public"]["Enums"]["listings_types"]
+          seller_address: string
+          status: Database["public"]["Enums"]["listings_statuses"]
+          tags: string | null
+          updated_at: string | null
+        }[]
+      }
+      transactions: {
+        Args: {
+          "": unknown
+        }
+        Returns: {
+          amount: number
+          app_id: number
+          chain: Database["public"]["Enums"]["chains"]
+          created_at: string
+          currency: string
+          from_address: string
+          id: string
+          note: string | null
+          type: Database["public"]["Enums"]["transaction_type"]
+        }[]
       }
     }
     Enums: {
@@ -440,7 +489,29 @@ export type Database = {
         | "cancel"
     }
     CompositeTypes: {
-      [_ in never]: never
+      composite_listing: {
+        id: string | null
+        created_at: string | null
+        updated_at: string | null
+        status: Database["public"]["Enums"]["listings_statuses"] | null
+        chain: Database["public"]["Enums"]["chains"] | null
+        seller_address: string | null
+        listing_name: string | null
+        listing_currency: string | null
+        listing_type: Database["public"]["Enums"]["listings_types"] | null
+        app_id: number | null
+        asset_id: string | null
+        asset_thumbnail: string | null
+        asset_type: Database["public"]["Enums"]["assets_types"] | null
+        asset_qty: number | null
+        asset_creator: string | null
+        tags: string | null
+        start_price: number | null
+        min_increment: number | null
+        duration: number | null
+        type: Database["public"]["Enums"]["auctions_type"] | null
+        asking_price: number | null
+      }
     }
   }
 }
