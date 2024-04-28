@@ -31,14 +31,14 @@ const handleLogin = async () => {
 }
 
 onMounted(() => {
-    supabase.auth.getSession().then((session) => {
-        if (session) {
-          loading.value = true
-          setTimeout(() => {
-            router.replace({ path: '/dashboard' })
-          }, 1000)
-        }
-    })
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      loading.value = true
+      setTimeout(() => {
+        router.replace({ path: '/dashboard' })
+      }, 1000)
+    }
+  })
 })
 </script>
 
