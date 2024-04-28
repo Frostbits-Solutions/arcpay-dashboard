@@ -4,7 +4,7 @@ import { createClient, getListings, buy } from 'arcpay-sdk'
 import type { QueryData } from '@supabase/supabase-js'
 
 const listings = ref<QueryData<any> | null>(null)
-const client = createClient('e95d6aac-db69-481b-8e40-9a5c8830459f')
+const client = createClient('99f7882a-b061-4e41-845d-70398b2c9738')
 
 onMounted(() => {
   nextTick(async () => {

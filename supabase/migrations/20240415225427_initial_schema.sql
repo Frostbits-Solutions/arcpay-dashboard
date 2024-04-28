@@ -163,8 +163,9 @@ CREATE TABLE IF NOT EXISTS "public"."auctions" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone,
     "listing_id" "uuid" NOT NULL,
-    "start_price" double precision NOT NULL,
-    "min_increment" double precision NOT NULL,
+    "min_price" double precision NOT NULL,
+    "max_price" double precision,
+    "increment" double precision NOT NULL,
     "duration" integer NOT NULL,
     "type" "public"."auctions_type" NOT NULL
 );
@@ -264,8 +265,9 @@ CREATE TABLE IF NOT EXISTS "public"."transactions" (
     "chain" "public"."chains" NOT NULL,
     "app_id" bigint NOT NULL,
     "type" "public"."transaction_type" NOT NULL,
-    "amount" double precision NOT NULL,
-    "currency" text NOT NULL,
+    "amount" double precision,
+    "currency" text,
+    "group_id" text,
     "note" text
 );
 
@@ -356,8 +358,9 @@ create type "public"."composite_listing" as (
     "asset_qty" double precision,
     "asset_creator" text,
     "tags" text,
-    "start_price" double precision,
-    "min_increment" double precision,
+    "min_price" double precision,
+    "max_price" double precision,
+    "increment" double precision,
     "duration" integer,
     "type" "public"."auctions_type",
     "asking_price" double precision
@@ -366,7 +369,7 @@ create type "public"."composite_listing" as (
 CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RETURNS "public"."composite_listing"
     LANGUAGE "sql" STABLE SECURITY DEFINER
     AS $function$
-        select l.id, l.created_at, l.updated_at, l.status, l.chain, l.seller_address, l.listing_name, l.listing_currency, l.listing_type, l.app_id, l.asset_id, l.asset_thumbnail, l.asset_type, l.asset_qty, l.asset_creator, l.tags, a.start_price, a.min_increment, a.duration, a.type, s.asking_price
+        select l.id, l.created_at, l.updated_at, l.status, l.chain, l.seller_address, l.listing_name, l.listing_currency, l.listing_type, l.app_id, l.asset_id, l.asset_thumbnail, l.asset_type, l.asset_qty, l.asset_creator, l.tags, a.min_price, a.max_price, a.min_increment, a.duration, a.type, s.asking_price
         from public.listings l left join public.auctions a on a.listing_id = get_listing_by_id.listing_id left join public.sales s on s.listing_id = get_listing_by_id.listing_id where l.id = get_listing_by_id.listing_id
     $function$;
 

@@ -10,7 +10,7 @@ values
     ('9de87750-df76-44af-a8f1-aa39157fdb0c', 0, 'closed', 'VOIUK3B5KQXVMVMYMLZOELHNABRKV27BP3CZRIK2ZCF7HEFP4F6APX76NM', 0, 'sale', 29084618, '29084618/10', 'VOIVIP10', 'https://prod.cdn.highforge.io/t/29084618/10.webp', 'ARC72', 1, 'BSVFQL2I7YZWVRQ5THOPTXZXPUYOMYPXUGJUQLVZGQEEPJ27EUZCPEANDI', 'primary/voivip', 'voi:testnet'),
     ('d1921524-7e6f-459a-a719-e6e6ee4056ae', 0, 'active', 'VOIUK3B5KQXVMVMYMLZOELHNABRKV27BP3CZRIK2ZCF7HEFP4F6APX76NM', 0, 'auction', 29088600, '29088600/7', 'Empty Cassette Case #7', 'https://prod.cdn.highforge.io/t/29088600/7.webp', 'ARC72', 1, 'BVWZNHUTAXJL754GL3RTCSDMOO6LYV4JMUO3M7MGBJ6VPAMBY7DRYOGLSQ', 'primary/cassette', 'voi:testnet');
 insert into sales (listing_id, asking_price) values ('9de87750-df76-44af-a8f1-aa39157fdb0c', 1000);
-insert into auctions (listing_id, start_price, min_increment, duration, type) values ('d1921524-7e6f-459a-a719-e6e6ee4056ae', 1000, 500, 10512000, 'english');
+insert into auctions (listing_id, min_price, increment, duration, type) values ('d1921524-7e6f-459a-a719-e6e6ee4056ae', 1000, 500, 10512000, 'english');
 insert into transactions
     (id, from_address, app_id, type, amount, currency, note, chain)
 values

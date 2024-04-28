@@ -15,8 +15,9 @@ export async function createAuction(
     seller_address: Database["public"]["Tables"]["listings"]["Row"]["seller_address"],
     tags: Database["public"]["Tables"]["listings"]["Row"]["tags"],
     duration: Database["public"]["Tables"]["auctions"]["Row"]["duration"],
-    min_increment: Database["public"]["Tables"]["auctions"]["Row"]["min_increment"],
-    start_price: Database["public"]["Tables"]["auctions"]["Row"]["start_price"],
+    increment: Database["public"]["Tables"]["auctions"]["Row"]["increment"],
+    min_price: Database["public"]["Tables"]["auctions"]["Row"]["min_price"],
+    max_price: Database["public"]["Tables"]["auctions"]["Row"]["max_price"],
     type: Database["public"]["Enums"]["auctions_type"]
 ) {
     const { data: listingData, error: listingError } = await supabase
@@ -46,8 +47,9 @@ export async function createAuction(
         .from('auctions')
         .insert({
             listing_id: listingId,
-            start_price,
-            min_increment,
+            min_price,
+            max_price,
+            increment,
             duration,
             type,
         })
