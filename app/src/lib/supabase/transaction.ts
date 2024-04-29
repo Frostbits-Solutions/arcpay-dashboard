@@ -8,6 +8,14 @@ export async function getTransactions(app_ids: string[]) {
     return { data, error }
 }
 
+export async function getTransactionsListings(account_id: number){
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*, listings( * )')
+    .eq('listings.account_id', account_id)
+  return { data, error }
+}
+
 export async function subscribeToTransactions(account_id: number, callback: ()=>{}) {
     supabase.channel(`transactions_feed`)
       .on(

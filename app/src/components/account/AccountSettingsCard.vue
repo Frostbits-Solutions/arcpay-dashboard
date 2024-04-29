@@ -3,7 +3,7 @@
         <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
             <slot name="title"></slot>
         </h2>
-        <p class="mb-6 text-gray-500 dark:text-gray-400">
+        <p class="mb-6 text-gray-500 text-sm dark:text-gray-400">
             <slot name="description"></slot>
         </p>
         <slot name="body"></slot>
