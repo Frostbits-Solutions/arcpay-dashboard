@@ -16,7 +16,7 @@ const handleLogin = async () => {
         const { error } = await supabase.auth.signInWithOtp({
             email: email.value,
             options: {
-                emailRedirectTo: `${window.location.origin}/auth`
+                emailRedirectTo: window.location.href
             }
         })
         if (error) throw error
