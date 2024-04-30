@@ -6,6 +6,7 @@ import DashboardLayout from '@/views/dashboard/DashboardLayout.vue'
 import AccountSettingsView from '@/views/account/AccountSettingsView.vue'
 import DashboardHomeView from '@/views/dashboard/DashboardHomeView.vue'
 import DashboardListingsView from '@/views/dashboard/DashboardListingsView.vue'
+import ListingView from '@/views/ListingView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,11 @@ const router = createRouter({
           component: DashboardListingsView,
         }
       ]
+    },
+    {
+      path: '/listing/:id',
+      name: 'listing',
+      component: ListingView,
     },
     {
       path: '/test',
