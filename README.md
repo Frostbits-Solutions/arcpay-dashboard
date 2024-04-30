@@ -89,6 +89,6 @@
 
 ## Set Your Secondary Fee
 1. Click the "Settings" gear icon at the bottom of the left sidebar
-2. Scroll to the bottom of the page and click the "Secondary fees" field
-3. Enter the fee percentage you want to apply to secondary listings
-4. Click the "Save" button
+2. Scroll to the bottom of the page and click the "Add fees" button
+3. Enter the "Fees percentage" you want to apply to secondary listings
+4. Click the "Add fees" button
