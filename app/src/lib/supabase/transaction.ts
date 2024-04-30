@@ -11,7 +11,7 @@ export async function getTransactions(app_ids: string[]) {
 export async function getTransactionsListings(account_id: number){
   const { data, error } = await supabase
     .from('transactions')
-    .select('*, listings( * )')
+    .select('*, listings!inner( * )')
     .eq('listings.account_id', account_id)
   return { data, error }
 }
