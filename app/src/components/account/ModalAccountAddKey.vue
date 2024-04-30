@@ -14,8 +14,8 @@ const keyName = ref('')
 const domain = ref('')
 
 async function handleAddKey() {
-  if (accounts?.active?.id) {
-    const {data, error} =  await createAccountApiKey(accounts?.active?.id, domain.value, keyName.value)
+  if (typeof accounts?.active?.id !== 'undefined') {
+    const {data, error} =  await createAccountApiKey(accounts.active.id, domain.value, keyName.value)
     if (error) {
       console.error(error)
     } else {
@@ -42,7 +42,7 @@ async function handleAddKey() {
             <input v-model="keyName" type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type key name" required>
           </div>
           <div class="col-span-2">
-            <label for="domain" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Domain</label>
+            <label for="domain" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Origin</label>
             <input v-model="domain" type="url" name="domain" id="domain" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type domain" required>
           </div>
         </div>

@@ -14,7 +14,7 @@ const userEmail = ref('')
 const userRole = ref<'member' | 'admin'>('member')
 
 async function handleAddUser() {
-  if (accounts?.active?.id) {
+  if (typeof accounts?.active?.id !== 'undefined') {
     const {data, error} =  await addAccountUser(accounts.active.id, userEmail.value, userRole.value)
     if (error) {
       console.error(error)

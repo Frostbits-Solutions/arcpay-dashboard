@@ -14,8 +14,8 @@ const address = ref('')
 const addressName = ref('')
 
 async function handleLinkAddress() {
-  if (accounts?.active?.id) {
-    const {data, error} =  await addAccountAddress(accounts?.active?.id, address.value, addressName.value)
+  if (typeof accounts?.active?.id !== 'undefined') {
+    const {data, error} =  await addAccountAddress(accounts.active.id, address.value, addressName.value, 'voi:testnet')
     if (error) {
       console.error(error)
     } else {
