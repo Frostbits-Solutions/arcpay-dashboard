@@ -46,7 +46,7 @@
 #### VOI to RWA
 - Enter your RWA ID
 - Enter your RWA Name
-#### VOI to RWA
+#### ARC200 to RWA
 - Enter your ARC200 Application ID
 - Enter your ARC72 Token ID
 - Enter your ARC72 Application ID
