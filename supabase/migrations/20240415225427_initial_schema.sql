@@ -46,7 +46,8 @@ ALTER TYPE "public"."assets_types" OWNER TO "postgres";
 CREATE TYPE "public"."listings_statuses" AS ENUM (
     'pending',
     'active',
-    'closed'
+    'closed',
+    'cancelled'
 );
 
 ALTER TYPE "public"."listings_statuses" OWNER TO "postgres";
