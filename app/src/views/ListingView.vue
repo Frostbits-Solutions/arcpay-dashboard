@@ -79,10 +79,10 @@ onMounted(async () => {
               </span>
           </div>
         </div>
-        <div class="flex border rounded">
-          <img :src="`https://prod.cdn.highforge.io/t/${listing.asset_id}.webp`" alt="Listing image" class="w-full object-cover rounded-lg">
-          <img :src="`https://prod.cdn.highforge.io/t/${listing.asset_id}.png`" alt="Listing image" class="w-full object-cover rounded-lg">
-          <img :src="`https://prod.cdn.highforge.io/t/${listing.asset_id}.jpg`" alt="Listing image" class="w-full object-cover rounded-lg">
+        <div class="flex border rounded shadow-xl max-h-60">
+          <img :src="`https://prod.cdn.highforge.io/t/${listing.asset_id}.webp`" class="w-full object-cover rounded-lg" onerror="this.style.display='none'">
+          <img :src="`https://prod.cdn.highforge.io/t/${listing.asset_id}.png`" class="w-full object-cover rounded-lg" onerror="this.style.display='none'">
+          <img :src="`https://prod.cdn.highforge.io/t/${listing.asset_id}.jpg`" class="w-full object-cover rounded-lg" onerror="this.style.display='none'">
         </div>
         <ul class="space-y-5 text-xs p-5" role="list">
           <li class="flex items-center">
