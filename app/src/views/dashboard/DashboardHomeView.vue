@@ -52,28 +52,28 @@ onMounted(async () => {
         </h2>
         <ul class="mt-10">
           <li v-for="(transaction, index) in transactions" :key="transaction.id">
-            <span class="pl-2 text-xs text-gray-300 dark:text-gray-600">{{ formatDate(transaction.created_at) }}</span>
+            <span class="pl-2 text-xs text-gray-400 dark:text-gray-600">{{ formatDate(transaction.created_at) }}</span>
             <TransactionCard :transaction="transaction" :style="`animation-delay: ${index * 100}ms; animation-fill-mode: both`"/>
           </li>
           <li v-if="!transactions?.length">
             <span class="flex justify-start items-center py-4 mb-5 border border-gray-100 text-gray-700 dark:text-gray-100 rounded-lg hover:shadow-lg dark:hover:bg-gray-700 animate-slide-in-bottom dark:border-gray-700">
               <div class="max-w-80 px-5 text-sm dark:border-gray-700">
-                <div class="text-gray-500 text-xs">Tx id</div>
+                <div class="text-gray-400 text-xs">Tx id</div>
                 <div class="w-72 h-3 my-0.5 bg-gray-200 rounded-full dark:bg-gray-700"></div>
               </div>
               <div class="w-28 px-5 border-l border-gray-100">
                 <div class="w-12 h-5 bg-gray-200 rounded-full dark:bg-gray-700 mx-auto"></div>
               </div>
               <div class="max-w-80 border-l border-gray-100 px-5 text-sm dark:border-gray-700">
-                <div class="text-gray-500 text-xs">From</div>
+                <div class="text-gray-400 text-xs">From</div>
                 <div class="w-72 h-3 my-0.5 bg-gray-200 rounded-full dark:bg-gray-700"></div>
               </div>
               <div class="w-28 border-l border-gray-100 px-5 text-sm dark:border-gray-700">
-                <div class="text-gray-500 text-xs">Amount</div>
+                <div class="text-gray-400 text-xs">Amount</div>
                 <div class="w-12 h-3 my-0.5 bg-gray-200 rounded-full dark:bg-gray-700"></div>
               </div>
               <div class="max-w-64 border-l px-5 border-gray-100 text-sm grow dark:border-gray-700">
-                <div class="text-gray-500 text-xs">Listing</div>
+                <div class="text-gray-400 text-xs">Listing</div>
                 <div class="w-42 h-3 my-0.5 bg-gray-200 rounded-full dark:bg-gray-700"></div>
               </div>
             </span>
