@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '@/views/AuthView.vue'
 import { useSessionStore } from '@/stores/session'
-import AboutView from '@/views/AboutView.vue'
 import TestView from '@/views/TestView.vue'
 import DashboardLayout from '@/views/dashboard/DashboardLayout.vue'
 import AccountSettingsView from '@/views/account/AccountSettingsView.vue'
 import DashboardHomeView from '@/views/dashboard/DashboardHomeView.vue'
+import DashboardListingsView from '@/views/dashboard/DashboardListingsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +30,11 @@ const router = createRouter({
           path: 'account/settings',
           name: 'dashboard-account-settings',
           component: AccountSettingsView,
+        },
+        {
+          path: 'listings',
+          name: 'dashboard-listings',
+          component: DashboardListingsView,
         }
       ]
     },
@@ -37,13 +42,7 @@ const router = createRouter({
       path: '/test',
       name: 'test',
       component: TestView
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: AboutView,
-      meta: { requiresAuth: true }
-    },
+    }
   ]
 })
 

@@ -7,9 +7,16 @@ import IconCog from '@/components/icons/IconCog.vue'
 import IconPlus from '@/components/icons/IconPlus.vue'
 import DropdownLogout from '@/components/layout/DropdownLogout.vue'
 import { ref } from 'vue'
+import { Client } from 'arcpay-sdk'
+import { supabase } from '@/lib/supabase/supabaseClient'
+import { useAccountsStore } from '@/stores/accounts'
 
 const session = useSessionStore()
+const account = useAccountsStore()
 const logOutToggle = ref(undefined)
+const arcpay = new Client({
+  client: supabase
+})
 </script>
 
 <template>
@@ -40,10 +47,10 @@ const logOutToggle = ref(undefined)
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/listings/new" class="flex justify-start items-center  p-2 text-gray-500 rounded-lg hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white group/link">
+            <a href="#" @click.prevent="arcpay.createListing(account.active?.id)" class="flex justify-start items-center  p-2 text-gray-500 rounded-lg hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white group/link">
               <IconPlus class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover/link:text-gray-900 dark:group-hover/link:text-white" />
               <span class="ms-3 font-light invisible group-hover/sidebar:visible truncate">New listing</span>
-            </RouterLink>
+            </a>
           </li>
         </ul>
       </div>

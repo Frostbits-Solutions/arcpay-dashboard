@@ -39,7 +39,9 @@ onMounted(async () => {
     <div class="max-w-screen-xl mx-auto p-10">
       <h4 class="text-2xl font-bold dark:text-white">Dashboard</h4>
       <div class="flex my-8 gap-8">
-        <div class="w-full bg-white rounded-lg  dark:bg-gray-800 p-4 md:p-6 border dark:border-gray-700"></div>
+        <div class="w-full bg-white rounded-lg  dark:bg-gray-800 p-4 md:p-6 border dark:border-gray-700">
+          <h4 class="text-xl font-bold text-gray-300 dark:text-gray-700">Comin' soon...</h4>
+        </div>
         <ChartTransactionHistory/>
       </div>
       <div class="mt-12 w-full rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">

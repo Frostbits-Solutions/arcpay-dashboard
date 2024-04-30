@@ -13,6 +13,7 @@ export async function getTransactionsListings(account_id: number){
     .from('transactions')
     .select('*, listings!inner( * )')
     .eq('listings.account_id', account_id)
+    .order('created_at', { ascending: false })
   return { data, error }
 }
 

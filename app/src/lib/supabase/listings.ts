@@ -133,7 +133,16 @@ export async function getListingsTransactions() {
     const { data, error } = await supabase
         .from('listings')
         .select('*, transactions( * )')
+        .order('created_at', { ascending: false })
     return { data, error }
+}
+
+export async function getListings() {
+  const { data, error } = await supabase
+    .from('listings')
+    .select('*, auctions( * ), sales( * )')
+    .order('created_at', { ascending: false })
+  return { data, error }
 }
 
 export async function getListingById(listing_id: string) {

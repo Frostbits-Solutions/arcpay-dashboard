@@ -18,7 +18,7 @@ const props = defineProps({
       <div class="text-gray-400 text-xs">Tx id</div>
       <div class="truncate">{{ props.transaction.id }}</div>
     </div>
-    <div class="w-24 px-5 text-sm border-l border-gray-100">
+    <div class="w-24 px-5 text-sm border-l border-gray-100 dark:border-gray-700">
         <span v-if="['create', 'fund'].includes(props.transaction.type)" class="inline-flex items-center bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">
           <span class="w-2 h-2 me-1 bg-purple-500 rounded-full"></span>
           {{ props.transaction.type }}
@@ -39,10 +39,10 @@ const props = defineProps({
     <div class="w-28 border-l border-gray-100 px-5 text-sm dark:border-gray-700">
       <div class="text-gray-400 text-xs">Amount</div>
       <div class="truncate">
-        {{ props.transaction.amount }}
+        {{ props.transaction.amount / 10 ** 6 }}
       </div>
     </div>
-    <div class="max-w-64 border-l px-5 border-gray-100 text-sm grow dark:border-gray-700">
+    <div v-if="props.transaction.listings" class="max-w-64 border-l px-5 border-gray-100 text-sm grow dark:border-gray-700">
       <div class="text-gray-400 text-xs">Listing</div>
       <div class="truncate">{{ props.transaction.listings[0].listing_name }}</div>
     </div>
