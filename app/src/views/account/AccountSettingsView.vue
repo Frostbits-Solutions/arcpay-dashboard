@@ -12,6 +12,7 @@ import ClipboardInput from '@/components/common/InputClipboard.vue'
 import IconLink from '@/components/icons/IconLink.vue'
 import ModalAccountLinkAddress from '@/components/account/ModalAccountLinkAddress.vue'
 import type { Database } from '@/lib/supabase/database.types'
+import ModalSecondaryMarketFees from '@/components/account/ModalSecondaryMarketFees.vue'
 
 interface AccountData {
   settings?: Database["public"]["Tables"]["accounts"]["Row"] | null
@@ -244,14 +245,17 @@ onMounted(() => {
 
       <!-- account addresses -->
       <AccountSettingsCard>
-        <template #title>Addresses</template>
-        <template #description>Link addresses to you organization to create listings from these addresses.</template>
+        <template #title>Primary Addresses</template>
+        <template #description>Link primary accounts to your organization to create listings. Listings made from non linked accounts will be considered secondary listings.</template>
         <template #body>
           <div class="relative">
             <div class="flex items-center justify-between pb-4">
               <div></div>
-              <button @click="modals.showModal('ModalAccountLinkAddress')" type="button" class="flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-2.5 me-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><IconLink class="mr-2 w-4 h-4"/> Link address</button>
-            </div>
+              <div class="flex gap-0.5">
+                <button @click="modals.showModal('ModalSecondaryMarketFees')" type="button" class="flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-2.5 me-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><IconPlus class="mr-2 w-4 h-4"/> Add fees</button>
+                <button @click="modals.showModal('ModalAccountLinkAddress')" type="button" class="flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-2.5 me-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><IconLink class="mr-2 w-4 h-4"/> Link address</button>
+              </div>
+               </div>
             <div class="shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               <table class="w-full text-sm text-left rtl:text-right text-gray-700 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
@@ -311,6 +315,7 @@ onMounted(() => {
     <ModalAccountAddUser @success="fetchAccountUsers"/>
     <ModalAccountAddKey @success="fetchAccountKeys"/>
     <ModalAccountLinkAddress @success="fetchAccountAddresses"/>
+    <ModalSecondaryMarketFees/>
   </main>
 </template>
 
