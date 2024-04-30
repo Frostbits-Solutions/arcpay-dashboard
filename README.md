@@ -1,4 +1,13 @@
-# Arcpay User Guide
+# Arcpay Buyer Guide
+## Buy a Listing
+1. Click a direct link, a graphical SDK implementation, or paste the arcpay URL directly into your browser
+2. Click the 'Buy' button, or click the image to review the NFT on NFT Navigator
+3. Select your wallet
+4. If an english auction, enter your bid amount
+5. Click the 'Buy' button
+6. Follow the prompts and sign the transaction in your wallet
+
+# Arcpay Seller Guide
 ## Create Your Account
 1. Go to https://frostbits.solutions/arcpay/
 2. Click "Create account"
@@ -64,20 +73,6 @@
 3. Select your desired "Primary listings" by clicking the box
 4. This will take you to your listing direct link. You can simply share this link with any potential buyer
 5. Alternatively, you can view your "Secondary listings" in the same manner
-
-## Buy a Listing
-1. Click a direct link, Click a graphical SDK implementation, or paste the arcpay URL directly into your browser
-2. 
-
-## Update Your Listings
-1. Click the "Listings" grid icon in the top of the left sidebar
-2. Select your desired "Primary listings" by clicking the box
-3. This will take you to your listing modal
-
-## Cancel Your Listings
-1. Click the "Listings" grid icon in the top of the left sidebar
-2. Select your desired "Primary listings" by clicking the box
-3. This will take you to your listing modal
 
 # Additional Features
 ## View Your Statistics
