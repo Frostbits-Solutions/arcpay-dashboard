@@ -1,16 +1,18 @@
-import './assets/style.css'
+import './assets/index.css'
+import '@/lib/arcpay/arcpay'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { MotionPlugin } from '@vueuse/motion'
 
 import App from './App.vue'
 import router from './router'
-import VueApexCharts from 'vue3-apexcharts'
+
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-app.use(VueApexCharts);
+app.use(MotionPlugin)
 
 app.mount('#app')

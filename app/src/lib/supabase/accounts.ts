@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
 import type { PostgrestError } from '@supabase/supabase-js'
+import type { Chain } from '@/models'
 type accountsMemberships = { id: number, name: string, role: 'admin'|'member'|'moderator'|'owner' }[]
 
 export async function createAccount(name: string, owner_email: string) {
@@ -17,6 +18,7 @@ export async function getAllAccounts(user_email: string): Promise<{ data: accoun
     .from('accounts')
     .select('id, name')
     .eq('owner_email', `${user_email}`)
+    .order('id', { ascending: true })
   if (ownershipError) return { data: null, error: ownershipError }
 
   const { data:membershipData, error:membershipError } = await supabase
@@ -46,11 +48,12 @@ export async function getAccount(id: number) {
   return { data, error }
 }
 
-export async function updateAccount(id: number, name: string | undefined, enable_secondary_sales: boolean | undefined, secondary_sales_percentage_fee: number | undefined){
+export async function updateAccount(id: number, name?: string | undefined, website?: string | undefined, enable_secondary_sales?: boolean | undefined, secondary_sales_percentage_fee?: number | undefined){
   const { data, error } = await supabase
     .from('accounts')
     .update({
       name: name,
+      website: website,
       s_enable_secondary_sales: enable_secondary_sales,
       s_secondary_sales_percentage_fee: secondary_sales_percentage_fee
     })
@@ -99,7 +102,7 @@ export async function updateAccountUser(account_id: number, user_email: string, 
   return { data, error }
 }
 
-export async function removeAccountUser(id: string, email: string) {
+export async function removeAccountUser(id: number, email: string) {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .delete()
@@ -108,14 +111,13 @@ export async function removeAccountUser(id: string, email: string) {
   return { data, error }
 }
 
-export async function addAccountAddress(account_id: number, address: string, name: string, chain: 'voi:testnet'|'voi:mainnet') {
+export async function addAccountAddress(account_id: number, address: string, name: string) {
   const { data, error } = await supabase
     .from('accounts_addresses')
     .insert({
       account_id,
       address,
-      name,
-      chain
+      name
     })
     .select()
   return { data, error }
@@ -145,7 +147,7 @@ export async function removeAccountAddress(id: number, address: string) {
   const { data, error } = await supabase
     .from('accounts_addresses')
     .delete()
-    .eq('id', id)
+    .eq('account_id', id)
     .eq('address', address)
   return { data, error }
 }
@@ -183,11 +185,21 @@ export async function updateAccountApiKey(account_id: number, key: number, origi
   return { data, error }
 }
 
-export async function deleteAccountApiKey(account_id: number, key: number) {
+export async function deleteAccountApiKey(account_id: number, key: string) {
   const { data, error } = await supabase
     .from('accounts_api_keys')
     .delete()
     .eq('account_id', account_id)
     .eq('key', key)
+  return { data, error }
+}
+
+export async function getAccountSubscription(account_id: number) {
+  const { data, error } = await supabase.rpc('get_account_subscription', { account_id })
+  return { data, error }
+}
+
+export async function getAccountActiveListingsAppids(account_id: number, chain: Chain) {
+  const { data, error } = await supabase.from('listings').select('app_id').eq('account_id', account_id).in('status', ['pending', 'active']).eq('chain', chain)
   return { data, error }
 }

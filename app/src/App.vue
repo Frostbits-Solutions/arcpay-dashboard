@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { useDark } from '@vueuse/core'
+import { Toaster } from '@/components/ui/toast'
+
+useDark({
+  selector: 'body',
+  valueDark: 'dark'
+})
 </script>
 
 <template>
-  <div class="dark:bg-gray-900">
-    <RouterView/>
-  </div>
+  <RouterView/>
+  <Toaster/>
 </template>
 
 <style scoped>

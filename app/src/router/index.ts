@@ -1,12 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '@/views/AuthView.vue'
 import { useSessionStore } from '@/stores/session'
-import TestView from '@/views/TestView.vue'
-import DashboardLayout from '@/views/dashboard/DashboardLayout.vue'
-import AccountSettingsView from '@/views/account/AccountSettingsView.vue'
-import DashboardHomeView from '@/views/dashboard/DashboardHomeView.vue'
-import DashboardListingsView from '@/views/dashboard/DashboardListingsView.vue'
-import ListingView from '@/views/ListingView.vue'
+import ListingsView from '@/views/ListingsView.vue'
+import OrganizationSettingsView from '@/views/OrganizationSettingsView.vue'
+import OrganizationSettingsGeneral from '@/components/organization/OrganizationSettingsGeneral.vue'
+import OrganizationSettingsIntegrations from '@/components/organization/OrganizationSettingsIntegrations.vue'
+import OrganizationSettingsUsers from '@/components/organization/OrganizationSettingsUsers.vue'
+import OrganizationSettingsListings from '@/components/organization/OrganizationSettingsListings.vue'
+import DashboardView from '@/views/DashboardView.vue'
+import DirectLinkView from '@/views/DirectLinkView.vue'
+import AuthenticatedView from '@/views/AuthenticatedView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,37 +20,56 @@ const router = createRouter({
       component: AuthView
     },
     {
-      path: '/dashboard',
-      alias: '/',
-      component: DashboardLayout,
+      path: '/',
+      name: 'authenticated-view',
+      component: AuthenticatedView,
       meta: { requiresAuth: true },
+      redirect: { name: 'dashboard' },
       children: [
         {
-          path: '',
+          path: '/dashboard',
           name: 'dashboard',
-          component: DashboardHomeView,
+          component: DashboardView,
         },
         {
-          path: 'account/settings',
-          name: 'dashboard-account-settings',
-          component: AccountSettingsView,
+          path: '/listings',
+          name: 'listings',
+          component: ListingsView,
         },
         {
-          path: 'listings',
-          name: 'dashboard-listings',
-          component: DashboardListingsView,
+          path: '/organization/:name/settings',
+          name: 'organization-organization',
+          component: OrganizationSettingsView,
+          children: [
+            {
+              path: '',
+              name: 'organization-organization-general',
+              component: OrganizationSettingsGeneral,
+            },
+            {
+              path: 'users',
+              name: 'organization-organization-users',
+              component: OrganizationSettingsUsers,
+            },
+            {
+              path: 'integrations',
+              name: 'organization-organization-integrations',
+              component: OrganizationSettingsIntegrations,
+            },
+            {
+              path: 'listings',
+              name: 'organization-organization-listings',
+              component: OrganizationSettingsListings,
+            }
+          ]
         }
       ]
     },
     {
-      path: '/listing/:id',
+      path: '/:chain/listing/:id',
       name: 'listing',
-      component: ListingView,
-    },
-    {
-      path: '/test',
-      name: 'test',
-      component: TestView
+      component: DirectLinkView,
+      props: true
     }
   ]
 })

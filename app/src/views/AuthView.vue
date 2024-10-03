@@ -2,7 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase/supabaseClient'
 import { useRouter } from 'vue-router'
-import ButtonSpinner from '@/components/common/ButtonSpinner.vue'
+import { Spinner } from '@/components/ui/spinner'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 const router = useRouter()
 const loading = ref(false)
@@ -43,29 +45,29 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
-        <div class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-4 shadow-xl sm:p-6 md:p-8 dark:border-gray-700 dark:bg-gray-800 animate-modal">
-          <div class="mb-8 flex items-center justify-center">
-            <img src="@/assets/logo.png" alt="Logo" class="w-12 h-12" />
-            <h1 class="text-4xl ml-2 dark:text-white">arcpay</h1>
+    <div class="flex items-center justify-center h-screen bg-muted/30">
+        <div class="w-full max-w-sm rounded-xl border border-border bg-popover p-4 shadow-xl sm:p-6 md:p-8">
+          <div class="mb-4 flex items-center justify-center">
+            <img src="@/assets/logo.png" alt="Logo" class="w-8 h-8" />
+            <h1 class="text-4xl ml-2 text-foreground">arcpay</h1>
           </div>
-          <form v-if="!success" class="space-y-6 border-t pt-8 dark:border-gray-700" @submit.prevent="handleLogin">
+          <form v-if="!success" class="mt-8 pt-10 border-t border-border" @submit.prevent="handleLogin">
             <div>
-              <label for="email" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-              <input v-model="email" type="email" name="email" id="email" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400" placeholder="name@company.com" required />
+              <label for="email" class="mb-2 block text-sm font-medium text-foreground">Your email</label>
+              <Input v-model="email" type="email" name="email" id="email" class="h-10" placeholder="name@company.com" required/>
             </div>
-            <button type="submit" class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <Button variant="gradient" type="submit" size="lg" class="w-full mt-12 mb-2">
               <template v-if="!loading">
                 <template v-if="register">Register with magic link</template>
                 <template v-else>Login with magic link</template>
               </template>
-              <ButtonSpinner v-else class="w-6 h-6 fill-white dark:fill-gray-300"/>
-            </button>
-            <div v-if="register" class="text-sm font-medium text-gray-500 dark:text-gray-300">
+              <Spinner v-else class="w-6 h-6 text-white"/>
+            </Button>
+            <div v-if="register" class="text-xs font-medium text-muted-foreground text-center">
               Already registered?
               <a @click.prevent="register = false" href="#" class="text-blue-700 hover:underline dark:text-blue-500">Sign-in</a>
             </div>
-            <div v-else class="text-sm font-medium text-gray-500 dark:text-gray-300">
+            <div v-else class="text-xs font-medium text-muted-foreground text-center">
               Not registered?
               <a @click.prevent="register = true" href="#" class="text-blue-700 hover:underline dark:text-blue-500">Create account</a>
             </div>

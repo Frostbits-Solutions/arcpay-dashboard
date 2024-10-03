@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       accounts: {
@@ -16,9 +41,11 @@ export type Database = {
           name: string
           owner_email: string
           s_enable_secondary_sales: boolean
+          s_secondary_sales_fee_address: string | null
           s_secondary_sales_percentage_fee: number | null
           subscription_expiration_date: string | null
           subscription_id: number
+          website: string | null
         }
         Insert: {
           created_at?: string
@@ -26,9 +53,11 @@ export type Database = {
           name: string
           owner_email: string
           s_enable_secondary_sales?: boolean
+          s_secondary_sales_fee_address?: string | null
           s_secondary_sales_percentage_fee?: number | null
           subscription_expiration_date?: string | null
           subscription_id?: number
+          website?: string | null
         }
         Update: {
           created_at?: string
@@ -36,9 +65,11 @@ export type Database = {
           name?: string
           owner_email?: string
           s_enable_secondary_sales?: boolean
+          s_secondary_sales_fee_address?: string | null
           s_secondary_sales_percentage_fee?: number | null
           subscription_expiration_date?: string | null
           subscription_id?: number
+          website?: string | null
         }
         Relationships: [
           {
@@ -54,21 +85,18 @@ export type Database = {
         Row: {
           account_id: number
           address: string
-          chain: Database["public"]["Enums"]["chains"]
           created_at: string
           name: string | null
         }
         Insert: {
           account_id: number
           address: string
-          chain: Database["public"]["Enums"]["chains"]
           created_at?: string
           name?: string | null
         }
         Update: {
           account_id?: number
           address?: string
-          chain?: Database["public"]["Enums"]["chains"]
           created_at?: string
           name?: string | null
         }
@@ -114,6 +142,42 @@ export type Database = {
           },
         ]
       }
+      accounts_currencies: {
+        Row: {
+          account_id: number
+          chain: Database["public"]["Enums"]["chains"]
+          created_at: string
+          currency: string
+        }
+        Insert: {
+          account_id: number
+          chain: Database["public"]["Enums"]["chains"]
+          created_at?: string
+          currency: string
+        }
+        Update: {
+          account_id?: number
+          chain?: Database["public"]["Enums"]["chains"]
+          created_at?: string
+          currency?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_currencies_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_currencies_chain_currency_fkey"
+            columns: ["chain", "currency"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["chain", "id"]
+          },
+        ]
+      }
       accounts_users_association: {
         Row: {
           account_id: number
@@ -153,9 +217,7 @@ export type Database = {
           id: number
           increment: number
           listing_id: string
-          max_price: number | null
-          min_price: number
-          type: Database["public"]["Enums"]["auctions_type"]
+          start_price: number
           updated_at: string | null
         }
         Insert: {
@@ -164,9 +226,7 @@ export type Database = {
           id?: number
           increment: number
           listing_id: string
-          max_price?: number | null
-          min_price: number
-          type: Database["public"]["Enums"]["auctions_type"]
+          start_price: number
           updated_at?: string | null
         }
         Update: {
@@ -175,9 +235,7 @@ export type Database = {
           id?: number
           increment?: number
           listing_id?: string
-          max_price?: number | null
-          min_price?: number
-          type?: Database["public"]["Enums"]["auctions_type"]
+          start_price?: number
           updated_at?: string | null
         }
         Relationships: [
@@ -190,32 +248,157 @@ export type Database = {
           },
         ]
       }
+      contracts: {
+        Row: {
+          byte_code: string
+          created_at: string
+          id: number
+          name: string | null
+        }
+        Insert: {
+          byte_code: string
+          created_at?: string
+          id?: number
+          name?: string | null
+        }
+        Update: {
+          byte_code?: string
+          created_at?: string
+          id?: number
+          name?: string | null
+        }
+        Relationships: []
+      }
+      contracts_tags: {
+        Row: {
+          created_at: string
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          tag?: string
+        }
+        Relationships: []
+      }
+      contracts_tags_association: {
+        Row: {
+          chain: Database["public"]["Enums"]["chains"]
+          contract: number
+          created_at: string
+          tag: string
+          version: string
+        }
+        Insert: {
+          chain: Database["public"]["Enums"]["chains"]
+          contract: number
+          created_at?: string
+          tag: string
+          version: string
+        }
+        Update: {
+          chain?: Database["public"]["Enums"]["chains"]
+          contract?: number
+          created_at?: string
+          tag?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_tags_association_contract_fkey"
+            columns: ["contract"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_tags_association_tag_fkey"
+            columns: ["tag"]
+            isOneToOne: false
+            referencedRelation: "contracts_tags"
+            referencedColumns: ["tag"]
+          },
+        ]
+      }
       currencies: {
         Row: {
           chain: Database["public"]["Enums"]["chains"]
           created_at: string
+          decimals: number
+          icon: string | null
           id: string
           name: string
           ticker: string
+          type: Database["public"]["Enums"]["currency_type"]
           updated_at: string | null
+          visible: boolean
         }
         Insert: {
           chain: Database["public"]["Enums"]["chains"]
           created_at?: string
+          decimals: number
+          icon?: string | null
           id: string
           name: string
           ticker: string
+          type: Database["public"]["Enums"]["currency_type"]
           updated_at?: string | null
+          visible?: boolean
         }
         Update: {
           chain?: Database["public"]["Enums"]["chains"]
           created_at?: string
+          decimals?: number
+          icon?: string | null
           id?: string
           name?: string
           ticker?: string
+          type?: Database["public"]["Enums"]["currency_type"]
           updated_at?: string | null
+          visible?: boolean
         }
         Relationships: []
+      }
+      dutch_auctions: {
+        Row: {
+          created_at: string
+          duration: number
+          id: number
+          listing_id: string
+          max_price: number | null
+          min_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration: number
+          id?: number
+          listing_id: string
+          max_price?: number | null
+          min_price: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration?: number
+          id?: number
+          listing_id?: string
+          max_price?: number | null
+          min_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_dutch_auctions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listings: {
         Row: {
@@ -228,13 +411,13 @@ export type Database = {
           asset_type: Database["public"]["Enums"]["assets_types"]
           chain: Database["public"]["Enums"]["chains"]
           created_at: string
+          currency: string
           id: string
-          listing_currency: string
-          listing_name: string
-          listing_type: Database["public"]["Enums"]["listings_types"]
+          name: string
           seller_address: string
           status: Database["public"]["Enums"]["listings_statuses"]
           tags: string | null
+          type: Database["public"]["Enums"]["listings_types"]
           updated_at: string | null
           transactions: unknown | null
         }
@@ -248,13 +431,13 @@ export type Database = {
           asset_type: Database["public"]["Enums"]["assets_types"]
           chain: Database["public"]["Enums"]["chains"]
           created_at?: string
+          currency: string
           id?: string
-          listing_currency: string
-          listing_name: string
-          listing_type: Database["public"]["Enums"]["listings_types"]
+          name: string
           seller_address: string
           status: Database["public"]["Enums"]["listings_statuses"]
           tags?: string | null
+          type: Database["public"]["Enums"]["listings_types"]
           updated_at?: string | null
         }
         Update: {
@@ -267,16 +450,23 @@ export type Database = {
           asset_type?: Database["public"]["Enums"]["assets_types"]
           chain?: Database["public"]["Enums"]["chains"]
           created_at?: string
+          currency?: string
           id?: string
-          listing_currency?: string
-          listing_name?: string
-          listing_type?: Database["public"]["Enums"]["listings_types"]
+          name?: string
           seller_address?: string
           status?: Database["public"]["Enums"]["listings_statuses"]
           tags?: string | null
+          type?: Database["public"]["Enums"]["listings_types"]
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "listings_listing_currency_chain_fkey"
+            columns: ["currency", "chain"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["id", "chain"]
+          },
           {
             foreignKeyName: "public_listings_account_id_fkey"
             columns: ["account_id"]
@@ -284,35 +474,28 @@ export type Database = {
             referencedRelation: "accounts"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "public_listings_listing_currency_fkey"
-            columns: ["listing_currency"]
-            isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["id"]
-          },
         ]
       }
       sales: {
         Row: {
-          asking_price: number
           created_at: string
           id: number
           listing_id: string
+          price: number
           updated_at: string | null
         }
         Insert: {
-          asking_price: number
           created_at?: string
           id?: number
           listing_id: string
+          price: number
           updated_at?: string | null
         }
         Update: {
-          asking_price?: number
           created_at?: string
           id?: number
           listing_id?: string
+          price?: number
           updated_at?: string | null
         }
         Relationships: [
@@ -324,6 +507,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sdk_versions: {
+        Row: {
+          changelog: string | null
+          created_at: string
+          id: string
+        }
+        Insert: {
+          changelog?: string | null
+          created_at?: string
+          id: string
+        }
+        Update: {
+          changelog?: string | null
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
       }
       subscription_tiers: {
         Row: {
@@ -412,11 +613,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_administrated_accounts_for_user: {
+      get_account_subscription: {
         Args: {
-          user_email: string
+          account_id: number
         }
-        Returns: number[]
+        Returns: {
+          allow_premium_contracts: boolean
+          allow_secondary_sales: boolean
+          created_at: string
+          duration: number | null
+          id: number
+          listing_flat_fee: number
+          name: string
+          sale_percentage_fee: number
+          secondary_listing_flat_fee: number | null
+          secondary_sale_percentage_fee: number | null
+          updated_at: string | null
+        }
+      }
+      get_daily_sales_volume_timeseries: {
+        Args: {
+          account_id: number
+          chain: Database["public"]["Enums"]["chains"]
+        }
+        Returns: Database["public"]["CompositeTypes"]["transactions_volume"][]
+      }
+      get_hourly_transactions_timeseries: {
+        Args: {
+          account_id: number
+          chain: Database["public"]["Enums"]["chains"]
+        }
+        Returns: Database["public"]["CompositeTypes"]["transactions_count"][]
       }
       get_key_account_id: {
         Args: {
@@ -430,12 +657,6 @@ export type Database = {
           listing_id: string
         }
         Returns: Database["public"]["CompositeTypes"]["composite_listing"]
-      }
-      get_member_accounts_for_user: {
-        Args: {
-          user_email: string
-        }
-        Returns: number[]
       }
       listings: {
         Args: {
@@ -451,13 +672,13 @@ export type Database = {
           asset_type: Database["public"]["Enums"]["assets_types"]
           chain: Database["public"]["Enums"]["chains"]
           created_at: string
+          currency: string
           id: string
-          listing_currency: string
-          listing_name: string
-          listing_type: Database["public"]["Enums"]["listings_types"]
+          name: string
           seller_address: string
           status: Database["public"]["Enums"]["listings_statuses"]
           tags: string | null
+          type: Database["public"]["Enums"]["listings_types"]
           updated_at: string | null
         }[]
       }
@@ -481,11 +702,11 @@ export type Database = {
     }
     Enums: {
       accounts_users_roles: "admin" | "moderator" | "member"
-      assets_types: "ARC72" | "OFFCHAIN"
-      auctions_type: "english" | "dutch"
-      chains: "voi:testnet" | "voi:mainnet"
-      listings_statuses: "pending" | "active" | "closed"
-      listings_types: "sale" | "auction"
+      assets_types: "arc72" | "offchain" | "asa"
+      chains: "voi:testnet" | "voi:mainnet" | "algo:testnet" | "algo:mainnet"
+      currency_type: "algo" | "asa" | "voi" | "arc200"
+      listings_statuses: "pending" | "active" | "closed" | "cancelled"
+      listings_types: "sale" | "auction" | "dutch"
       transaction_type:
         | "create"
         | "fund"
@@ -503,23 +724,354 @@ export type Database = {
         status: Database["public"]["Enums"]["listings_statuses"] | null
         chain: Database["public"]["Enums"]["chains"] | null
         seller_address: string | null
-        listing_name: string | null
-        listing_currency: string | null
-        listing_type: Database["public"]["Enums"]["listings_types"] | null
+        name: string | null
+        type: Database["public"]["Enums"]["listings_types"] | null
         app_id: number | null
+        currency: string | null
+        currency_name: string | null
+        currency_ticker: string | null
+        currency_icon: string | null
+        currency_type: Database["public"]["Enums"]["currency_type"] | null
+        currency_decimals: number | null
         asset_id: string | null
         asset_thumbnail: string | null
         asset_type: Database["public"]["Enums"]["assets_types"] | null
         asset_qty: number | null
         asset_creator: string | null
         tags: string | null
-        min_price: number | null
-        max_price: number | null
-        increment: number | null
-        duration: number | null
-        auction_type: Database["public"]["Enums"]["auctions_type"] | null
-        asking_price: number | null
+        sale_price: number | null
+        auction_start_price: number | null
+        auction_increment: number | null
+        auction_duration: number | null
+        dutch_min_price: number | null
+        dutch_max_price: number | null
+        dutch_duration: number | null
       }
+      transactions_count: {
+        time: string | null
+        count: number | null
+      }
+      transactions_volume: {
+        time: string | null
+        volume: number | null
+        currency_id: string | null
+        currency_ticker: string | null
+      }
+    }
+  }
+  storage: {
+    Tables: {
+      buckets: {
+        Row: {
+          allowed_mime_types: string[] | null
+          avif_autodetection: boolean | null
+          created_at: string | null
+          file_size_limit: number | null
+          id: string
+          name: string
+          owner: string | null
+          owner_id: string | null
+          public: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id: string
+          name: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id?: string
+          name?: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      migrations: {
+        Row: {
+          executed_at: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Insert: {
+          executed_at?: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Update: {
+          executed_at?: string | null
+          hash?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      objects: {
+        Row: {
+          bucket_id: string | null
+          created_at: string | null
+          id: string
+          last_accessed_at: string | null
+          metadata: Json | null
+          name: string | null
+          owner: string | null
+          owner_id: string | null
+          path_tokens: string[] | null
+          updated_at: string | null
+          user_metadata: Json | null
+          version: string | null
+        }
+        Insert: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Update: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objects_bucketId_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          owner_id: string | null
+          upload_signature: string
+          user_metadata: Json | null
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          owner_id?: string | null
+          upload_signature: string
+          user_metadata?: Json | null
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          owner_id?: string | null
+          upload_signature?: string
+          user_metadata?: Json | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "s3_multipart_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      can_insert_object: {
+        Args: {
+          bucketid: string
+          name: string
+          owner: string
+          metadata: Json
+        }
+        Returns: undefined
+      }
+      extension: {
+        Args: {
+          name: string
+        }
+        Returns: string
+      }
+      filename: {
+        Args: {
+          name: string
+        }
+        Returns: string
+      }
+      foldername: {
+        Args: {
+          name: string
+        }
+        Returns: string[]
+      }
+      get_size_by_bucket: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          size: number
+          bucket_id: string
+        }[]
+      }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+        }
+        Returns: {
+          key: string
+          id: string
+          created_at: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          start_after?: string
+          next_token?: string
+        }
+        Returns: {
+          name: string
+          id: string
+          metadata: Json
+          updated_at: string
+        }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      search: {
+        Args: {
+          prefix: string
+          bucketname: string
+          limits?: number
+          levels?: number
+          offsets?: number
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          name: string
+          id: string
+          updated_at: string
+          created_at: string
+          last_accessed_at: string
+          metadata: Json
+        }[]
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
