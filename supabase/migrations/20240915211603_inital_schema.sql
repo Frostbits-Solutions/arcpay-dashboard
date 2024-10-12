@@ -517,7 +517,7 @@ CREATE TABLE IF NOT EXISTS "supabase_migrations"."schema_migrations" (
 CREATE OR REPLACE FUNCTION "public"."get_account_subscription"("account_id" bigint) RETURNS "public"."subscription_tiers"
     LANGUAGE "sql" STABLE SECURITY DEFINER
     set search_path = ''
-    AS $_$select * from "public"."subscription_tiers" where (id IN ( SELECT "private"."get_administrated_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user")) and id = (select subscription_id from "public"."accounts" where id = $1)$_$;
+    AS $_$select * from "public"."subscription_tiers" where ($1 IN ( SELECT "private"."get_member_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user")) and id = (select subscription_id from "public"."accounts" where id = $1)$_$;
 
 ALTER FUNCTION "public"."get_account_subscription"("account_id" bigint) OWNER TO "postgres";
 
@@ -686,7 +686,7 @@ CREATE POLICY "Members can manage sales" ON "public"."sales" TO "authenticated" 
    FROM "public"."listings"
   WHERE ("listings"."account_id" IN ( SELECT "private"."get_member_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user")))));
 
-CREATE POLICY "Members can read accounts" ON "public"."accounts" FOR SELECT TO "authenticated" USING (("id" IN ( SELECT "private"."get_administrated_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user")));
+CREATE POLICY "Members can read accounts" ON "public"."accounts" FOR SELECT TO "authenticated" USING (("id" IN ( SELECT "private"."get_member_accounts_for_user"("auth"."email"()) AS "get_member_accounts_for_user")));
 
 CREATE POLICY "Owner and admins can manage account addresses" ON "public"."accounts_addresses" TO "authenticated" USING (("account_id" IN ( SELECT "private"."get_administrated_accounts_for_user"("auth"."email"()) AS "get_administrated_accounts_for_user")));
 

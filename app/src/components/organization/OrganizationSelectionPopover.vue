@@ -16,8 +16,8 @@ const accounts = useAccountsStore()
     <PopoverTrigger>
       <Button variant="outline">
         <template v-if="accounts.active">
-          {{ accounts.active?.name || 'Create an organization' }}
-          <Badge variant="secondary" class="ml-1">{{ accounts.activeSettings?.subscription?.name || 'free' }}</Badge>
+          {{ accounts.active?.name }}
+          <Badge variant="secondary" class="ml-1" v-if="accounts.activeSettings?.subscription?.name">{{ accounts.activeSettings?.subscription?.name }}</Badge>
           <ChevronDown class="w-4 h-4 ml-1"/>
         </template>
         <Skeleton v-else class="h-4 w-24 mr-4"/>
@@ -27,7 +27,7 @@ const accounts = useAccountsStore()
       <ScrollArea class="h-48 border-b border-b-border mb-1">
         <ul class="text-foreground pb-1">
           <li v-for="account in accounts.all" :key="account.id" class="[&:not(:first-child)]:mt-1 [&:not(:last-child)]:mb-1">
-            <Button variant="ghost" :class="['w-full justify-between px-2 rounded-sm', account.id === accounts?.active?.id?'bg-muted/70':'']" @click.prevent="accounts.selectAccount(account.id)">
+            <Button variant="ghost" :class="['w-full justify-between px-2 rounded-sm', account.id === accounts?.active?.id?'bg-muted/70':'']" @click.prevent="accounts.selectAccount(account.id);">
             <span class="truncate">
                 {{ account.name }}
             </span>

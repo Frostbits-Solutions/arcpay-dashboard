@@ -115,7 +115,11 @@ export const useTransactionsStore = defineStore('transactions', () => {
           }
           dailySalesVolumeTimeseries.value = tm.reverse()
         }
-        else dailySalesVolumeTimeseries.value = []
+        else {
+          dailySalesVolumeTimeseries.value = []
+          totalSalesVolumes.value = {}
+          top5CurrenciesByVolume.value = []
+        }
       }
     }
   }
