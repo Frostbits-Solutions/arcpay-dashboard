@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useNetworksStore } from '@/stores/networks'
 import ChartHourlyTransactions from '@/components/dashboard/ChartHourlyTransactions.vue'
 import ChartDailySalesVolume from '@/components/dashboard/ChartDailySalesVolume.vue'
@@ -11,7 +11,7 @@ import type { PublicNetwork } from 'arcpay-sdk'
 
 const networks = useNetworksStore()
 const transactions = useTransactionsStore()
-const currencies = useCurrenciesStore()
+useCurrenciesStore()
 const pollingInterval = ref<NodeJS.Timeout>()
 
 
