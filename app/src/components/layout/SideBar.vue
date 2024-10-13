@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {House, LayoutGrid, Plus, Cog } from 'lucide-vue-next'
+import {House, LayoutGrid, Plus, Cog, Book } from 'lucide-vue-next'
 import { useDark, useToggle } from '@vueuse/core'
 import { Button } from '@/components/ui/button'
 import LogoutPopover from '@/components/layout/LogoutPopover.vue'
@@ -52,6 +52,12 @@ function onCreateClick() {
         </ul>
       </div>
       <ul class="space-y-2 font-medium">
+        <li>
+          <a href="https://docs.arcpay.dev" class="flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link" target="_blank">
+            <Book class="shrink-0 w-5 h-5"/>
+            <span class="ms-3 font-light invisible group-hover/sidebar:visible truncate">Documentation</span>
+          </a>
+        </li>
         <li v-if="account.active?.name">
           <RouterLink :to="`/organization/${account.active.name}/settings`" class="flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link">
             <Cog class="shrink-0 w-5 h-5"/>
