@@ -6,7 +6,7 @@ import ListingsTableAssetCell from '@/components/listings-table/ListingsTableAss
 import ListingsTableTypeCell from '@/components/listings-table/ListingsTableTypeCell.vue'
 import ListingsTableSellerCell from '@/components/listings-table/ListingsTableSellerCell.vue'
 import ListingsTableIdCell from '@/components/listings-table/ListingsTableIdCell.vue'
-import ListingsTableShareCell from '@/components/listings-table/ListingsTableShareCell.vue'
+import ListingsTableActionCell from '@/components/listings-table/ListingsTableActionCell.vue'
 
 export const columns: ColumnDef<CompositeListing>[] = [
   {
@@ -45,10 +45,10 @@ export const columns: ColumnDef<CompositeListing>[] = [
     },
   },
   {
-    accessorKey: 'share',
+    accessorKey: 'actions',
     header: () => h('div', { class: 'text-left' }, ''),
     cell: ({ row }) => {
-      return h(ListingsTableShareCell, {row})
+      return h(ListingsTableActionCell, {row})
     },
   }
 ]

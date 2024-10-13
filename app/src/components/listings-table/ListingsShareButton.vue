@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Row } from '@tanstack/vue-table'
-import type { CompositeListing } from '@/models'
 import { computed, h } from 'vue'
 import { useNetworksStore } from '@/stores/networks'
 import { Button } from '@/components/ui/button'
@@ -9,14 +7,14 @@ import { useToast } from '@/components/ui/toast'
 import { useClipboard } from '@vueuse/core'
 import ToastCheck from '@/components/ui/toast/ToastCheck.vue'
 
-const props = defineProps<{row: Row<CompositeListing>}>()
-const id = computed(() => props.row.original.id)
+const props = defineProps<{id: string}>()
 const networks = useNetworksStore()
+const { toast } = useToast()
+
 const link = computed(() => {
-  return `${window.origin}${import.meta.env.BASE_URL}${networks?.activeNetwork}/listing/${id.value}/`
+  return `${window.origin}${import.meta.env.BASE_URL}${networks?.activeNetwork}/listing/${props.id}/`
 })
 
-const { toast } = useToast()
 const { copy, copied, isSupported } = useClipboard({ source: link.value })
 
 function onClick() {
@@ -34,7 +32,6 @@ function onClick() {
       <Share2 v-if="!copied" class="size-4 text-muted-foreground"/>
       <Check v-else class="size-4"/>
     </template>
-
   </Button>
 </template>
 
