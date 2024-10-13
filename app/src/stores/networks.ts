@@ -30,6 +30,7 @@ export const useNetworksStore = defineStore('networks', () => {
       })
     }
     activeNetwork.value = network
+    localStorage.setItem("defaultNetwork", network)
   }
 
   return { activeNetwork, activeClient, setActive }
