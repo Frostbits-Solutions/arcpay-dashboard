@@ -27,8 +27,8 @@ function onCreateClick() {
       <div>
         <ul class="space-y-2 font-medium">
           <li>
-            <Button variant="ghost" class="flex px-2 py-2 h-auto mb-6 -mt-0.5 -ml-[1px] hover:bg-foreground" @click="toggleDark()">
-              <img src="@/assets/logo.png" alt="arcpay logo" class="w-6 h-6"/>
+            <Button variant="ghost" size="icon" class="flex mb-6 hover:bg-foreground size-10" @click="toggleDark()">
+              <img src="@/assets/logo.png" alt="arcpay logo" class="h-8"/>
             </Button>
           </li>
           <li>

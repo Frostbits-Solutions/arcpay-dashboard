@@ -48,8 +48,8 @@ onMounted(() => {
     <div class="flex items-center justify-center h-screen bg-muted/30">
         <div class="w-full max-w-sm rounded-xl border border-border bg-popover p-4 shadow-xl sm:p-6 md:p-8">
           <div class="mb-4 flex items-center justify-center">
-            <img src="@/assets/logo.png" alt="Logo" class="w-8 h-8" />
-            <h1 class="text-4xl ml-2 text-foreground">arcpay</h1>
+            <img src="@/assets/logo.png" alt="Logo" class="h-14 mr-2" />
+            <h1 class="text-5xl text-foreground">arcpay</h1>
           </div>
           <form v-if="!success" class="mt-8 pt-10 border-t border-border" @submit.prevent="handleLogin">
             <div>
