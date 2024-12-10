@@ -7,7 +7,7 @@ import { useTransactionsStore } from '@/stores/transactions'
 import { DataTable } from '@/components/ui/data-table'
 import { columns } from '@/components/transactions-table/columns'
 import { useCurrenciesStore } from '@/stores/currencies'
-import type { PublicNetwork } from 'arcpay-sdk'
+import type { Chain } from '@/models'
 
 const networks = useNetworksStore()
 const transactions = useTransactionsStore()
@@ -18,7 +18,7 @@ const pollingInterval = ref<NodeJS.Timeout>()
 onMounted(async () => {
   const defaultNet = localStorage.getItem("defaultNetwork");
   if (defaultNet) {
-    networks.setActive(defaultNet as PublicNetwork)
+    networks.setActive(defaultNet as Chain)
   } else {
     networks.setActive('algo:mainnet')
   }
