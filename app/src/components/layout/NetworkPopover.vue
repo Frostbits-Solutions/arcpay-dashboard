@@ -6,7 +6,7 @@ import { useNetworksStore } from '@/stores/networks'
 import type { Chain } from '@/models'
 
 const networks = useNetworksStore()
-const supportedNetworks = ['algo:mainnet', 'algo:testnet']
+const supportedNetworks = ['algo:mainnet', 'algo:testnet', 'voi:mainnet']
 </script>
 
 <template>
