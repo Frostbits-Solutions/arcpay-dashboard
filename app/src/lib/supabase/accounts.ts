@@ -203,3 +203,39 @@ export async function getAccountActiveListingsAppids(account_id: number, chain: 
   const { data, error } = await supabase.from('listings').select('app_id').eq('account_id', account_id).in('status', ['pending', 'active']).eq('chain', chain)
   return { data, error }
 }
+
+export async function getAccountChainsParameters(account_id: number) {
+  const { data, error } = await supabase
+  .from('accounts_chains_parameters')
+  .select('*')
+  .eq('account_id', account_id)
+  return { data, error }
+}
+
+export async function createAccountChainsParameters(account_id: number, chain_id: string, enable_secondary: boolean, secondary_fee_address: string, secondary_percentage_fee: number) {
+  const { data, error } = await supabase
+    .from('accounts_chains_parameters')
+    .insert({
+      account_id,
+      chain_id,
+      enable_secondary,
+      secondary_fee_address,
+      secondary_percentage_fee
+    })
+    .select()
+  return { data, error }
+}
+
+export async function updateAccountChainsParameters(account_id: number, chain_id: string, enable_secondary: boolean, secondary_fee_address: string, secondary_percentage_fee: number) {
+  const { data, error } = await supabase
+    .from('accounts_chains_parameters')
+    .update({
+      enable_secondary,
+      secondary_fee_address,
+      secondary_percentage_fee,
+    })
+    .eq('account_id', account_id)
+    .eq('chain_id', chain_id)
+    .select()
+  return { data, error }
+}

@@ -3,9 +3,9 @@ import { defineStore } from 'pinia'
 import {
   getAccount,
   getAccountAddresses,
-  getAccountApiKeys, getAccountSubscription,
+  getAccountApiKeys, getAccountChainsParameters, getAccountSubscription,
   getAccountUsers,
-  getAllAccounts
+  getAllAccounts,
 } from '@/lib/supabase/accounts'
 import { useSessionStore } from '@/stores/session'
 import type { Database } from '@/lib/supabase/database.types'
@@ -23,6 +23,7 @@ interface AccountSettings{
   }[] | undefined
   keys?: Database["public"]["Tables"]["accounts_api_keys"]["Row"][] | undefined
   addresses?: Database["public"]["Tables"]["accounts_addresses"]["Row"][] | undefined
+  chainsParameters?: Database['public']['Tables']['accounts_chains_parameters']['Row'][] | undefined
 }
 
 export const useAccountsStore = defineStore('accounts', () => {
@@ -71,7 +72,8 @@ export const useAccountsStore = defineStore('accounts', () => {
         fetchAccountUsers(account.id),
         fetchAccountAddresses(account.id),
         fetchAccountKeys(account.id),
-        fetchAccountSubscription(account.id)
+        fetchAccountSubscription(account.id),
+        fetchAccountChainsParameters(account.id),
       ]).then(() => {
         loading.value = false
       })
@@ -153,5 +155,22 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountKeys, fetchAccountAddresses, selectAccount }
+  async function fetchAccountChainsParameters(accountId: number) {
+    const { data: chainsParameters, error } = await getAccountChainsParameters(accountId)
+    if (error) {
+      console.error(error)
+      toast({
+        title: 'Error fetching account chains paramaters',
+        description: error?.message || 'Unexpected error',
+        variant: 'destructive',
+        action: h(ToastError)
+      })
+    } else {
+      activeSettings.value.chainsParameters = chainsParameters ?? []
+    }
+  }
+
+  
+
+  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountKeys, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, selectAccount }
 })
