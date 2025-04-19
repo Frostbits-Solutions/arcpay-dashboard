@@ -17,6 +17,7 @@ const pollingInterval = ref<NodeJS.Timeout>()
 
 onMounted(async () => {
   const defaultNet = localStorage.getItem("defaultNetwork");
+  networks.fetchChains();
   if (defaultNet) {
     networks.setActive(defaultNet as Chain)
   } else {

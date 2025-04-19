@@ -5,8 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Clipboard } from '@/components/ui/clipboard'
 import { Trash2 } from 'lucide-vue-next'
 import { Skeleton } from '@/components/ui/skeleton'
-import { deleteAccountApiKey, removeAccountAddress } from '@/lib/supabase/accounts'
-import { h, ref } from 'vue'
+import { 
+  deleteAccountApiKey, 
+  removeAccountAddress, 
+  updateAccountChainsParameters, 
+  createAccountChainsParameters 
+} from '@/lib/supabase/accounts'
+import { h, ref, watch, type Ref } from 'vue'
 import ToastError from '@/components/ui/toast/ToastError.vue'
 import ToastCheck from '@/components/ui/toast/ToastCheck.vue'
 import { useToast } from '@/components/ui/toast'
@@ -16,13 +21,43 @@ import { Switch } from '@/components/ui/switch'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate';
 import * as z from 'zod'
-import { onMounted } from 'vue'
+import type { Chain, AccountsChainsParameter } from '@/models'
+import { useNetworksStore } from '@/stores/networks'
 
 const accounts = useAccountsStore()
-const hasProSubscription = ref(accounts.activeSettings.subscription.allow_secondary_listings)
+const network = useNetworksStore()
+
 const { toast } = useToast()
-async function onDelete(address: string) {
+
+const hasProSubscription : Ref<boolean> = ref(accounts.activeSettings.subscription?.allow_secondary_listings ?? false)
+const chains : Ref<Chain[]> = ref(network.networks)
+const activeChainTab = ref(0)
+
+const formSchema = toTypedSchema(z.object({
+  enable_secondary: z.boolean().optional(),
+  secondary_percentage_fee: z
+    .number()
+    .min(0, "Percentage must be at least 0.00%")
+    .max(50, "Percentage must be at most 50.00%"),
+  secondary_fee_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid chain address") // Regex for Ethereum-like addresses
+}))
+
+const activeChainParameter: Ref<AccountsChainsParameter>= ref({
+          account_id: 0,
+          created_at: '',
+          chain_id: '',
+          enable_secondary: false,
+          secondary_fee_address: null,
+          secondary_percentage_fee: 0,
+        })
+
+const form = useForm({
+  validationSchema: formSchema,
+});
+
+async function onDeleteAccountAddress(address: string) {
   if (accounts.active?.id) {
     const {data, error} = await removeAccountAddress(accounts.active.id, address)
     if (error) {
@@ -42,15 +77,97 @@ async function onDelete(address: string) {
   }
 }
 
+function updateChainParamFormValues() {
+  const selectedChain = chains.value[activeChainTab.value];
+  if (!selectedChain || !accounts.active || !accounts.activeSettings.chainsParameters) return;
 
-onMounted(() => {
-  console.log(hasProSubscription.value)
-})
+  // Find the chain parameter for the selected chain
+  const chainParameter = accounts.activeSettings.chainsParameters.find(
+    (c) => c.chain_id === selectedChain.id
+  );
 
-const formSchema = toTypedSchema(z.object({
-  fees: z.number().min(0).max(50),
-  blockchainAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid chain address") // Regex for Ethereum-like addresses
-}))
+  // Update the activeChainParameter based on the found chain parameter or set default values
+  activeChainParameter.value = chainParameter
+    ? { ...chainParameter, account_id: accounts.active.id }
+    : {
+        account_id: accounts.active.id,
+        created_at: '',
+        chain_id: selectedChain.id,
+        enable_secondary: false,
+        secondary_fee_address: null,
+        secondary_percentage_fee: 0,
+      };
+
+  // Reset the form with the updated activeChainParameter values
+  form.resetForm({
+    values: {
+      enable_secondary: activeChainParameter.value.enable_secondary,
+      secondary_fee_address: activeChainParameter.value.secondary_fee_address ?? '',
+      secondary_percentage_fee: activeChainParameter.value.secondary_percentage_fee,
+    },
+  });
+}
+
+const onChainParamFormSubmit = form.handleSubmit(async (values) => {
+  if (!hasProSubscription.value || !accounts.active?.id || !accounts.activeSettings.chainsParameters) return;
+
+  const accountId = activeChainParameter.value.account_id;
+  const chainId = chains.value[activeChainTab.value].id;
+
+  // Check if chain parameter already exists
+  const existingChainParameter = accounts.activeSettings.chainsParameters.find(
+    (c) => c.chain_id === chainId
+  );
+
+  const apiCall = existingChainParameter
+    ? updateAccountChainsParameters // Update if exists
+    : createAccountChainsParameters; // Create if not exists
+
+  // Call the appropriate API
+  const { data, error } = await apiCall(
+    accountId,
+    chainId,
+    values.enable_secondary ?? false,
+    values.secondary_fee_address ?? "",
+    values.secondary_percentage_fee
+  );
+
+  if(error) {
+    // Show error toast
+    toast({
+      title: `Error ${existingChainParameter ? "updating" : "creating"} chain parameter`,
+      description: error.message,
+      variant: "destructive",
+      action: h(ToastError),
+    });
+    return;
+  }
+  
+  // Update local state with the new/updated chain parameters
+  if (data) accounts.activeSettings.chainsParameters = data;
+
+  // Show success toast
+  toast({
+    title: `${existingChainParameter ? "Updated" : "Created"} chain parameter for ${chainId}`,
+    action: h(ToastCheck),
+  });
+});
+
+watch(
+  () => accounts,
+  () => {
+    updateChainParamFormValues();
+  },
+  { deep: true }
+);
+
+watch(
+  activeChainTab,
+  () => {
+    updateChainParamFormValues();
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -89,7 +206,7 @@ const formSchema = toTypedSchema(z.object({
               {{ address.name }}
             </td>
             <td class="px-6 py-4">
-              <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDelete(address.address)">
+              <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDeleteAccountAddress(address.address)">
                 <Trash2 class="size-4 text-destructive"/>
               </Button>
             </td>
@@ -125,71 +242,112 @@ const formSchema = toTypedSchema(z.object({
             Allow third party listings to be created by addresses that are not linked to your organization. Your organization collects fees on each third party listing sold.
           </p>
         </div>
-        <Switch :v-bind="hasProSubscription" :disabled="true"/>
+        <Switch :default-checked="hasProSubscription" :disabled="true"/>
       </div>
-      <Form v-if="hasProSubscription" id="listings-form" :validation-schema="formSchema" class="space-y-6 mt-6">
-        <FormField v-slot="{ componentField }" name="fees">
-          <FormItem>
-            <div class="flex items-center justify-between">
-              <div>
-              <FormLabel>Enable secondary listing</FormLabel>
-              <FormDescription>
-                Allow fees on secondary listings for this chain.
-              </FormDescription>
-              </div>
-              <FormControl>
-              <Switch />
-              </FormControl>
-            </div>
-          </FormItem>
-          <FormField v-slot="{ field, errors }" name="blockchainAddress">
-          <FormItem>
-            <div class="flex items-center justify-between">
-              <div>
-                <FormLabel>Secondary fee address</FormLabel>
-          
-                <FormDescription>
-                  Address that will receive the fees from secondary listings.
-                </FormDescription>
-                <FormMessage v-if="errors" class="text-xs mt-2">{{ errors }}</FormMessage>
-
-              </div>
-              <FormControl>
-                <Input v-bind="field" placeholder="Enter chain address" class="w-1/2 truncate" />
-              </FormControl>
-            </div>
-          </FormItem>
-        </FormField>
-          <FormField v-slot="{ field, errors }" name="fees">
-            <FormItem>
-              <div class="flex items-center justify-between">
-                <div>
-                  <FormLabel>Fee Percentage</FormLabel>
-                  <FormDescription>
-                    Enter the percentage fee (0.00% to 50.00%).
-                  </FormDescription>
-                  <FormMessage v-if="errors" class="text-xs mt-2">{{ errors }}</FormMessage>
-                </div>
-                <FormControl>
-                    <div class="flex items-center">
-                    <Input v-bind="field" type="number" placeholder="X.XX" min="0" max="50" class="w-1/8" />
-                    <span class="ml-2 text-muted-foreground">%</span>
-                    </div>
-                </FormControl>
-              </div>
-            </FormItem>
-          </FormField>
-        </FormField>
-        <div class="flex justify-end">
-          <Button variant="outline"  type="submit" disabled>
-            Save
-          </Button>
+      <div v-if="hasProSubscription" >
+        <div class="flex border-b border-border pt-8">
+          <button
+            v-for="(chain, index) in chains"
+            :key="chain.id"
+            @click="activeChainTab = index"
+            :class="[
+              'px-4 py-2 text-sm',
+              activeChainTab === index ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground',
+            ]"
+          >
+            {{ chain.id }}
+          </button>
         </div>
-      </Form>
-      <div>
+        <form  
+          id="chains-parameters-form" 
+          class="space-y-6 mt-6"
+          @submit="onChainParamFormSubmit"
+        >
+          <div>
+            <div v-for="(chain, index) in chains" :key="chain.id" v-show="activeChainTab === index" class="mt-4">
+              <!-- Enable Secondary Listing -->
+              <FormField v-slot="{ value, handleChange }" name="enable_secondary">
+                <FormItem>
+                  <div class="flex items-center justify-between px-4 py-4">
+                    <div>
+                      <FormLabel>Enable secondary listing for {{ chain.id }}</FormLabel>
+                      <FormDescription>
+                        Allow fees on secondary listings for this chain.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        @update:checked="handleChange"	
+                        :checked="value"
+                      />
+                    </FormControl>
+                  </div>
+                </FormItem>
+              </FormField>
+
+              <!-- Secondary Fee Address -->
+              <FormField v-slot="{ componentField, errors }" name="secondary_fee_address">
+                <FormItem>
+                  <div class="flex items-center justify-between px-4 py-4">
+                    <div>
+                      <FormLabel>Secondary fee address</FormLabel>
+                      <FormDescription>
+                        Address that will receive the fees from secondary listings.
+                      </FormDescription>
+                      <FormMessage v-if="errors" class="text-xs mt-2">{{ errors }}</FormMessage>
+                    </div>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        v-bind="componentField"
+                        placeholder="0x..."
+                        class="w-1/2 truncate"
+                      />
+                    </FormControl>
+                  </div>
+                </FormItem>
+              </FormField>
+
+              <!-- Fee Percentage -->
+              <FormField v-slot="{ componentField, errors }" name="secondary_percentage_fee">
+                <FormItem>
+                  <div class="flex items-center justify-between px-4 py-4">
+                    <div>
+                      <FormLabel>Fee Percentage</FormLabel>
+                      <FormDescription>
+                        Enter the percentage fee (0.00% to 50.00%).
+                      </FormDescription>
+                      <FormMessage v-if="errors" class="text-xs mt-2">{{ errors }}</FormMessage>
+                    </div>
+                    <FormControl>
+                      <div class="flex items-center">
+                        <Input
+                          v-bind="componentField"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="50"
+                          class="w-1/8"
+                        />
+                        <span class="ml-2 text-muted-foreground">%</span>
+                      </div>
+                    </FormControl>
+                  </div>
+                </FormItem>
+              </FormField>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <Button variant="outline" type="submit" form="chains-parameters-form">
+              Save
+            </Button>
+          </div>
+        </form >
+      </div>
+      <div v-else>
         <p class="text-sm text-muted-foreground pt-8">
           This feature is available exclusively for PRO subscribers. Upgrade to PRO to enable third party listings and collect fees on each sale.
-        </p>
+        </p> 
       </div>
     </div>
   </div>

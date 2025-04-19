@@ -7,31 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       accounts: {
@@ -40,36 +15,24 @@ export type Database = {
           id: number
           name: string
           owner_email: string
-          s_enable_secondary_sales: boolean
-          s_secondary_sales_fee_address: string | null
-          s_secondary_sales_percentage_fee: number | null
           subscription_expiration_date: string | null
           subscription_id: number
-          website: string | null
         }
         Insert: {
           created_at?: string
           id?: number
           name: string
           owner_email: string
-          s_enable_secondary_sales?: boolean
-          s_secondary_sales_fee_address?: string | null
-          s_secondary_sales_percentage_fee?: number | null
           subscription_expiration_date?: string | null
           subscription_id?: number
-          website?: string | null
         }
         Update: {
           created_at?: string
           id?: number
           name?: string
           owner_email?: string
-          s_enable_secondary_sales?: boolean
-          s_secondary_sales_fee_address?: string | null
-          s_secondary_sales_percentage_fee?: number | null
           subscription_expiration_date?: string | null
           subscription_id?: number
-          website?: string | null
         }
         Relationships: [
           {
@@ -142,22 +105,64 @@ export type Database = {
           },
         ]
       }
+      accounts_chains_parameters: {
+        Row: {
+          account_id: number
+          chain_id: string
+          created_at: string
+          enable_secondary: boolean
+          secondary_fee_address: string | null
+          secondary_percentage_fee: number
+        }
+        Insert: {
+          account_id: number
+          chain_id: string
+          created_at?: string
+          enable_secondary?: boolean
+          secondary_fee_address?: string | null
+          secondary_percentage_fee?: number
+        }
+        Update: {
+          account_id?: number
+          chain_id?: string
+          created_at?: string
+          enable_secondary?: boolean
+          secondary_fee_address?: string | null
+          secondary_percentage_fee?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_chains_parameters_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_chains_parameters_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "chains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       accounts_currencies: {
         Row: {
           account_id: number
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
           created_at: string
           currency: string
         }
         Insert: {
           account_id: number
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
           created_at?: string
           currency: string
         }
         Update: {
           account_id?: number
-          chain?: Database["public"]["Enums"]["chains"]
+          chain_id?: string
           created_at?: string
           currency?: string
         }
@@ -170,11 +175,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "accounts_currencies_chain_currency_fkey"
-            columns: ["chain", "currency"]
+            foreignKeyName: "accounts_currencies_chain_id_fkey"
+            columns: ["chain_id"]
             isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["chain", "id"]
+            referencedRelation: "chains"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -248,119 +253,131 @@ export type Database = {
           },
         ]
       }
+      chains: {
+        Row: {
+          created_at: string
+          fee_proxy_app_id: number | null
+          id: string
+          last_indexed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          fee_proxy_app_id?: number | null
+          id: string
+          last_indexed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          fee_proxy_app_id?: number | null
+          id?: string
+          last_indexed_at?: string | null
+        }
+        Relationships: []
+      }
       contracts: {
         Row: {
           byte_code: string
+          chain_id: string
           created_at: string
-          id: number
-          name: string | null
+          tag: Database["public"]["Enums"]["contract_tag_enum"]
+          version: number
         }
         Insert: {
           byte_code: string
+          chain_id: string
           created_at?: string
-          id?: number
-          name?: string | null
+          tag: Database["public"]["Enums"]["contract_tag_enum"]
+          version: number
         }
         Update: {
           byte_code?: string
+          chain_id?: string
           created_at?: string
-          id?: number
-          name?: string | null
-        }
-        Relationships: []
-      }
-      contracts_tags: {
-        Row: {
-          created_at: string
-          tag: string
-        }
-        Insert: {
-          created_at?: string
-          tag: string
-        }
-        Update: {
-          created_at?: string
-          tag?: string
-        }
-        Relationships: []
-      }
-      contracts_tags_association: {
-        Row: {
-          chain: Database["public"]["Enums"]["chains"]
-          contract: number
-          created_at: string
-          tag: string
-          version: string
-        }
-        Insert: {
-          chain: Database["public"]["Enums"]["chains"]
-          contract: number
-          created_at?: string
-          tag: string
-          version: string
-        }
-        Update: {
-          chain?: Database["public"]["Enums"]["chains"]
-          contract?: number
-          created_at?: string
-          tag?: string
-          version?: string
+          tag?: Database["public"]["Enums"]["contract_tag_enum"]
+          version?: number
         }
         Relationships: [
           {
-            foreignKeyName: "contracts_tags_association_contract_fkey"
-            columns: ["contract"]
+            foreignKeyName: "contracts_version_fkey"
+            columns: ["version", "chain_id"]
             isOneToOne: false
-            referencedRelation: "contracts"
-            referencedColumns: ["id"]
+            referencedRelation: "contracts_versions"
+            referencedColumns: ["version", "chain_id"]
           },
+        ]
+      }
+      contracts_versions: {
+        Row: {
+          chain_id: string
+          created_at: string
+          version: number
+        }
+        Insert: {
+          chain_id: string
+          created_at?: string
+          version: number
+        }
+        Update: {
+          chain_id?: string
+          created_at?: string
+          version?: number
+        }
+        Relationships: [
           {
-            foreignKeyName: "contracts_tags_association_tag_fkey"
-            columns: ["tag"]
+            foreignKeyName: "contracts_versions_chain_id_fkey"
+            columns: ["chain_id"]
             isOneToOne: false
-            referencedRelation: "contracts_tags"
-            referencedColumns: ["tag"]
+            referencedRelation: "chains"
+            referencedColumns: ["id"]
           },
         ]
       }
       currencies: {
         Row: {
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
           created_at: string
           decimals: number
           icon: string | null
           id: string
+          is_public: boolean
           name: string
           ticker: string
           type: Database["public"]["Enums"]["currency_type"]
           updated_at: string | null
-          visible: boolean
         }
         Insert: {
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
           created_at?: string
           decimals: number
           icon?: string | null
           id: string
+          is_public?: boolean
           name: string
           ticker: string
           type: Database["public"]["Enums"]["currency_type"]
           updated_at?: string | null
-          visible?: boolean
         }
         Update: {
-          chain?: Database["public"]["Enums"]["chains"]
+          chain_id?: string
           created_at?: string
           decimals?: number
           icon?: string | null
           id?: string
+          is_public?: boolean
           name?: string
           ticker?: string
           type?: Database["public"]["Enums"]["currency_type"]
           updated_at?: string | null
-          visible?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "currencies_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "chains"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dutch_auctions: {
         Row: {
@@ -409,7 +426,8 @@ export type Database = {
           asset_qty: number
           asset_thumbnail: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
+          contract_version: number | null
           created_at: string
           currency: string
           id: string
@@ -419,7 +437,9 @@ export type Database = {
           tags: string | null
           type: Database["public"]["Enums"]["listings_types"]
           updated_at: string | null
-          transactions: unknown | null
+          transactions:
+            | Database["public"]["Tables"]["transactions"]["Row"]
+            | null
         }
         Insert: {
           account_id: number
@@ -429,7 +449,8 @@ export type Database = {
           asset_qty?: number
           asset_thumbnail?: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
+          contract_version?: number | null
           created_at?: string
           currency: string
           id?: string
@@ -448,7 +469,8 @@ export type Database = {
           asset_qty?: number
           asset_thumbnail?: string | null
           asset_type?: Database["public"]["Enums"]["assets_types"]
-          chain?: Database["public"]["Enums"]["chains"]
+          chain_id?: string
+          contract_version?: number | null
           created_at?: string
           currency?: string
           id?: string
@@ -461,11 +483,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "listings_listing_currency_chain_fkey"
-            columns: ["currency", "chain"]
+            foreignKeyName: "listings_chain_id_fkey"
+            columns: ["chain_id"]
             isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["id", "chain"]
+            referencedRelation: "chains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listings_contract_version_chain_id_fkey"
+            columns: ["contract_version", "chain_id"]
+            isOneToOne: false
+            referencedRelation: "contracts_versions"
+            referencedColumns: ["version", "chain_id"]
           },
           {
             foreignKeyName: "public_listings_account_id_fkey"
@@ -528,51 +557,84 @@ export type Database = {
       }
       subscription_tiers: {
         Row: {
-          allow_premium_contracts: boolean
-          allow_secondary_sales: boolean
+          allow_custom_currencies: boolean
+          allow_secondary_listings: boolean
           created_at: string
           duration: number | null
           id: number
-          listing_flat_fee: number
           name: string
-          sale_percentage_fee: number
-          secondary_listing_flat_fee: number | null
           secondary_sale_percentage_fee: number | null
-          updated_at: string | null
         }
         Insert: {
-          allow_premium_contracts?: boolean
-          allow_secondary_sales?: boolean
+          allow_custom_currencies?: boolean
+          allow_secondary_listings?: boolean
           created_at?: string
           duration?: number | null
           id?: number
-          listing_flat_fee: number
           name: string
-          sale_percentage_fee: number
-          secondary_listing_flat_fee?: number | null
           secondary_sale_percentage_fee?: number | null
-          updated_at?: string | null
         }
         Update: {
-          allow_premium_contracts?: boolean
-          allow_secondary_sales?: boolean
+          allow_custom_currencies?: boolean
+          allow_secondary_listings?: boolean
           created_at?: string
           duration?: number | null
           id?: number
-          listing_flat_fee?: number
           name?: string
-          sale_percentage_fee?: number
-          secondary_listing_flat_fee?: number | null
           secondary_sale_percentage_fee?: number | null
-          updated_at?: string | null
         }
         Relationships: []
+      }
+      subscriptions_chains_parameters: {
+        Row: {
+          chain_id: string
+          created_at: string
+          flat_fees: number
+          sales_fees: number
+          secondary_flat_fees: number
+          secondary_sales_fees: number
+          subscription_id: number
+        }
+        Insert: {
+          chain_id: string
+          created_at?: string
+          flat_fees?: number
+          sales_fees?: number
+          secondary_flat_fees?: number
+          secondary_sales_fees?: number
+          subscription_id: number
+        }
+        Update: {
+          chain_id?: string
+          created_at?: string
+          flat_fees?: number
+          sales_fees?: number
+          secondary_flat_fees?: number
+          secondary_sales_fees?: number
+          subscription_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_chains_parameters_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "chains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_chains_parameters_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
           amount: number | null
           app_id: number
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
           created_at: string
           currency: string | null
           from_address: string
@@ -580,12 +642,12 @@ export type Database = {
           id: string
           note: string | null
           type: Database["public"]["Enums"]["transaction_type"]
-          listings: unknown | null
+          listings: Database["public"]["Tables"]["listings"]["Row"] | null
         }
         Insert: {
           amount?: number | null
           app_id: number
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
           created_at?: string
           currency?: string | null
           from_address: string
@@ -597,7 +659,7 @@ export type Database = {
         Update: {
           amount?: number | null
           app_id?: number
-          chain?: Database["public"]["Enums"]["chains"]
+          chain_id?: string
           created_at?: string
           currency?: string | null
           from_address?: string
@@ -606,7 +668,15 @@ export type Database = {
           note?: string | null
           type?: Database["public"]["Enums"]["transaction_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transactions_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "chains"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -614,54 +684,41 @@ export type Database = {
     }
     Functions: {
       get_account_subscription: {
-        Args: {
-          account_id: number
-        }
+        Args: { account_id: number }
         Returns: {
-          allow_premium_contracts: boolean
-          allow_secondary_sales: boolean
+          allow_custom_currencies: boolean
+          allow_secondary_listings: boolean
           created_at: string
           duration: number | null
           id: number
-          listing_flat_fee: number
           name: string
-          sale_percentage_fee: number
-          secondary_listing_flat_fee: number | null
           secondary_sale_percentage_fee: number | null
-          updated_at: string | null
         }
       }
       get_daily_sales_volume_timeseries: {
         Args: {
           account_id: number
-          chain: Database["public"]["Enums"]["chains"]
+          chain: Database["public"]["Enums"]["chains_enum"]
         }
         Returns: Database["public"]["CompositeTypes"]["transactions_volume"][]
       }
       get_hourly_transactions_timeseries: {
         Args: {
           account_id: number
-          chain: Database["public"]["Enums"]["chains"]
+          chain: Database["public"]["Enums"]["chains_enum"]
         }
         Returns: Database["public"]["CompositeTypes"]["transactions_count"][]
       }
       get_key_account_id: {
-        Args: {
-          key: string
-          origin: string
-        }
+        Args: { key: string; origin: string }
         Returns: number
       }
       get_listing_by_id: {
-        Args: {
-          listing_id: string
-        }
+        Args: { listing_id: string }
         Returns: Database["public"]["CompositeTypes"]["composite_listing"]
       }
       listings: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": Database["public"]["Tables"]["transactions"]["Row"] }
         Returns: {
           account_id: number
           app_id: number
@@ -670,7 +727,8 @@ export type Database = {
           asset_qty: number
           asset_thumbnail: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
+          contract_version: number | null
           created_at: string
           currency: string
           id: string
@@ -683,13 +741,11 @@ export type Database = {
         }[]
       }
       transactions: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": Database["public"]["Tables"]["listings"]["Row"] }
         Returns: {
           amount: number | null
           app_id: number
-          chain: Database["public"]["Enums"]["chains"]
+          chain_id: string
           created_at: string
           currency: string | null
           from_address: string
@@ -703,7 +759,29 @@ export type Database = {
     Enums: {
       accounts_users_roles: "admin" | "moderator" | "member"
       assets_types: "arc72" | "offchain" | "asa"
-      chains: "voi:testnet" | "voi:mainnet" | "algo:testnet" | "algo:mainnet"
+      chains_enum:
+        | "voi:testnet"
+        | "voi:mainnet"
+        | "algo:testnet"
+        | "algo:mainnet"
+      contract_tag_enum:
+        | "clear"
+        | "algo_asa_auction_approval"
+        | "algo_asa_dutch_approval"
+        | "algo_asa_sale_approval"
+        | "algo_offchain_sale_approval"
+        | "asa_asa_auction_approval"
+        | "asa_asa_dutch_approval"
+        | "asa_asa_sale_approval"
+        | "asa_offchain_sale_approval"
+        | "arc200_arc72_auction_approval"
+        | "arc200_arc72_dutch_approval"
+        | "arc200_arc72_sale_approval"
+        | "arc200_offchain_sale_approval"
+        | "voi_arc72_auction_approval"
+        | "voi_arc72_dutch_approval"
+        | "voi_arc72_sale_approval"
+        | "voi_offchain_sale_approval"
       currency_type: "algo" | "asa" | "voi" | "arc200"
       listings_statuses: "pending" | "active" | "closed" | "cancelled"
       listings_types: "sale" | "auction" | "dutch"
@@ -722,7 +800,7 @@ export type Database = {
         created_at: string | null
         updated_at: string | null
         status: Database["public"]["Enums"]["listings_statuses"] | null
-        chain: Database["public"]["Enums"]["chains"] | null
+        chain: Database["public"]["Enums"]["chains_enum"] | null
         seller_address: string | null
         name: string | null
         type: Database["public"]["Enums"]["listings_types"] | null
@@ -759,344 +837,31 @@ export type Database = {
       }
     }
   }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          user_metadata: Json | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          owner_id: string | null
-          upload_signature: string
-          user_metadata: Json | null
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          owner_id?: string | null
-          upload_signature: string
-          user_metadata?: Json | null
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          owner_id?: string | null
-          upload_signature?: string
-          user_metadata?: Json | null
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      can_insert_object: {
-        Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
-        }
-        Returns: undefined
-      }
-      extension: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      filename: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      foldername: {
-        Args: {
-          name: string
-        }
-        Returns: string[]
-      }
-      get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          size: number
-          bucket_id: string
-        }[]
-      }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-        }
-        Returns: {
-          key: string
-          id: string
-          created_at: string
-        }[]
-      }
-      list_objects_with_delimiter: {
-        Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          start_after?: string
-          next_token?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          metadata: Json
-          updated_at: string
-        }[]
-      }
-      operation: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      search: {
-        Args: {
-          prefix: string
-          bucketname: string
-          limits?: number
-          levels?: number
-          offsets?: number
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          updated_at: string
-          created_at: string
-          last_accessed_at: string
-          metadata: Json
-        }[]
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1104,20 +869,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1125,20 +892,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1146,14 +915,77 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      accounts_users_roles: ["admin", "moderator", "member"],
+      assets_types: ["arc72", "offchain", "asa"],
+      chains_enum: [
+        "voi:testnet",
+        "voi:mainnet",
+        "algo:testnet",
+        "algo:mainnet",
+      ],
+      contract_tag_enum: [
+        "clear",
+        "algo_asa_auction_approval",
+        "algo_asa_dutch_approval",
+        "algo_asa_sale_approval",
+        "algo_offchain_sale_approval",
+        "asa_asa_auction_approval",
+        "asa_asa_dutch_approval",
+        "asa_asa_sale_approval",
+        "asa_offchain_sale_approval",
+        "arc200_arc72_auction_approval",
+        "arc200_arc72_dutch_approval",
+        "arc200_arc72_sale_approval",
+        "arc200_offchain_sale_approval",
+        "voi_arc72_auction_approval",
+        "voi_arc72_dutch_approval",
+        "voi_arc72_sale_approval",
+        "voi_offchain_sale_approval",
+      ],
+      currency_type: ["algo", "asa", "voi", "arc200"],
+      listings_statuses: ["pending", "active", "closed", "cancelled"],
+      listings_types: ["sale", "auction", "dutch"],
+      transaction_type: [
+        "create",
+        "fund",
+        "buy",
+        "bid",
+        "close",
+        "update",
+        "cancel",
+      ],
+    },
+  },
+} as const
