@@ -11,4 +11,7 @@ export type CompositeListing = Database['public']['Tables']['listings']['Row'] &
   dutch_auctions: Database['public']['Tables']['dutch_auctions']['Row'][]
 }
 
-export type Chain = Database['public']['Enums']['chains']
+export type Chain = Database['public']['Tables']['chains']['Row']
+
+export type AccountsChainsParameter = Database['public']['Tables']['accounts_chains_parameters']['Row']
+
