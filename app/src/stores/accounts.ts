@@ -5,7 +5,8 @@ import {
   getAccountAddresses,
   getAccountApiKeys, getAccountSubscription,
   getAccountUsers,
-  getAllAccounts
+  getAllAccounts,
+  getAccountJwtSecrets
 } from '@/lib/supabase/accounts'
 import { useSessionStore } from '@/stores/session'
 import type { Database } from '@/lib/supabase/database.types'
@@ -22,6 +23,7 @@ interface AccountSettings{
     created_at: Database["public"]["Tables"]["accounts_users_association"]["Row"]["created_at"],
   }[] | undefined
   keys?: Database["public"]["Tables"]["accounts_api_keys"]["Row"][] | undefined
+  secrets?: Database["public"]["Tables"]["accounts_secrets"]["Row"][] | undefined
   addresses?: Database["public"]["Tables"]["accounts_addresses"]["Row"][] | undefined
 }
 
@@ -71,7 +73,8 @@ export const useAccountsStore = defineStore('accounts', () => {
         fetchAccountUsers(account.id),
         fetchAccountAddresses(account.id),
         fetchAccountKeys(account.id),
-        fetchAccountSubscription(account.id)
+        fetchAccountSubscription(account.id),
+        fetchAccountSecrets(account.id)
       ]).then(() => {
         loading.value = false
       })
@@ -153,5 +156,20 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountKeys, fetchAccountAddresses, selectAccount }
+  async function fetchAccountSecrets(accountId: number) {
+    const { data: secrets, error } = await getAccountJwtSecrets(accountId)
+    if (!secrets || error) {
+      console.error(error)
+      toast({
+        title: 'Error fetching account secrets',
+        description: error?.message || 'Unexpected error',
+        variant: 'destructive',
+        action: h(ToastError)
+      })
+    } else {
+      activeSettings.value.secrets = secrets
+    }
+  }
+
+  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountKeys, fetchAccountSecrets,fetchAccountAddresses, selectAccount }
 })

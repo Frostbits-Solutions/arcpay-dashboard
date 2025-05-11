@@ -23,7 +23,7 @@ const formSchema = toTypedSchema(z.object({
 
 const quickLinks = [
   {name: 'Invite new team members', icon: Users, to: {name: 'organization-organization-users'}},
-  {name: 'Generate new API key', icon: Key, to: {name: 'organization-organization-integrations'}},
+  {name: 'Generate new API key - JWT Secret', icon: Key, to: {name: 'organization-organization-integrations'}},
   {name: 'Link address to organization', icon: WalletMinimal, to: {name: 'organization-organization-listings'}},
   // {name: 'Billing and subscription', icon: Receipt, to: {name: 'organization-organization-general'}},
 ]

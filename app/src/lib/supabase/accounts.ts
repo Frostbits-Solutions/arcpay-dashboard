@@ -203,3 +203,47 @@ export async function getAccountActiveListingsAppids(account_id: number, chain: 
   const { data, error } = await supabase.from('listings').select('app_id').eq('account_id', account_id).in('status', ['pending', 'active']).eq('chain', chain)
   return { data, error }
 }
+
+/**
+ * Create a new JWT secret for an account.
+ * @param account_id - The ID of the account.
+ * @param origin - The allowed origin for the secret.
+ * @param name - The name of the secret.
+ */
+export async function createAccountJwtSecret(account_id: number, origin: string, name: string) {
+  const { data, error } = await supabase
+    .from('accounts_secrets')
+    .insert({
+      account_id,
+      name,
+      origin
+    })
+    .select();
+  return { data, error };
+}
+
+/**
+ * Get all JWT secrets for an account.
+ * @param account_id - The ID of the account.
+ */
+export async function getAccountJwtSecrets(account_id: number) {
+  const { data, error } = await supabase
+    .from('accounts_secrets')
+    .select('*')
+    .eq('account_id', account_id);
+  return { data, error };
+}
+
+/**
+ * Delete a JWT secret for an account.
+ * @param account_id - The ID of the account.
+ * @param secret_id - The secret to delete.
+ */
+export async function deleteAccountJwtSecret(account_id: number, secret: string) {
+  const { data, error } = await supabase
+    .from('accounts_secrets')
+    .delete()
+    .eq('account_id', account_id)
+    .eq('secret', secret);
+  return { data, error };
+}

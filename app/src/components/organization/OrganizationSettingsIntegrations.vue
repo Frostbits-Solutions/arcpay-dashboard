@@ -3,7 +3,7 @@
 import { useAccountsStore } from '@/stores/accounts'
 import { Button } from '@/components/ui/button'
 import { ArrowUpRight, Trash2, Package } from 'lucide-vue-next'
-import { deleteAccountApiKey, removeAccountUser } from '@/lib/supabase/accounts'
+import { deleteAccountApiKey, deleteAccountJwtSecret } from '@/lib/supabase/accounts'
 import { h } from 'vue'
 import ToastError from '@/components/ui/toast/ToastError.vue'
 import ToastCheck from '@/components/ui/toast/ToastCheck.vue'
@@ -11,11 +11,12 @@ import { useToast } from '@/components/ui/toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Clipboard } from '@/components/ui/clipboard'
 import OrganizationGenerateKeyDialog from '@/components/organization/OrganizationGenerateKeyDialog.vue'
+import { JWT_SECRET, API_KEY } from './utils'
 
 const accounts = useAccountsStore()
 const { toast } = useToast()
 
-async function onDelete(key: string) {
+async function onDeleteKeyApi(key: string) {
   if (accounts.active?.id) {
     const {data, error} = await deleteAccountApiKey(accounts.active.id, key)
     if (error) {
@@ -34,6 +35,27 @@ async function onDelete(key: string) {
     }
   }
 }
+
+async function onDeleteJwtSecret(secret: string) {
+  if (accounts.active?.id) {
+    const {data, error} = await deleteAccountJwtSecret(accounts.active.id, secret)
+    if (error) {
+      toast({
+        title: `Error deleting API key`,
+        description: error.message,
+        variant: 'destructive',
+        action: h(ToastError)
+      });
+    } else {
+      await accounts.fetchAccountSecrets(accounts.active.id)
+      toast({
+        title: `API key deleted`,
+        action: h(ToastCheck)
+      });
+    }
+  }
+}
+
 </script>
 
 <template>
@@ -41,10 +63,81 @@ async function onDelete(key: string) {
   <div class="relative mt-6">
     <div class="flex items-end justify-between pb-4 gap-10">
       <div>
+        <h4 class="text-md font-normal">Secret JWT</h4>
+        <p class="text-sm text-muted-foreground">You can create a secret key to use for signing JSON Web Tokens (JWT) in your transactions. To ensure security, you must also specify the allowed origin for this key. Requests from origins not listed will be blocked.</p>
+      </div>
+      <!-- Use JWT_SECRET constant -->
+      <OrganizationGenerateKeyDialog :type="JWT_SECRET">
+        <Button variant="outline">Generate new secret</Button>
+      </OrganizationGenerateKeyDialog>
+    </div>
+    <div class="rounded-lg border border-border overflow-hidden">
+      <table class="w-full text-sm text-left rtl:text-right text-muted-foreground">
+        <thead class="text-xs text-muted-foreground/50 uppercase bg-muted/50">
+          <tr>
+            <th scope="col" class="px-6 py-3">
+              Secret
+            </th>
+            <th scope="col" class="px-6 py-3">
+              Allowed Origin
+            </th>
+            <th scope="col" class="px-6 py-3">
+              Name
+            </th>
+            <th scope="col" class="w-16">
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+        <template v-if="!accounts.loading">
+          <tr v-for="secret in accounts.activeSettings.secrets" :key="secret.secret" class="border-b last:border-b-0 border-border">
+            <td class="px-6 py-4">
+              <Clipboard :source="secret.secret" class="min-w-64"/>
+            </td>
+            <td class="px-6 py-4 truncate">
+              {{ secret.origin }}
+            </td>
+            <td class="px-6 py-4 truncate">
+              {{ secret.name }}
+            </td>
+            <td class="px-6 py-4">
+              <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDeleteJwtSecret(secret.secret)">
+                <Trash2 class="size-4 text-destructive"/>
+              </Button>
+            </td>
+          </tr>
+          <tr v-if="!accounts.activeSettings.secrets?.length">
+            <td colspan="4" class="px-6 py-4 text-center text-sm text-muted-foreground">
+              No secret
+            </td>
+          </tr>
+        </template>
+        <tr v-else>
+          <td class="px-6 py-4">
+            <Skeleton class="h-4 w-48"/>
+          </td>
+          <td class="px-6 py-4">
+            <Skeleton class="h-4 w-48"/>
+          </td>
+          <td class="px-6 py-4">
+            <Skeleton class="h-4 w-28"/>
+          </td>
+          <td class="px-6 py-4">
+            <Skeleton class="h-5 w-8"/>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="relative mt-6">
+    <div class="flex items-end justify-between pb-4 gap-10">
+      <div>
         <h4 class="text-md font-normal">API Keys</h4>
         <p class="text-sm text-muted-foreground">API keys can be used for advanced integration to interact with our API. To prevent malicious use of your keys, you must specify the origin to allow for each key. HTTP requests that don't have a matching Origin header will be blocked.</p>
       </div>
-      <OrganizationGenerateKeyDialog>
+      <!-- Use API_KEY constant -->
+      <OrganizationGenerateKeyDialog :type="API_KEY">
         <Button variant="outline">Generate new key</Button>
       </OrganizationGenerateKeyDialog>
     </div>
@@ -78,7 +171,7 @@ async function onDelete(key: string) {
               {{ key.name }}
             </td>
             <td class="px-6 py-4">
-              <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDelete(key.key)">
+              <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDeleteKeyApi(key.key)">
                 <Trash2 class="size-4 text-destructive"/>
               </Button>
             </td>

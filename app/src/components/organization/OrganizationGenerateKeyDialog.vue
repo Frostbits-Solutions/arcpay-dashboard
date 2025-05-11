@@ -8,7 +8,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { createAccountApiKey } from '@/lib/supabase/accounts'
+import { createAccountApiKey, createAccountJwtSecret } from '@/lib/supabase/accounts'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import {
@@ -25,11 +25,22 @@ import { useToast } from '@/components/ui/toast'
 import { h, ref } from 'vue'
 import ToastCheck from '@/components/ui/toast/ToastCheck.vue'
 import ToastError from '@/components/ui/toast/ToastError.vue'
+import { JWT_SECRET, API_KEY } from './utils'
+
+// Define props
+const props = defineProps({
+  type: {
+    type: String,
+    required: true,
+    validator: (value: string) => [API_KEY, JWT_SECRET].includes(value),
+  },
+})
 
 const accounts = useAccountsStore()
-const {toast} = useToast()
+const { toast } = useToast()
 const open = ref(false)
 
+// Form schema includes both name and origin for all types
 const formSchema = toTypedSchema(z.object({
   name: z.string().min(4).max(50),
   origin: z.string().url(),
@@ -37,26 +48,36 @@ const formSchema = toTypedSchema(z.object({
 
 async function onSubmit(values: any) {
   if (accounts.active?.id) {
-    const {data, error} =  await createAccountApiKey(accounts.active.id, values.origin, values.name)
+    let response
+    if (props.type === API_KEY) {
+      response = await createAccountApiKey(accounts.active.id, values.origin, values.name)
+    } else if (props.type === JWT_SECRET) {
+      response = await createAccountJwtSecret(accounts.active.id, values.origin, values.name)
+    }
+
+    const { data, error } = response
     if (error) {
       toast({
-        title: `Error generating new key`,
+        title: `Error generating new ${props.type === API_KEY ? 'API key' : 'JWT secret'}`,
         description: error.message,
         variant: 'destructive',
         action: h(ToastError)
       });
     } else {
       toast({
-        title: `New API key generated`,
-        description: `You can use this key to authenticate with the API`,
+        title: `New ${props.type === API_KEY ? 'API key' : 'JWT secret'} generated`,
+        description: `You can use this ${props.type === API_KEY ? 'key' : 'secret'} to authenticate`,
         action: h(ToastCheck)
       });
-      await accounts.fetchAccountKeys(accounts.active.id)
+      if (props.type === API_KEY) {
+        await accounts.fetchAccountKeys(accounts.active.id)
+      } else {
+        await accounts.fetchAccountSecrets(accounts.active.id)
+      }
       open.value = false
     }
   }
 }
-
 </script>
 
 <template>
@@ -66,16 +87,17 @@ async function onSubmit(values: any) {
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>New API key</DialogTitle>
+        <DialogTitle>New {{ type === API_KEY ? 'API key' : 'JWT secret' }}</DialogTitle>
         <DialogDescription>
-          Generate a new key to authenticate with the API. Origin must match the domain of the requests.
+          Generate a new {{ type === API_KEY ? 'key' : 'secret' }} to authenticate and communicate with the API. 
+          Origin must match the domain of the requests.
         </DialogDescription>
       </DialogHeader>
       <div class="py-4">
         <Form id="add-user-form" :validation-schema="formSchema" @submit="onSubmit" class="space-y-6">
           <FormField v-slot="{ componentField }" name="name">
             <FormItem class="flex-1">
-              <FormLabel>Key name</FormLabel>
+              <FormLabel>{{ type === API_KEY ? 'Key name' : 'Secret name' }}</FormLabel>
               <FormControl>
                 <Input type="text" placeholder="name" v-bind="componentField" />
               </FormControl>
@@ -95,7 +117,7 @@ async function onSubmit(values: any) {
       </div>
       <DialogFooter>
         <Button type="submit" form="add-user-form" variant="gradient">
-          Generate key
+          Generate {{ type === API_KEY ? 'key' : 'secret' }}
         </Button>
       </DialogFooter>
     </DialogContent>
