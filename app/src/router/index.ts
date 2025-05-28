@@ -4,7 +4,7 @@ import { useSessionStore } from '@/stores/session'
 import ListingsView from '@/views/ListingsView.vue'
 import OrganizationSettingsView from '@/views/OrganizationSettingsView.vue'
 import OrganizationSettingsGeneral from '@/components/organization/OrganizationSettingsGeneral.vue'
-import OrganizationSettingsIntegrations from '@/components/organization/OrganizationSettingsIntegrations.vue'
+import OrganizationSettingsSecurity from '@/components/organization/OrganizationSettingsSecurity.vue'
 import OrganizationSettingsUsers from '@/components/organization/OrganizationSettingsUsers.vue'
 import OrganizationSettingsListings from '@/components/organization/OrganizationSettingsListings.vue'
 import DashboardView from '@/views/DashboardView.vue'
@@ -52,9 +52,9 @@ const router = createRouter({
               component: OrganizationSettingsUsers,
             },
             {
-              path: 'integrations',
-              name: 'organization-organization-integrations',
-              component: OrganizationSettingsIntegrations,
+              path: 'security',
+              name: 'organization-organization-security',
+              component: OrganizationSettingsSecurity,
             },
             {
               path: 'listings',

@@ -79,21 +79,18 @@ export type Database = {
           created_at: string
           key: string
           name: string | null
-          origin: string
         }
         Insert: {
           account_id: number
           created_at?: string
           key?: string
           name?: string | null
-          origin: string
         }
         Update: {
           account_id?: number
           created_at?: string
           key?: string
           name?: string | null
-          origin?: string
         }
         Relationships: [
           {
@@ -176,10 +173,10 @@ export type Database = {
           },
           {
             foreignKeyName: "accounts_currencies_chain_id_fkey"
-            columns: ["chain_id"]
+            columns: ["currency", "chain_id"]
             isOneToOne: false
-            referencedRelation: "chains"
-            referencedColumns: ["id"]
+            referencedRelation: "currencies"
+            referencedColumns: ["id", "chain_id"]
           },
         ]
       }
@@ -187,22 +184,19 @@ export type Database = {
         Row: {
           account_id: number
           created_at: string
-          name: string | null
-          origin: string
+          name: string
           secret: string
         }
         Insert: {
-          account_id: number
+          account_id?: number
           created_at?: string
-          name?: string | null
-          origin?: string
+          name: string
           secret?: string
         }
         Update: {
           account_id?: number
           created_at?: string
-          name?: string | null
-          origin?: string
+          name?: string
           secret?: string
         }
         Relationships: [
@@ -569,24 +563,6 @@ export type Database = {
           },
         ]
       }
-      sdk_versions: {
-        Row: {
-          changelog: string | null
-          created_at: string
-          id: string
-        }
-        Insert: {
-          changelog?: string | null
-          created_at?: string
-          id: string
-        }
-        Update: {
-          changelog?: string | null
-          created_at?: string
-          id?: string
-        }
-        Relationships: []
-      }
       subscription_tiers: {
         Row: {
           allow_custom_currencies: boolean
@@ -595,7 +571,6 @@ export type Database = {
           duration: number | null
           id: number
           name: string
-          secondary_sale_percentage_fee: number | null
         }
         Insert: {
           allow_custom_currencies?: boolean
@@ -604,7 +579,6 @@ export type Database = {
           duration?: number | null
           id?: number
           name: string
-          secondary_sale_percentage_fee?: number | null
         }
         Update: {
           allow_custom_currencies?: boolean
@@ -613,7 +587,6 @@ export type Database = {
           duration?: number | null
           id?: number
           name?: string
-          secondary_sale_percentage_fee?: number | null
         }
         Relationships: []
       }
@@ -724,7 +697,6 @@ export type Database = {
           duration: number | null
           id: number
           name: string
-          secondary_sale_percentage_fee: number | null
         }
       }
       get_daily_sales_volume_timeseries: {

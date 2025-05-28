@@ -8,8 +8,8 @@ import { useToast } from '@/components/ui/toast'
 import ToastCheck from '@/components/ui/toast/ToastCheck.vue'
 
 const props = defineProps<{
-  source: string,
-  class?:HTMLAttributes['class']
+  source: string
+  class?: HTMLAttributes['class']
 }>()
 const { toast } = useToast()
 const { copy, copied, isSupported } = useClipboard({ source: props.source })
@@ -18,21 +18,19 @@ function onClick() {
   copy(props.source)
   toast({
     title: `Copied to clipboard!`,
-    action: h(ToastCheck)
-  });
+    action: h(ToastCheck),
+  })
 }
 </script>
 
 <template>
-  <Button variant="outline"  @click="onClick" :class="cn('p-4 h-12', props.class)">
-    {{ source }}
+  <Button variant="outline" @click="onClick" :class="cn('h-12 p-4', props.class)">
+    {{ source.length > 60 ? source.slice(0, 60) + '...' : source }}
     <template v-if="isSupported">
-      <Clipboard v-if="!copied" class="size-4 ms-2"/>
-      <ClipboardCheck v-else class="size-4 ms-2"/>
+      <Clipboard v-if="!copied" class="ms-2 size-4" />
+      <ClipboardCheck v-else class="ms-2 size-4" />
     </template>
   </Button>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

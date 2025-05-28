@@ -152,13 +152,12 @@ export async function removeAccountAddress(id: number, address: string) {
   return { data, error }
 }
 
-export async function createAccountApiKey(account_id: number, origin: string, name: string) {
+export async function createAccountApiKey(account_id: number, name: string) {
   const { data, error } = await supabase
     .from('accounts_api_keys')
     .insert({
       account_id,
       name,
-      origin
     })
     .select()
   return { data, error }
@@ -172,11 +171,10 @@ export async function getAccountApiKeys(account_id: number) {
   return { data, error }
 }
 
-export async function updateAccountApiKey(account_id: number, key: number, origin: string, name: string) {
+export async function updateAccountApiKey(account_id: number, key: number, name: string) {
   const { data, error } = await supabase
     .from('accounts_api_keys')
     .update({
-      origin,
       name
     })
     .eq('account_id', account_id)
@@ -210,13 +208,12 @@ export async function getAccountActiveListingsAppids(account_id: number, chain: 
  * @param origin - The allowed origin for the secret.
  * @param name - The name of the secret.
  */
-export async function createAccountJwtSecret(account_id: number, origin: string, name: string) {
+export async function createAccountJwtSecret(account_id: number, name: string) {
   const { data, error } = await supabase
     .from('accounts_secrets')
     .insert({
       account_id,
       name,
-      origin
     })
     .select();
   return { data, error };
