@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import {
   getAccount,
   getAccountAddresses,
-  getAccountApiKeys, getAccountSubscription,
+  getAccountSubscription,
   getAccountUsers,
   getAllAccounts,
   getAccountJwtSecrets
@@ -22,7 +22,6 @@ interface AccountSettings{
     user_email: Database["public"]["Tables"]["accounts_users_association"]["Row"]["user_email"],
     created_at: Database["public"]["Tables"]["accounts_users_association"]["Row"]["created_at"],
   }[] | undefined
-  keys?: Database["public"]["Tables"]["accounts_api_keys"]["Row"][] | undefined
   secrets?: Database["public"]["Tables"]["accounts_secrets"]["Row"][] | undefined
   addresses?: Database["public"]["Tables"]["accounts_addresses"]["Row"][] | undefined
 }
@@ -72,7 +71,6 @@ export const useAccountsStore = defineStore('accounts', () => {
         fetchAccountSettings(account.id),
         fetchAccountUsers(account.id),
         fetchAccountAddresses(account.id),
-        fetchAccountKeys(account.id),
         fetchAccountSubscription(account.id),
         fetchAccountSecrets(account.id)
       ]).then(() => {
@@ -126,21 +124,6 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  async function fetchAccountKeys(accountId: number) {
-    const { data: keys, error } = await getAccountApiKeys(accountId)
-    if (!keys || error) {
-      console.error(error)
-      toast({
-        title: 'Error fetching account api keys',
-        description: error?.message || 'Unexpected error',
-        variant: 'destructive',
-        action: h(ToastError)
-      })
-    } else {
-      activeSettings.value.keys = keys
-    }
-  }
-
   async function fetchAccountAddresses(accountId: number) {
     const { data: addresses, error } = await getAccountAddresses(accountId)
     if (!addresses || error) {
@@ -171,5 +154,5 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountKeys, fetchAccountSecrets,fetchAccountAddresses, selectAccount }
+  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountSecrets,fetchAccountAddresses, selectAccount }
 })

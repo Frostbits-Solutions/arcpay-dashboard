@@ -3,7 +3,6 @@ import { useAccountsStore } from '@/stores/accounts'
 import { Button } from '@/components/ui/button'
 import { Trash2, Package } from 'lucide-vue-next'
 import {
-    deleteAccountApiKey,
     deleteAccountJwtSecret,
 } from '@/lib/supabase/accounts'
 import { h } from 'vue'
@@ -12,34 +11,11 @@ import ToastCheck from '@/components/ui/toast/ToastCheck.vue'
 import { useToast } from '@/components/ui/toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Clipboard } from '@/components/ui/clipboard'
-import OrganizationGenerateKeyDialog from '@/components/organization/OrganizationGenerateKeyDialog.vue'
-import { JWT_SECRET, PUBLIC_ACCOUNT_KEY } from './utils'
+import OrganizationGenerateSecretDialog from '@/components/organization/OrganizationGenerateSecretDialog.vue'
+import JWTValidityTestingComponent from '@/components/organization/JWTValidityTestingComponent.vue'
 
 const accounts = useAccountsStore()
 const { toast } = useToast()
-
-async function onDeleteKeyApi(key: string) {
-    if (accounts.active?.id) {
-        const { data, error } = await deleteAccountApiKey(
-            accounts.active.id,
-            key
-        )
-        if (error) {
-            toast({
-                title: `Error deleting API key`,
-                description: error.message,
-                variant: 'destructive',
-                action: h(ToastError),
-            })
-        } else {
-            await accounts.fetchAccountKeys(accounts.active.id)
-            toast({
-                title: `API key deleted`,
-                action: h(ToastCheck),
-            })
-        }
-    }
-}
 
 async function onDeleteJwtSecret(secret: string) {
     if (accounts.active?.id) {
@@ -67,6 +43,23 @@ async function onDeleteJwtSecret(secret: string) {
 
 <template>
     <h2 class="text-2xl font-bold dark:text-white">Security</h2>
+    <div class="relative mt-6">
+        <div class="mb-8">
+            <h4 class="text-md font-normal mb-1">Authentication</h4>
+            <p class="text-sm text-muted-foreground mb-2">
+                Your Account ID is required for all Arcpay API and SDK calls.<br>
+                Send it as a header named <strong>x-arcpay-account-id</strong> in every request.<br>
+                This header is used to authenticate your organization.
+            </p>
+            <div class="flex items-center gap-2">
+                <span class="text-base font-semibold text-muted-foreground">Account ID :</span>
+                <Clipboard
+                    :source="accounts.active?.id.toString() || ''"
+                    class="font-mono bg-muted px-3 py-1 rounded text-sm text-primary"
+                />
+            </div>
+        </div>
+    </div>
     <div class="relative mt-6">
         <div class="flex items-end justify-between gap-10 pb-4">
             <div>
@@ -122,9 +115,9 @@ async function onDeleteJwtSecret(secret: string) {
                 </span>
             </div>
             <!-- Use JWT_SECRET constant -->
-            <OrganizationGenerateKeyDialog :type="JWT_SECRET">
+            <OrganizationGenerateSecretDialog >
                 <Button variant="outline">Generate new secret</Button>
-            </OrganizationGenerateKeyDialog>
+            </OrganizationGenerateSecretDialog>
         </div>
         <div class="overflow-hidden rounded-lg border border-border">
             <table
@@ -194,76 +187,7 @@ async function onDeleteJwtSecret(secret: string) {
             </table>
         </div>
     </div>
-    <div class="relative mt-6">
-        <div class="flex items-end justify-between gap-10 pb-4">
-            <div>
-                <h4 class="text-md font-normal">Account Public Key</h4>
-                <p class="text-sm text-muted-foreground">
-                    Your account's public key is used to identify and
-                    authenticate your organization when using the Arcpay SDK.
-                    Include this key in your JWTs to securely reference your
-                    account. You can generate a new key at any time if needed.
-                    But it will deprecate the previous key.
-                </p>
-            </div>
-            <OrganizationGenerateKeyDialog :type="PUBLIC_ACCOUNT_KEY">
-                <Button variant="outline">Generate new key</Button>
-            </OrganizationGenerateKeyDialog>
-        </div>
-        <div class="overflow-hidden rounded-lg border border-border">
-            <table
-                class="w-full text-left text-sm text-muted-foreground rtl:text-right"
-            >
-                <thead
-                    class="bg-muted/50 text-xs uppercase text-muted-foreground/50"
-                >
-                    <tr>
-                        <th scope="col" class="px-6 py-3">Key</th>
-                        <th scope="col" class="px-6 py-3">Name</th>
-                        <th scope="col" class="w-16"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template v-if="!accounts.loading">
-                        <tr
-                            v-for="key in accounts.activeSettings.keys"
-                            :key="key.key"
-                            class="border-b border-border last:border-b-0"
-                        >
-                            <td class="px-6 py-4">
-                                <Clipboard :source="key.key" class="min-w-64" />
-                            </td>
-                            <td class="truncate px-6 py-4">
-                                {{ key.name }}
-                            </td>
-                        </tr>
-                        <tr v-if="!accounts.activeSettings.keys?.length">
-                            <td
-                                colspan="4"
-                                class="px-6 py-4 text-center text-sm text-muted-foreground"
-                            >
-                                No API key
-                            </td>
-                        </tr>
-                    </template>
-                    <tr v-else>
-                        <td class="px-6 py-4">
-                            <Skeleton class="h-4 w-48" />
-                        </td>
-                        <td class="px-6 py-4">
-                            <Skeleton class="h-4 w-48" />
-                        </td>
-                        <td class="px-6 py-4">
-                            <Skeleton class="h-4 w-28" />
-                        </td>
-                        <td class="px-6 py-4">
-                            <Skeleton class="h-5 w-8" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <a
+    <a
             href="https://www.npmjs.com/package/arcpay-sdk"
             target="_blank"
             class="relative mt-6 flex h-16 items-center justify-start rounded-lg border border-border bg-muted/50 p-4 text-sm"
@@ -274,7 +198,7 @@ async function onDeleteJwtSecret(secret: string) {
                 class="absolute right-2 top-2 h-4 w-4 rotate-90 text-border"
             />
         </a>
-    </div>
+    <JWTValidityTestingComponent />
 </template>
 
 <style scoped></style>

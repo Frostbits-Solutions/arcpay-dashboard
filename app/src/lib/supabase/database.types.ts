@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       accounts: {
         Row: {
+          authenticate_clients: boolean
           created_at: string
           id: number
           name: string
@@ -19,6 +20,7 @@ export type Database = {
           subscription_id: number
         }
         Insert: {
+          authenticate_clients?: boolean
           created_at?: string
           id?: number
           name: string
@@ -27,6 +29,7 @@ export type Database = {
           subscription_id?: number
         }
         Update: {
+          authenticate_clients?: boolean
           created_at?: string
           id?: number
           name?: string
@@ -66,35 +69,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "public_accounts_addresses_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      accounts_api_keys: {
-        Row: {
-          account_id: number
-          created_at: string
-          key: string
-          name: string | null
-        }
-        Insert: {
-          account_id: number
-          created_at?: string
-          key?: string
-          name?: string | null
-        }
-        Update: {
-          account_id?: number
-          created_at?: string
-          key?: string
-          name?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_accounts_api_keys_account_id_fkey"
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "accounts"
@@ -758,6 +732,10 @@ export type Database = {
           note: string | null
           type: Database["public"]["Enums"]["transaction_type"]
         }[]
+      }
+      verify_arcpay_jwt_request: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {

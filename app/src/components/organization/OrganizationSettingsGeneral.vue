@@ -12,7 +12,7 @@ import ToastCheck from '@/components/ui/toast/ToastCheck.vue'
 import { useToast } from '@/components/ui/toast'
 import ToastError from '@/components/ui/toast/ToastError.vue'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Users, ArrowUpRight, Key, WalletMinimal, Receipt } from 'lucide-vue-next'
+import { Users, ArrowUpRight, Key, WalletMinimal } from 'lucide-vue-next'
 
 const {toast} = useToast()
 const accounts = useAccountsStore()

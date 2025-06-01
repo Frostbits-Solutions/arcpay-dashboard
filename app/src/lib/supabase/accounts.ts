@@ -152,46 +152,6 @@ export async function removeAccountAddress(id: number, address: string) {
   return { data, error }
 }
 
-export async function createAccountApiKey(account_id: number, name: string) {
-  const { data, error } = await supabase
-    .from('accounts_api_keys')
-    .insert({
-      account_id,
-      name,
-    })
-    .select()
-  return { data, error }
-}
-
-export async function getAccountApiKeys(account_id: number) {
-  const { data, error } = await supabase
-    .from('accounts_api_keys')
-    .select('*')
-    .eq('account_id', account_id)
-  return { data, error }
-}
-
-export async function updateAccountApiKey(account_id: number, key: number, name: string) {
-  const { data, error } = await supabase
-    .from('accounts_api_keys')
-    .update({
-      name
-    })
-    .eq('account_id', account_id)
-    .eq('key', key)
-    .select()
-  return { data, error }
-}
-
-export async function deleteAccountApiKey(account_id: number, key: string) {
-  const { data, error } = await supabase
-    .from('accounts_api_keys')
-    .delete()
-    .eq('account_id', account_id)
-    .eq('key', key)
-  return { data, error }
-}
-
 export async function getAccountSubscription(account_id: number) {
   const { data, error } = await supabase.rpc('get_account_subscription', { account_id })
   return { data, error }
