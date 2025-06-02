@@ -1,3 +1,25 @@
+/*
+# Accounts Schema Permissions Table
+
+This table provides a comprehensive overview of permissions for different user roles across all tables in the accounts schema.
+
+| Table                      | anon                   | authenticated             | member                  | admin                         | owner                          |
+|----------------------------|------------------------|---------------------------|-------------------------|-------------------------------|--------------------------------|
+| accounts                   | SELECT (read-only)     | CREATE new accounts       | SELECT only             | SELECT, UPDATE                | ALL (full CRUD access)         |
+| accounts_addresses         | SELECT (read-only)     | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_users_association | No access              | Can add self as owner     | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_chains_parameters | SELECT (read-only)     | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_currencies        | SELECT (read-only)     | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_secrets           | No access              | No direct access          | No access               | ALL (full CRUD access)        | ALL (full CRUD access)         |
+
+## Notes:
+- "authenticated" refers to any logged-in user, which may not be associated with a specific account
+- "member", "admin", and "owner" are roles assigned to authenticated users within specific accounts
+- RLS (Row-Level Security) policies enforce these permissions at the row level
+- Users with admin role can manage most account settings but cannot delete the account
+- Only owners can delete accounts
+- The service_role has ALL permissions on all tables (superuser)
+*/
 
 -------------------- ACCOUNTS --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts" (
@@ -40,6 +62,7 @@ ALTER TABLE "public"."accounts_addresses" OWNER TO "postgres";
 ALTER TABLE "public"."accounts_addresses" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts_addresses" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_addresses" TO "service_role";
+CREATE POLICY "Allow public read access to all addresses" ON "public"."accounts_addresses" FOR SELECT USING (true);
 CREATE POLICY "Account members can view addresses" ON "public"."accounts_addresses" FOR SELECT TO "authenticated" USING (SELECT "private"."is_user_account_member"("auth"."email"(), "account_id"));
 CREATE POLICY "Account admins can manage addresses" ON "public"."accounts_addresses" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
 
@@ -183,14 +206,8 @@ CREATE OR REPLACE FUNCTION "private"."get_user_accounts"("user_email" "text") RE
     AS $_$select account_id from public.accounts_users_association where user_email = $1$_$;
 ALTER FUNCTION "private"."get_user_accounts"("user_email" "text") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."get_key_account_id"("key" "text", "origin" "text") RETURNS "uuid"
-    LANGUAGE "sql" STABLE SECURITY DEFINER
-    AS $_$select account_id from "public"."accounts_api_keys" where key::text = $1 and origin = $2$_$;
-ALTER FUNCTION "public"."get_key_account_id"("key" "text", "origin" "text") OWNER TO "postgres";
-
 -- Grant permissions for functions
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_owner"("user_email" "text", "account_id" "uuid") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_admin"("user_email" "text", "account_id" "uuid") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_member"("user_email" "text", "account_id" "uuid") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."get_user_accounts"("user_email" "text") TO "authenticated", "service_role";
-GRANT EXECUTE ON FUNCTION "public"."get_key_account_id"("key" "text", "origin" "text") TO "anon", "authenticated", "service_role";
