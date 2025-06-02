@@ -15,6 +15,7 @@ This table provides a comprehensive overview of permissions for different user r
 - The service_role has ALL permissions on all tables (superuser)
 - RLS (Row-Level Security) policies enforce these permissions based on user roles and account associations
 */
+
 -------------------- SALES --------------------
 CREATE TABLE IF NOT EXISTS "public"."sales" (
     "listing_id" "uuid" NOT NULL,
