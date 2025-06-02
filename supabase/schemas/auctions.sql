@@ -36,6 +36,7 @@ ALTER TABLE "public"."auctions" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."auctions" TO "anon";
 GRANT ALL ON TABLE "public"."auctions" TO "authenticated";
 GRANT ALL ON TABLE "public"."auctions" TO "service_role";
+
 CREATE POLICY "Enable read access for all users" ON "public"."auctions" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."auctions" FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can manage auctions" ON "public"."auctions" FOR ALL TO "authenticated"
@@ -45,6 +46,3 @@ CREATE POLICY "Members can manage auctions" ON "public"."auctions" FOR ALL TO "a
         WHERE "listings"."id" = "auctions"."listing_id"
         AND "private"."is_user_account_member"("auth"."email"(), "listings"."account_id")
     ));
-
--- Indexes
-CREATE INDEX "idx_auctions_listing_id" ON "public"."auctions" USING "btree" ("listing_id");
