@@ -1,21 +1,44 @@
--- Supabase Schema: contracts.sql
+/*
+# Contracts Schema Permissions Table
 
--- Table Definition: contracts_versions (from 20250413032235_updated_contracts.sql)
+This table provides a comprehensive overview of permissions for different user roles across all tables in the contracts schema.
+
+| Table               | anon                  | authenticated          | member                 | admin                  | owner                  |
+|---------------------|----------------------|------------------------|------------------------|------------------------|------------------------|
+| contracts_versions  | SELECT (read-only)   | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     |
+| contracts           | SELECT (read-only)   | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     |
+
+## Notes:
+- All users (anon, authenticated, member, admin, owner) have read-only access to contracts data
+- No users can modify contracts data through regular application interfaces
+- The service_role has ALL permissions on all tables (superuser)
+- RLS (Row-Level Security) policies enforce these permissions with universal read policies
+- Contracts data is typically managed through administrative processes or migrations
+- These tables serve as reference data for smart contract deployments and versioning
+*/
+
+-------------------- CONTRACTS_VERSIONS --------------------
 CREATE TABLE IF NOT EXISTS "public"."contracts_versions" (
     "version" integer NOT NULL,
-    "chain_id" text NOT NULL, -- Foreign key to chains.id
+    "chain_id" text NOT NULL,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT "contracts_versions_pkey" PRIMARY KEY ("version", "chain_id"),
-    CONSTRAINT "contracts_versions_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE CASCADE
+    CONSTRAINT "contracts_versions_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE RESTRICT
 );
 ALTER TABLE "public"."contracts_versions" OWNER TO "postgres";
 
--- Table Definition: contracts (from 20250413032235_updated_contracts.sql)
--- Original contracts, contracts_tags, contracts_tags_association were dropped.
+-- RLS for contracts_versions
+ALTER TABLE "public"."contracts_versions" ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON TABLE "public"."contracts_versions" TO "anon";
+GRANT SELECT ON TABLE "public"."contracts_versions" TO "authenticated";
+GRANT ALL ON TABLE "public"."contracts_versions" TO "service_role";
+CREATE POLICY "Allow public read access to all contracts versions" ON "public"."contracts_versions" FOR SELECT USING (true);
+
+-------------------- CONTRACTS --------------------
 CREATE TABLE IF NOT EXISTS "public"."contracts" (
     "tag" "public"."contract_tag_enum" NOT NULL,
-    "version" bigint NOT NULL, -- Part of composite FK to contracts_versions
-    "chain_id" text NOT NULL, -- Part of composite FK to contracts_versions
+    "version" text NOT NULL,
+    "chain_id" text NOT NULL,
     "byte_code" text NOT NULL,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT "contracts_pkey" PRIMARY KEY ("version", "tag", "chain_id"),
@@ -23,34 +46,9 @@ CREATE TABLE IF NOT EXISTS "public"."contracts" (
 );
 ALTER TABLE "public"."contracts" OWNER TO "postgres";
 
--- RLS and Grant Permissions (from 20250413032235_updated_contracts.sql)
--- Note: RLS is not explicitly enabled on these new tables in the migration, but grants are provided.
--- If RLS is intended, add: ALTER TABLE "public"."contracts_versions" ENABLE ROW LEVEL SECURITY;
--- If RLS is intended, add: ALTER TABLE "public"."contracts" ENABLE ROW LEVEL SECURITY;
-
-GRANT SELECT ON TABLE "public"."contracts_versions" TO "anon";
-GRANT ALL ON TABLE "public"."contracts_versions" TO "authenticated";
-GRANT ALL ON TABLE "public"."contracts_versions" TO "service_role";
-
+-- RLS for contracts
+ALTER TABLE "public"."contracts" ENABLE ROW LEVEL SECURITY;
 GRANT SELECT ON TABLE "public"."contracts" TO "anon";
-GRANT ALL ON TABLE "public"."contracts" TO "authenticated";
+GRANT SELECT ON TABLE "public"."contracts" TO "authenticated";
 GRANT ALL ON TABLE "public"."contracts" TO "service_role";
-
--- RLS Policies for original contracts tables (from 20240915211603_inital_schema.sql)
--- These are for the OLD tables that were dropped. Included for historical context if needed, but not active for new schema.
-/*
-ALTER TABLE "public"."contracts" ENABLE ROW LEVEL SECURITY; -- Old table
 CREATE POLICY "Allow public read access to all contracts" ON "public"."contracts" FOR SELECT USING (true);
-CREATE POLICY "Allow admin to manage contracts" ON "public"."contracts" FOR ALL USING ((get_my_claim('role')) = 'admin'::text);
-
-ALTER TABLE "public"."contracts_tags" ENABLE ROW LEVEL SECURITY; -- Old table
-CREATE POLICY "Allow public read access to all contract tags" ON "public"."contracts_tags" FOR SELECT USING (true);
-CREATE POLICY "Allow admin to manage contract tags" ON "public"."contracts_tags" FOR ALL USING ((get_my_claim('role')) = 'admin'::text);
-
-ALTER TABLE "public"."contracts_tags_association" ENABLE ROW LEVEL SECURITY; -- Old table
-CREATE POLICY "Allow public read access to all contract tag associations" ON "public"."contracts_tags_association" FOR SELECT USING (true);
-CREATE POLICY "Allow admin to manage contract tag associations" ON "public"."contracts_tags_association" FOR ALL USING ((get_my_claim('role')) = 'admin'::text);
-*/
-
--- Note: The table `sdk_versions` was dropped in 20250413032235_updated_contracts.sql.
--- DROP TABLE IF EXISTS "public"."sdk_versions";
