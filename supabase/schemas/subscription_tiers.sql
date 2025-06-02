@@ -56,7 +56,7 @@ GRANT ALL ON SEQUENCE "public"."subscription_tiers_id_seq" TO "service_role";
 
 -- Related function (from 20240915211603_inital_schema.sql)
 -- This function retrieves the subscription tier for a given account.
-CREATE OR REPLACE FUNCTION "public"."get_account_subscription"("p_account_id" bigint)
+CREATE OR REPLACE FUNCTION "public"."get_account_subscription"("p_account_id" "uuid")
 RETURNS "public"."subscription_tiers"
 LANGUAGE "sql" STABLE SECURITY DEFINER
 SET search_path = ''
@@ -68,8 +68,8 @@ AS $_$
     AND (p_account_id IN (SELECT "private"."get_member_accounts_for_user"(auth.email())));
 $_$;
 
-ALTER FUNCTION "public"."get_account_subscription"(bigint) OWNER TO "postgres";
-GRANT EXECUTE ON FUNCTION "public"."get_account_subscription"(bigint) TO "anon", "authenticated", "service_role";
+ALTER FUNCTION "public"."get_account_subscription"("uuid") OWNER TO "postgres";
+GRANT EXECUTE ON FUNCTION "public"."get_account_subscription"("uuid") TO "anon", "authenticated", "service_role";
 
 -- Comments on related entities:
 -- The "public"."accounts" table has a foreign key ("subscription_id") referencing "public"."subscription_tiers"("id").

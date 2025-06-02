@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS "public"."transactions" (
     "id" "text" NOT NULL,
     "created_at" timestamp without time zone DEFAULT "now"() NOT NULL,
-    "account_id" bigint NOT NULL,
+    "account_id" "uuid" NOT NULL,
     "app_id" bigint,
     "type" "public"."transaction_type" NOT NULL,
     "note" "text",

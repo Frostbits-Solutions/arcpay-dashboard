@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "public"."listings" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone,
-    "account_id" bigint NOT NULL,
+    "account_id" "uuid" NOT NULL,
     "status" "public"."listings_statuses" NOT NULL,
     "seller_address" "text" NOT NULL,
     "name" "text" NOT NULL,
