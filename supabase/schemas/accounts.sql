@@ -5,11 +5,11 @@ This table provides a comprehensive overview of permissions for different user r
 
 | Table                      | anon                   | authenticated             | member                  | admin                         | owner                          |
 |----------------------------|------------------------|---------------------------|-------------------------|-------------------------------|--------------------------------|
-| accounts                   | SELECT (read-only)     | CREATE new accounts       | SELECT only             | SELECT, UPDATE                | ALL (full CRUD access)         |
-| accounts_addresses         | SELECT (read-only)     | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_users_association | No access              | Can add self as owner     | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_chains_parameters | SELECT (read-only)     | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_currencies        | SELECT (read-only)     | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts                   | No access              | No direct access          | SELECT only             | SELECT, UPDATE                | ALL (full CRUD access)         |
+| accounts_addresses         | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_users_association | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_chains_parameters | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_currencies        | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
 | accounts_secrets           | No access              | No direct access          | No access               | ALL (full CRUD access)        | ALL (full CRUD access)         |
 
 ## Function Permissions
@@ -59,7 +59,6 @@ CREATE TABLE IF NOT EXISTS "public"."accounts_addresses" (
     "account_id" "uuid" NOT NULL,
     CONSTRAINT "accounts_addresses_pkey" PRIMARY KEY ("address", "account_id"),
     CONSTRAINT "accounts_addresses_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE
-
 );
 ALTER TABLE "public"."accounts_addresses" OWNER TO "postgres";
 
@@ -67,7 +66,6 @@ ALTER TABLE "public"."accounts_addresses" OWNER TO "postgres";
 ALTER TABLE "public"."accounts_addresses" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts_addresses" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_addresses" TO "service_role";
-CREATE POLICY "Allow public read access to all addresses" ON "public"."accounts_addresses" FOR SELECT USING (true);
 CREATE POLICY "Account members can view addresses" ON "public"."accounts_addresses" FOR SELECT TO "authenticated" USING (SELECT "private"."is_user_account_member"("auth"."email"(), "account_id"));
 CREATE POLICY "Account admins can manage addresses" ON "public"."accounts_addresses" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
 
@@ -87,20 +85,6 @@ ALTER TABLE "public"."accounts_users_association" OWNER TO "postgres";
 ALTER TABLE "public"."accounts_users_association" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts_users_association" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_users_association" TO "service_role";
-CREATE POLICY "Account creator can add themselves as owner" ON "public"."accounts_users_association" FOR INSERT TO "authenticated" 
-WITH CHECK (
-    -- Either the user is already an account owner
-    "private"."is_user_account_owner"("auth"."email"(), "account_id") 
-    OR (
-        -- Or all these conditions must be met:
-        "user_email" = "auth"."email"() -- Can only add themselves
-        AND "role" = 'owner' -- Must be adding as owner
-        AND NOT EXISTS (
-            SELECT 1 FROM "public"."accounts_users_association" 
-            WHERE "account_id" = "accounts_users_association"."account_id"
-        ) -- No users linked to this account yet
-    )
-);
 CREATE POLICY "Account members can view users in their account" ON "public"."accounts_users_association" FOR SELECT TO "authenticated" USING (SELECT "private"."is_user_account_member"("auth"."email"(), "account_id"));
 CREATE POLICY "Account admins can manage account users" ON "public"."accounts_users_association" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
 
