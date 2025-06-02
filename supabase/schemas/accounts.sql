@@ -12,6 +12,14 @@ This table provides a comprehensive overview of permissions for different user r
 | accounts_currencies        | SELECT (read-only)     | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
 | accounts_secrets           | No access              | No direct access          | No access               | ALL (full CRUD access)        | ALL (full CRUD access)         |
 
+## Function Permissions
+| Function                   | anon                   | authenticated           | member                  | admin                   | owner                   |
+|----------------------------|------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
+| is_user_account_owner      | No access              | EXECUTE                 | EXECUTE                 | EXECUTE                 | EXECUTE                 |
+| is_user_account_admin      | No access              | EXECUTE                 | EXECUTE                 | EXECUTE                 | EXECUTE                 |
+| is_user_account_member     | No access              | EXECUTE                 | EXECUTE                 | EXECUTE                 | EXECUTE                 |
+| get_user_accounts          | No access              | EXECUTE                 | EXECUTE                 | EXECUTE                 | EXECUTE                 |
+
 ## Notes:
 - "authenticated" refers to any logged-in user, which may not be associated with a specific account
 - "member", "admin", and "owner" are roles assigned to authenticated users within specific accounts
