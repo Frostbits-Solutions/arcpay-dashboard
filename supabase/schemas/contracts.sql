@@ -17,6 +17,28 @@ This table provides a comprehensive overview of permissions for different user r
 - These tables serve as reference data for smart contract deployments and versioning
 */
 
+-------------------- TYPES --------------------
+CREATE TYPE "public"."contract_tag_enum" AS ENUM (
+    'clear',
+    'algo_asa_auction_approval',
+    'algo_asa_dutch_approval',
+    'algo_asa_sale_approval',
+    'algo_offchain_sale_approval',
+    'asa_asa_auction_approval',
+    'asa_asa_dutch_approval',
+    'asa_asa_sale_approval',
+    'asa_offchain_sale_approval',
+    'arc200_arc72_auction_approval',
+    'arc200_arc72_dutch_approval',
+    'arc200_arc72_sale_approval',
+    'arc200_offchain_sale_approval',
+    'voi_arc72_auction_approval',
+    'voi_arc72_dutch_approval',
+    'voi_arc72_sale_approval',
+    'voi_offchain_sale_approval'
+);
+ALTER TYPE "public"."contract_tag_enum" OWNER TO "postgres";
+
 -------------------- CONTRACTS_VERSIONS --------------------
 CREATE TABLE IF NOT EXISTS "public"."contracts_versions" (
     "version" integer NOT NULL,

@@ -1,3 +1,8 @@
+INSERT INTO "public"."chains" ("id") VALUES
+('voi:testnet'),
+('voi:mainnet'),
+('algo:testnet'),
+('algo:mainnet');
 INSERT INTO "public"."subscription_tiers" ("name", "allow_secondary_listings", "allow_custom_currencies", "duration") VALUES ('free', false, false, null);
 INSERT INTO "public"."subscriptions_chains_parameters" ("subscription_id", "chain_id", "flat_fees", "sales_fees", "secondary_flat_fees", "secondary_sales_fees") VALUES
 (1, 'voi:testnet', 1000, 0.2, 1000, 0.2),

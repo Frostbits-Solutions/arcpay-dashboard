@@ -23,6 +23,61 @@ This table provides a comprehensive overview of permissions for different user r
 - All users can SELECT and INSERT into listings, but only account members can UPDATE and DELETE their own listings
 */
 
+-------------------- TYPES --------------------
+CREATE TYPE "public"."listings_statuses" AS ENUM (
+    'pending',
+    'active',
+    'closed',
+    'cancelled'
+);
+ALTER TYPE "public"."listings_statuses" OWNER TO "postgres";
+
+CREATE TYPE "public"."listings_types" AS ENUM (
+    'sale',
+    'auction',
+    'dutch'
+);
+ALTER TYPE "public"."listings_types" OWNER TO "postgres";
+
+CREATE TYPE "public"."composite_listing" AS (
+	"id" "uuid",
+	"created_at" timestamp without time zone,
+	"updated_at" timestamp without time zone,
+	"status" "public"."listings_statuses",
+	"chain_id" "text",
+	"creator_address" "text",
+	"name" "text",
+	"type" "public"."listings_types",
+	"app_id" bigint,
+	"currency" bigint,
+	"currency_name" "text",
+	"currency_ticker" "text",
+	"currency_icon" "text",
+	"currency_type" "public"."currency_type",
+	"currency_decimals" bigint,
+	"asset_id" "text",
+	"asset_thumbnail" "text",
+	"asset_type" "public"."assets_types",
+	"asset_qty" double precision,
+	"metadata" "jsonb",
+	"sale_price" double precision,
+	"auction_start_price" double precision,
+	"auction_increment" double precision,
+	"auction_duration" integer,
+	"dutch_min_price" double precision,
+	"dutch_max_price" double precision,
+	"dutch_duration" integer
+);
+
+ALTER TYPE "public"."composite_listing" OWNER TO "postgres";
+
+CREATE TYPE "public"."assets_types" AS ENUM (
+    'arc72',
+    'offchain',
+    'asa'
+);
+ALTER TYPE "public"."assets_types" OWNER TO "postgres";
+
 -------------------- LISTINGS --------------------
 CREATE TABLE IF NOT EXISTS "public"."listings" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,

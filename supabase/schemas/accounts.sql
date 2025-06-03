@@ -30,6 +30,15 @@ This table provides a comprehensive overview of permissions for different user r
 - The service_role has ALL permissions on all tables (superuser)
 */
 
+-------------------- TYPES --------------------
+CREATE TYPE "public"."accounts_users_roles" AS ENUM (
+    'owner',
+    'admin',
+    'moderator', -- as per active file
+    'member'
+);
+ALTER TYPE "public"."accounts_users_roles" OWNER TO "postgres";
+
 -------------------- ACCOUNTS --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
@@ -153,6 +162,7 @@ CREATE POLICY "Account admins can manage secrets" ON "public"."accounts_secrets"
 -------------------- FUNCTIONS --------------------
 CREATE OR REPLACE FUNCTION "public"."create_account"("account_name" "text") RETURNS "uuid"
     LANGUAGE "plpgsql" SECURITY DEFINER
+    set search_path = ''
     AS $$
 DECLARE
     new_account_id uuid;
@@ -172,6 +182,7 @@ ALTER FUNCTION "public"."create_account"("account_name" "text") OWNER TO "postgr
 
 CREATE OR REPLACE FUNCTION "private"."is_user_account_owner"("user_email" "text", "account_id" "uuid") RETURNS boolean
     LANGUAGE "sql" STABLE SECURITY DEFINER
+    set search_path = ''
         AS $_$
         SELECT EXISTS (
             SELECT 1 
@@ -185,6 +196,7 @@ ALTER FUNCTION "private"."is_user_account_owner"("user_email" "text", "account_i
 
 CREATE OR REPLACE FUNCTION "private"."is_user_account_admin"("user_email" "text", "account_id" "uuid") RETURNS boolean
     LANGUAGE "sql" STABLE SECURITY DEFINER
+    set search_path = ''
         AS $_$
         SELECT EXISTS (
             SELECT 1 
@@ -198,6 +210,7 @@ ALTER FUNCTION "private"."is_user_account_admin"("user_email" "text", "account_i
 
 CREATE OR REPLACE FUNCTION "private"."is_user_account_member"("user_email" "text", "account_id" "uuid") RETURNS boolean
     LANGUAGE "sql" STABLE SECURITY DEFINER
+    set search_path = ''
         AS $_$
         SELECT EXISTS (
             SELECT 1 
@@ -211,6 +224,7 @@ ALTER FUNCTION "private"."is_user_account_member"("user_email" "text", "account_
 
 CREATE OR REPLACE FUNCTION "private"."get_user_accounts"("user_email" "text") RETURNS SETOF "uuid"
     LANGUAGE "sql" STABLE SECURITY DEFINER
+    set search_path = ''
     AS $_$select account_id from public.accounts_users_association where user_email = $1$_$;
 ALTER FUNCTION "private"."get_user_accounts"("user_email" "text") OWNER TO "postgres";
 

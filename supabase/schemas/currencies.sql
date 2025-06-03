@@ -15,6 +15,15 @@ This table provides a comprehensive overview of permissions for different user r
 - Currency data is typically managed through administrative processes or migrations
 */
 
+-------------------- TYPES --------------------
+CREATE TYPE "public"."currency_type" AS ENUM (
+    'algo',
+    'asa',
+    'voi',
+    'arc200'
+);
+ALTER TYPE "public"."currency_type" OWNER TO "postgres";
+
 -------------------- CURRENCIES --------------------
 CREATE TABLE IF NOT EXISTS "public"."currencies" (
     "id" bigint NOT NULL,
