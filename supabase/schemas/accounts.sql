@@ -115,8 +115,8 @@ CREATE POLICY "Account admins can manage accounts chain parameters" ON "public".
 CREATE TABLE IF NOT EXISTS "public"."accounts_currencies" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "account_id" "uuid" NOT NULL,
-    "currency" "text" NOT NULL,
-    "chain_id" text NOT NULL,
+    "currency" "bigint" NOT NULL,
+    "chain_id" "text" NOT NULL,
     CONSTRAINT "accounts_currencies_pkey" PRIMARY KEY ("account_id", "currency", "chain_id"),
     CONSTRAINT "accounts_currencies_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
     CONSTRAINT "accounts_currencies_currency_fkey" FOREIGN KEY ("currency", "chain_id") REFERENCES "public"."currencies"("id", "chain_id") ON DELETE CASCADE
