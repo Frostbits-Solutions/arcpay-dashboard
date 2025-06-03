@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "public"."chains" (
 ALTER TABLE "public"."chains" OWNER TO "postgres";
 
 -- RLS for chains
-ALTER TABLE "public"."accounts" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."chains" ENABLE ROW LEVEL SECURITY;
 GRANT SELECT ON TABLE "public"."chains" TO "anon";
 GRANT SELECT ON TABLE "public"."chains" TO "authenticated";
 GRANT ALL ON TABLE "public"."chains" TO "service_role";

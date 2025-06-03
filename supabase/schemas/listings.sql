@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS "public"."listings" (
 );
 
 ALTER TABLE "public"."listings" OWNER TO "postgres";
-CREATE INDEX IF NOT EXISTS "idx_listings" ON "public"."listings" ("account_id", "status", "chain_id", "currency", "type", "asset_type", "asset_id", "seller_address");
+CREATE INDEX IF NOT EXISTS "idx_listings" ON "public"."listings" ("account_id", "status", "chain_id", "currency", "type", "asset_type", "asset_id", "creator_address");
 
 -- RLS Policies for listings
 ALTER TABLE "public"."listings" ENABLE ROW LEVEL SECURITY;

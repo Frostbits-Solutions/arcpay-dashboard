@@ -56,8 +56,8 @@ ALTER TABLE "public"."accounts" OWNER TO "postgres";
 ALTER TABLE "public"."accounts" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts" TO "service_role";
-CREATE POLICY "Owners can update and delete account" ON "public"."accounts" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_owner"("auth"."email"(), "account_id"));
-CREATE POLICY "Admins can update account" ON "public"."accounts" FOR UPDATE TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
+CREATE POLICY "Owners can update and delete account" ON "public"."accounts" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_owner"("auth"."email"(), "id"));
+CREATE POLICY "Admins can update account" ON "public"."accounts" FOR UPDATE TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "id"));
 
 
 -------------------- ACCOUNTS ADDRESSES --------------------

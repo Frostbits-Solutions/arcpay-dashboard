@@ -67,9 +67,9 @@ CREATE TABLE IF NOT EXISTS "public"."transactions" (
     "type" "public"."transaction_type" NOT NULL,
     "amount" double precision,
     "currency" "bigint" NOT NULL,
-    "metadata" jsonb DEFAULT '{}'::jsonb NOT NULL
-    
+    "metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
     CONSTRAINT "transactions_pkey" PRIMARY KEY ("id", "chain_id", "app_id", "from_address", "created_at"),
+    CONSTRAINT "transactions_currency_fkey" FOREIGN KEY ("currency", "chain_id") REFERENCES "public"."currencies"("id", "chain_id") ON DELETE CASCADE,
     CONSTRAINT "transactions_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE CASCADE
 );
 ALTER TABLE "public"."transactions" OWNER TO "postgres";
@@ -90,7 +90,7 @@ CREATE OR REPLACE FUNCTION "public"."transactions"("public"."listings") RETURNS 
 
 ALTER FUNCTION "public"."transactions"("public"."listings") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" bigint, "chain" "public"."chains") RETURNS SETOF "public"."transactions_count"
+CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") RETURNS SETOF "public"."transactions_count"
     LANGUAGE "sql" STABLE
     set search_path = ''
     AS $_$
@@ -99,14 +99,14 @@ CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("accoun
     count(t.id) AS count
     from "public"."transactions" t
     left join "public"."listings" l on t.app_id = l.app_id
-    where l.account_id = $1 and t.created_at > NOW() - interval '168 hours' and t.chain = $2
+    where l.account_id = $1 and t.created_at > NOW() - interval '168 hours' and t."chain_id" = $2
     group by time
     order by time asc
     $_$;
 
-ALTER FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" bigint, "chain" "public"."chains") OWNER TO "postgres";
+ALTER FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" bigint, "chain" "public"."chains") RETURNS SETOF "public"."transactions_volume"
+CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") RETURNS SETOF "public"."transactions_volume"
     LANGUAGE "sql" STABLE
     set search_path = ''
     AS $_$
@@ -116,16 +116,16 @@ CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account
     c.id as currency_id,
     c.ticker as currency_ticker
     from "public"."transactions" t
-    left join "public"."currencies" c on t.currency = c.id and t.chain = c.chain
+    left join "public"."currencies" c on t.currency = c.id and t."chain_id" = c."chain_id"
     left join "public"."listings" l on t.app_id = l.app_id
-    where l.account_id = $1 and t.created_at > NOW() - interval '30 days' and t.type = 'buy' and t.chain = $2
+    where l.account_id = $1 and t.created_at > NOW() - interval '30 days' and t.type = 'buy' and t."chain_id" = $2
     group by time, c.id, c.decimals, c.ticker
     order by time asc
     $_$;
 
-ALTER FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" bigint, "chain" "public"."chains") OWNER TO "postgres";
+ALTER FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") OWNER TO "postgres";
 
 -- GRANT PERMISSION ON FUNCTIONS
 GRANT EXECUTE ON FUNCTION "public"."transactions"("public"."listings") TO "anon", "authenticated", "service_role";
-GRANT EXECUTE ON FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" bigint, "chain" "public"."chains") TO "authenticated", "service_role";
-GRANT EXECUTE ON FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" bigint, "chain" "public"."chains") TO "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") TO "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") TO "authenticated", "service_role";

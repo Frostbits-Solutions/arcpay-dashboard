@@ -43,7 +43,7 @@ ALTER TABLE "public"."currencies" OWNER TO "postgres";
 
 -- RLS Policies
 ALTER TABLE "public"."currencies" ENABLE ROW LEVEL SECURITY;
-GRANT SELECT ON TABLE "public"."accounts" TO "anon";
-GRANT SELECT ON TABLE "public"."accounts" TO "authenticated";
-GRANT ALL ON TABLE "public"."accounts" TO "service_role";
+GRANT SELECT ON TABLE "public"."currencies" TO "anon";
+GRANT SELECT ON TABLE "public"."currencies" TO "authenticated";
+GRANT ALL ON TABLE "public"."currencies" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."currencies" FOR SELECT USING (true);
