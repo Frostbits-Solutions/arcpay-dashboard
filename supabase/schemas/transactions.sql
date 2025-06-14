@@ -1,10 +1,4 @@
 /*
-
-# Initial set-up notes related to this table (from migrations):
-1. Realtime should be activated on this table.
-2. This table should be added to the supabase_realtime publication.
-3. TimescaleDB extension should be enabled and this table converted to a hypertable on "created_at".
-
 # Transactions Schema Permissions Table
 
 This table provides a comprehensive overview of permissions for different user roles across all tables in the transactions schema.
@@ -95,7 +89,7 @@ CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("accoun
     set search_path = ''
     AS $_$
     select
-    "extensions"."time_bucket"('1 hour', t.created_at) AS time,
+    date_trunc('hour', t.created_at) AS time,
     count(t.id) AS count
     from "public"."transactions" t
     left join "public"."listings" l on t.app_id = l.app_id
@@ -111,7 +105,7 @@ CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account
     set search_path = ''
     AS $_$
     select
-    "extensions"."time_bucket"('1 day', t.created_at) AS time,
+    date_trunc('day', t.created_at) AS time,
     sum(t.amount) / POWER(10,c.decimals) AS volume,
     c.id as currency_id,
     c.ticker as currency_ticker
