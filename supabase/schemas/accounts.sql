@@ -56,9 +56,6 @@ ALTER TABLE "public"."accounts" OWNER TO "postgres";
 ALTER TABLE "public"."accounts" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts" TO "service_role";
-CREATE POLICY "Owners can update and delete account" ON "public"."accounts" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_owner"("auth"."email"(), "id"));
-CREATE POLICY "Admins can update account" ON "public"."accounts" FOR UPDATE TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "id"));
-
 
 -------------------- ACCOUNTS ADDRESSES --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts_addresses" (
@@ -75,8 +72,6 @@ ALTER TABLE "public"."accounts_addresses" OWNER TO "postgres";
 ALTER TABLE "public"."accounts_addresses" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts_addresses" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_addresses" TO "service_role";
-CREATE POLICY "Account members can view addresses" ON "public"."accounts_addresses" FOR SELECT TO "authenticated" USING (SELECT "private"."is_user_account_member"("auth"."email"(), "account_id"));
-CREATE POLICY "Account admins can manage addresses" ON "public"."accounts_addresses" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
 
 
 -------------------- ACCOUNTS USERS --------------------
@@ -94,8 +89,6 @@ ALTER TABLE "public"."accounts_users_association" OWNER TO "postgres";
 ALTER TABLE "public"."accounts_users_association" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts_users_association" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_users_association" TO "service_role";
-CREATE POLICY "Account members can view users in their account" ON "public"."accounts_users_association" FOR SELECT TO "authenticated" USING (SELECT "private"."is_user_account_member"("auth"."email"(), "account_id"));
-CREATE POLICY "Account admins can manage account users" ON "public"."accounts_users_association" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
 
 -------------------- ACCOUNTS CHAINS PARAMETERS --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts_chains_parameters" (
@@ -116,15 +109,12 @@ ALTER TABLE "public"."accounts_chains_parameters" ENABLE ROW LEVEL SECURITY;
 GRANT SELECT ON TABLE "public"."accounts_chains_parameters" TO "anon";
 GRANT ALL ON TABLE "public"."accounts_chains_parameters" TO "authenticated"; 
 GRANT ALL ON TABLE "public"."accounts_chains_parameters" TO "service_role";
-CREATE POLICY "Public can view chain parameters" ON "public"."accounts_chains_parameters" FOR SELECT USING (true);
-CREATE POLICY "Account admins can manage accounts chain parameters" ON "public"."accounts_chains_parameters" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
-
 
 -------------------- ACCOUNTS CURRENCIES --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts_currencies" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "account_id" "uuid" NOT NULL,
-    "currency" "bigint" NOT NULL,
+    "currency" bigint NOT NULL,
     "chain_id" "text" NOT NULL,
     CONSTRAINT "accounts_currencies_pkey" PRIMARY KEY ("account_id", "currency", "chain_id"),
     CONSTRAINT "accounts_currencies_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
@@ -137,9 +127,6 @@ ALTER TABLE "public"."accounts_currencies" ENABLE ROW LEVEL SECURITY;
 GRANT SELECT ON TABLE "public"."accounts_currencies" TO "anon";
 GRANT ALL ON TABLE "public"."accounts_currencies" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_currencies" TO "service_role";
-CREATE POLICY "Public can view account currencies" ON "public"."accounts_currencies" FOR SELECT USING (true);
-CREATE POLICY "Account admins can manage account currencies" ON "public"."accounts_currencies" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
-
 
 -------------------- ACCOUNTS SECRETS --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts_secrets" (
@@ -156,8 +143,6 @@ ALTER TABLE "public"."accounts_secrets" OWNER TO "postgres";
 ALTER TABLE "public"."accounts_secrets" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts_secrets" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_secrets" TO "service_role";
-CREATE POLICY "Account admins can manage secrets" ON "public"."accounts_secrets" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_admin"("auth"."email"(), "account_id"));
-
 
 -------------------- FUNCTIONS --------------------
 CREATE OR REPLACE FUNCTION "public"."create_account"("account_name" "text") RETURNS "uuid"
@@ -228,9 +213,48 @@ CREATE OR REPLACE FUNCTION "private"."get_user_accounts"("user_email" "text") RE
     AS $_$select account_id from public.accounts_users_association where user_email = $1$_$;
 ALTER FUNCTION "private"."get_user_accounts"("user_email" "text") OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."get_account_subscription_params"("p_account_id" "uuid", "p_chain_id" "text")
+RETURNS "public"."chain_subscription_parameters"
+LANGUAGE "sql" STABLE SECURITY DEFINER
+SET search_path = ''
+AS $_$
+    SELECT st.allow_secondary_listings, st.allow_custom_currencies, scp.flat_fees, scp.sales_fees, scp.secondary_flat_fees, scp.secondary_sales_fees
+    FROM "public"."subscription_tiers" st
+    JOIN "public"."accounts" a ON st.id = a.subscription_id
+    JOIN "public"."subscriptions_chains_parameters" scp ON st.id = scp.subscription_id AND scp.chain_id = p_chain_id
+    WHERE a.id = p_account_id;
+$_$;
+
+ALTER FUNCTION "public"."get_account_subscription_params"("uuid", "p_chain_id" "text") OWNER TO "postgres";
+
 -- Grant permissions for functions
 GRANT EXECUTE ON FUNCTION "public"."create_account"("account_name" "text") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_owner"("user_email" "text", "account_id" "uuid") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_admin"("user_email" "text", "account_id" "uuid") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_member"("user_email" "text", "account_id" "uuid") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."get_user_accounts"("user_email" "text") TO "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "public"."get_account_subscription_params"("uuid", "p_chain_id" "text") TO "anon", "authenticated", "service_role";
+
+-------------------- RLS --------------------
+-- accounts
+CREATE POLICY "Owners can update and delete account" ON "public"."accounts" FOR ALL TO "authenticated" USING ("private"."is_user_account_owner"("auth"."email"(), "id"));
+CREATE POLICY "Admins can update account" ON "public"."accounts" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"("auth"."email"(), "id"));
+
+-- accounts_addresses
+CREATE POLICY "Account members can view addresses" ON "public"."accounts_addresses" FOR SELECT TO "authenticated" USING ("private"."is_user_account_member"("auth"."email"(), "account_id"));
+CREATE POLICY "Account admins can manage addresses" ON "public"."accounts_addresses" FOR ALL TO "authenticated" USING ("private"."is_user_account_admin"("auth"."email"(), "account_id"));
+
+-- accounts_users_association
+CREATE POLICY "Account members can view users in their account" ON "public"."accounts_users_association" FOR SELECT TO "authenticated" USING ("private"."is_user_account_member"("auth"."email"(), "account_id"));
+CREATE POLICY "Account admins can manage account users" ON "public"."accounts_users_association" FOR ALL TO "authenticated" USING ("private"."is_user_account_admin"("auth"."email"(), "account_id"));
+
+-- accounts_chains_parameters
+CREATE POLICY "Public can view chain parameters" ON "public"."accounts_chains_parameters" FOR SELECT USING (true);
+CREATE POLICY "Account admins can manage accounts chain parameters" ON "public"."accounts_chains_parameters" FOR ALL TO "authenticated" USING ("private"."is_user_account_admin"("auth"."email"(), "account_id"));
+
+-- accounts_currencies
+CREATE POLICY "Public can view account currencies" ON "public"."accounts_currencies" FOR SELECT USING (true);
+CREATE POLICY "Account admins can manage account currencies" ON "public"."accounts_currencies" FOR ALL TO "authenticated" USING ("private"."is_user_account_admin"("auth"."email"(), "account_id"));
+
+-- RLS for accounts_secrets
+CREATE POLICY "Account admins can manage secrets" ON "public"."accounts_secrets" FOR ALL TO "authenticated" USING ("private"."is_user_account_admin"("auth"."email"(), "account_id"));

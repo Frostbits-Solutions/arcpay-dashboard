@@ -1,3 +1,18 @@
+-- Partition transactions table
+DO $$
+DECLARE partition_name text='transactions_' || to_char(CURRENT_DATE, 'YYYY_MM_DD');
+BEGIN
+    EXECUTE 'CREATE TABLE ' || partition_name || ' PARTITION OF public.transactions
+        FOR VALUES FROM (CURRENT_DATE) TO (CURRENT_DATE + INTERVAL ''1 day'')';
+    EXECUTE format('ALTER TABLE "public"."%I" ENABLE ROW LEVEL SECURITY', partition_name);
+    EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "anon"', partition_name);
+    EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "authenticated"', partition_name);
+    EXECUTE format('GRANT ALL ON TABLE "public"."%I" TO "service_role"', partition_name);
+    EXECUTE format('CREATE POLICY "Enable read access for all users" ON "public"."%I" FOR SELECT USING (true)', partition_name);
+END $$;
+SELECT cron.schedule('create_daily_transactions_partition', '0 0 * * *', 'SELECT "private"."create_daily_transactions_partition"();');
+
+-- Seed data
 INSERT INTO "public"."chains" ("id") VALUES
 ('voi:testnet'),
 ('voi:mainnet'),

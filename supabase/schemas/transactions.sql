@@ -60,12 +60,12 @@ CREATE TABLE IF NOT EXISTS "public"."transactions" (
     "app_id" bigint NOT NULL,
     "type" "public"."transaction_type" NOT NULL,
     "amount" double precision,
-    "currency" "bigint" NOT NULL,
+    "currency" bigint NOT NULL,
     "metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
     CONSTRAINT "transactions_pkey" PRIMARY KEY ("id", "chain_id", "app_id", "from_address", "created_at"),
     CONSTRAINT "transactions_currency_fkey" FOREIGN KEY ("currency", "chain_id") REFERENCES "public"."currencies"("id", "chain_id") ON DELETE CASCADE,
     CONSTRAINT "transactions_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE CASCADE
-);
+) PARTITION BY RANGE (created_at);
 ALTER TABLE "public"."transactions" OWNER TO "postgres";
 
 -- RLS for transactions
@@ -83,6 +83,14 @@ CREATE OR REPLACE FUNCTION "public"."transactions"("public"."listings") RETURNS 
     AS $_$ select * from public.transactions where app_id = $1.app_id $_$;
 
 ALTER FUNCTION "public"."transactions"("public"."listings") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."listings"("public"."transactions") RETURNS SETOF "public"."listings"
+    LANGUAGE "sql" STABLE
+    set search_path = ''
+    AS $_$ select * from public.listings where app_id = $1.app_id $_$;
+
+ALTER FUNCTION "public"."listings"("public"."transactions") OWNER TO "postgres";
+GRANT EXECUTE ON FUNCTION "public"."listings"("public"."transactions") TO "anon", "authenticated", "service_role";
 
 CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") RETURNS SETOF "public"."transactions_count"
     LANGUAGE "sql" STABLE
@@ -119,7 +127,41 @@ CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account
 
 ALTER FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") OWNER TO "postgres";
 
+-- Create a function to automatically create new daily partitions
+CREATE OR REPLACE FUNCTION "private"."create_daily_transactions_partition"()
+RETURNS void
+LANGUAGE plpgsql
+set search_path = ''
+AS $$
+DECLARE
+    start_date date;
+    end_date date;
+    partition_name text;
+BEGIN
+    -- Create partition for tomorrow
+    start_date := CURRENT_DATE + INTERVAL '1 day';
+    end_date := start_date + INTERVAL '1 day';
+    partition_name := 'transactions_' || to_char(start_date, 'YYYY_MM_DD');
+    
+    -- Check if partition already exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.tables 
+        WHERE table_name = partition_name 
+        AND table_schema = 'public'
+    ) THEN
+        EXECUTE format('CREATE TABLE "public"."%I" PARTITION OF public.transactions FOR VALUES FROM (%L) TO (%L)',
+                      partition_name, start_date, end_date);
+        EXECUTE format('ALTER TABLE "public"."%I" ENABLE ROW LEVEL SECURITY', partition_name);
+        EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "anon"', partition_name);
+        EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "authenticated"', partition_name);
+        EXECUTE format('GRANT ALL ON TABLE "public"."%I" TO "service_role"', partition_name);
+        EXECUTE format('CREATE POLICY "Enable read access for all users" ON "public"."%I" FOR SELECT USING (true)', partition_name);
+    END IF;
+END;
+$$;
+
 -- GRANT PERMISSION ON FUNCTIONS
 GRANT EXECUTE ON FUNCTION "public"."transactions"("public"."listings") TO "anon", "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") TO "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "private"."create_daily_transactions_partition"() TO "service_role";

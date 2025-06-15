@@ -3,9 +3,12 @@
 
 This table provides a comprehensive overview of permissions for different user roles across all tables in the listings schema.
 
-| Table     | anon                   | authenticated           | member                  | admin                   | owner                   |
-|-----------|------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
-| listings  | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
+| Table           | anon                   | authenticated           | member                  | admin                   | owner                   |
+|-----------------|------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
+| listings        | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
+| auctions        | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
+| dutch_auctions  | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
+| sales           | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
 
 ## Function Permissions
 | Function                   | anon                   | authenticated           | member                  | admin                   | owner                   |
@@ -39,12 +42,20 @@ CREATE TYPE "public"."listings_types" AS ENUM (
 );
 ALTER TYPE "public"."listings_types" OWNER TO "postgres";
 
+CREATE TYPE "public"."assets_types" AS ENUM (
+    'arc72',
+    'offchain',
+    'asa'
+);
+ALTER TYPE "public"."assets_types" OWNER TO "postgres";
+
 CREATE TYPE "public"."composite_listing" AS (
 	"id" "uuid",
 	"created_at" timestamp without time zone,
 	"updated_at" timestamp without time zone,
 	"status" "public"."listings_statuses",
 	"chain_id" "text",
+    "contract_version" text,
 	"creator_address" "text",
 	"name" "text",
 	"type" "public"."listings_types",
@@ -70,14 +81,6 @@ CREATE TYPE "public"."composite_listing" AS (
 );
 
 ALTER TYPE "public"."composite_listing" OWNER TO "postgres";
-
-CREATE TYPE "public"."assets_types" AS ENUM (
-    'arc72',
-    'offchain',
-    'asa'
-);
-ALTER TYPE "public"."assets_types" OWNER TO "postgres";
-
 -------------------- LISTINGS --------------------
 CREATE TABLE IF NOT EXISTS "public"."listings" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
@@ -96,7 +99,7 @@ CREATE TABLE IF NOT EXISTS "public"."listings" (
     "asset_qty" double precision DEFAULT '1'::double precision NOT NULL,
     "metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
     "chain_id" "text" NOT NULL,
-    "contract_version" integer,
+    "contract_version" text NOT NULL,
     CONSTRAINT "listings_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "listings_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
     CONSTRAINT "listings_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id"),
@@ -115,7 +118,94 @@ GRANT ALL ON TABLE "public"."listings" TO "service_role";
 
 CREATE POLICY "Enable read access for all users" ON "public"."listings" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."listings" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Members can manage listings" ON "public"."listings" FOR ALL TO "authenticated" USING (SELECT "private"."is_user_account_member"("auth"."email"(), "account_id"));
+CREATE POLICY "Members can manage listings" ON "public"."listings" FOR ALL TO "authenticated" USING ("private"."is_user_account_member"("auth"."email"(), "account_id"));
+
+-------------------- AUCTIONS --------------------
+CREATE TABLE IF NOT EXISTS "public"."auctions" (
+    "listing_id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone,
+    "start_price" double precision NOT NULL,
+    "increment" double precision NOT NULL,
+    "duration" integer NOT NULL,
+    CONSTRAINT "auctions_pkey" PRIMARY KEY ("listing_id"),
+    CONSTRAINT "auctions_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE
+);
+
+ALTER TABLE "public"."auctions" OWNER TO "postgres";
+
+-- RLS for auctions
+ALTER TABLE "public"."auctions" ENABLE ROW LEVEL SECURITY;
+GRANT ALL ON TABLE "public"."auctions" TO "anon";
+GRANT ALL ON TABLE "public"."auctions" TO "authenticated";
+GRANT ALL ON TABLE "public"."auctions" TO "service_role";
+
+CREATE POLICY "Enable read access for all users" ON "public"."auctions" FOR SELECT USING (true);
+CREATE POLICY "Enable insert for all users" ON "public"."auctions" FOR INSERT WITH CHECK (true);
+CREATE POLICY "Members can manage auctions" ON "public"."auctions" FOR ALL TO "authenticated"
+    USING (EXISTS ( 
+        SELECT 1
+        FROM "public"."listings"
+        WHERE "listings"."id" = "auctions"."listing_id"
+        AND "private"."is_user_account_member"("auth"."email"(), "listings"."account_id")
+    ));
+
+-------------------- DUTCH_AUCTION --------------------
+CREATE TABLE IF NOT EXISTS "public"."dutch_auctions" (
+    "listing_id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone,
+    "min_price" double precision NOT NULL,
+    "max_price" double precision,
+    "duration" integer NOT NULL,
+    CONSTRAINT "dutch_auctions_pkey" PRIMARY KEY ("listing_id"),
+    CONSTRAINT "dutch_auctions_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE
+);
+
+ALTER TABLE "public"."dutch_auctions" OWNER TO "postgres";
+
+-- RLS for dutch auctions
+ALTER TABLE "public"."dutch_auctions" ENABLE ROW LEVEL SECURITY;
+GRANT ALL ON TABLE "public"."dutch_auctions" TO "anon";
+GRANT ALL ON TABLE "public"."dutch_auctions" TO "authenticated";
+GRANT ALL ON TABLE "public"."dutch_auctions" TO "service_role";
+
+CREATE POLICY "Enable read access for all users" ON "public"."dutch_auctions" FOR SELECT USING (true);
+CREATE POLICY "Enable insert for all users" ON "public"."dutch_auctions" FOR INSERT WITH CHECK (true);
+CREATE POLICY "Members can manage dutch auctions" ON "public"."dutch_auctions" FOR ALL TO "authenticated"
+    USING (EXISTS ( 
+        SELECT 1
+        FROM "public"."listings"
+        WHERE "listings"."id" = "dutch_auctions"."listing_id"
+        AND "private"."is_user_account_member"("auth"."email"(), "listings"."account_id")
+    ));
+
+-------------------- SALES --------------------
+CREATE TABLE IF NOT EXISTS "public"."sales" (
+    "listing_id" "uuid" NOT NULL,
+    "created_at" timestamp without time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp without time zone,
+    "price" numeric NOT NULL,
+    CONSTRAINT "sales_pkey" PRIMARY KEY ("listing_id"),
+    CONSTRAINT "sales_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE
+);
+ALTER TABLE "public"."sales" OWNER TO "postgres";
+
+-- RLS for sales
+ALTER TABLE "public"."sales" ENABLE ROW LEVEL SECURITY;
+GRANT ALL ON TABLE "public"."sales" TO "anon";
+GRANT ALL ON TABLE "public"."sales" TO "authenticated";
+GRANT ALL ON TABLE "public"."sales" TO "service_role";
+
+CREATE POLICY "Enable read access for all users" ON "public"."sales" FOR SELECT USING (true);
+CREATE POLICY "Enable insert for all users" ON "public"."sales" FOR INSERT WITH CHECK (true);
+CREATE POLICY "Members can manage sales" ON "public"."sales" FOR ALL TO "authenticated"
+    USING (EXISTS ( 
+        SELECT 1
+        FROM "public"."listings"
+        WHERE "listings"."id" = "sales"."listing_id"
+        AND "private"."is_user_account_member"("auth"."email"(), "listings"."account_id")
+    ));
 
 
 -------------------- FUNCTIONS --------------------
@@ -155,16 +245,8 @@ CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RET
         left join public.auctions a on a.listing_id = get_listing_by_id.listing_id
         left join public.dutch_auctions d on d.listing_id = get_listing_by_id.listing_id
         left join public.sales s on s.listing_id = get_listing_by_id.listing_id
-        left join public.currencies c on (c.id = l.currency and c.chain = l.chain)
+        left join public.currencies c on (c.id = l.currency and c.chain_id = l.chain_id)
     where l.id = get_listing_by_id.listing_id$$;
 
 ALTER FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") OWNER TO "postgres";
 GRANT EXECUTE ON FUNCTION "public"."get_listing_by_id"("uuid") TO "anon", "authenticated", "service_role";
-
-CREATE OR REPLACE FUNCTION "public"."listings"("public"."transactions") RETURNS SETOF "public"."listings"
-    LANGUAGE "sql" STABLE
-    set search_path = ''
-    AS $_$ select * from public.listings where app_id = $1.app_id $_$;
-
-ALTER FUNCTION "public"."listings"("public"."transactions") OWNER TO "postgres";
-GRANT EXECUTE ON FUNCTION "public"."listings"("public"."transactions") TO "anon", "authenticated", "service_role";

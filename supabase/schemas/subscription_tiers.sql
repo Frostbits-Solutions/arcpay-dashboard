@@ -87,20 +87,3 @@ GRANT SELECT ON TABLE "public"."subscriptions_chains_parameters" TO "authenticat
 GRANT ALL ON TABLE "public"."subscriptions_chains_parameters" TO "service_role";
 
 CREATE POLICY "Enable read access for all users" ON "public"."subscriptions_chains_parameters" FOR SELECT USING (true);
-
-
--------------------- FUNCTIONS --------------------
-CREATE OR REPLACE FUNCTION "public"."get_account_subscription_params"("p_account_id" "uuid", "p_chain_id" "text")
-RETURNS "public"."chain_subscription_parameters"
-LANGUAGE "sql" STABLE SECURITY DEFINER
-SET search_path = ''
-AS $_$
-    SELECT st.allow_secondary_listings, st.allow_custom_currencies, scp.flat_fees, scp.sales_fees, scp.secondary_flat_fees, scp.secondary_sales_fees
-    FROM "public"."subscription_tiers" st
-    JOIN "public"."accounts" a ON st.id = a.subscription_id
-    JOIN "public"."subscriptions_chains_parameters" scp ON st.id = scp.subscription_id AND scp.chain_id = p_chain_id
-    WHERE a.id = p_account_id;
-$_$;
-
-ALTER FUNCTION "public"."get_account_subscription_params"("uuid", "p_chain_id" "text") OWNER TO "postgres";
-GRANT EXECUTE ON FUNCTION "public"."get_account_subscription_params"("uuid", "p_chain_id" "text") TO "anon", "authenticated", "service_role";

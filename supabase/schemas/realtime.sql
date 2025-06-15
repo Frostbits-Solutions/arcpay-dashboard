@@ -1,9 +1,17 @@
 -------------------- RLS --------------------
-create policy "Users can interact with presence channels"
+create policy "Users can select presence channels"
 on realtime.messages
-for select, insert
+for select
 to public, authenticated
 using (
+  realtime.messages.extension = 'presence'
+);
+
+create policy "Users can update presence channels"
+on realtime.messages
+for insert
+to public, authenticated
+with check (
   realtime.messages.extension = 'presence'
 );
 
@@ -20,6 +28,7 @@ create or replace function public.transactions_changes()
 returns trigger
 security definer
 language plpgsql
+set search_path = ''
 as $$
 begin
   perform realtime.broadcast_changes(

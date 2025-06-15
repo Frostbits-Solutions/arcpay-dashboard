@@ -41,7 +41,7 @@ ALTER TYPE "public"."contract_tag_enum" OWNER TO "postgres";
 
 -------------------- CONTRACTS_VERSIONS --------------------
 CREATE TABLE IF NOT EXISTS "public"."contracts_versions" (
-    "version" integer NOT NULL,
+    "version" text NOT NULL,
     "chain_id" text NOT NULL,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT "contracts_versions_pkey" PRIMARY KEY ("version", "chain_id"),
