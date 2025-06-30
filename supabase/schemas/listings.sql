@@ -118,7 +118,7 @@ GRANT ALL ON TABLE "public"."listings" TO "service_role";
 
 CREATE POLICY "Enable read access for all users" ON "public"."listings" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."listings" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Members can manage listings" ON "public"."listings" FOR ALL TO "authenticated" USING ("private"."is_user_account_member"("auth"."email"(), "account_id"));
+CREATE POLICY "Members can manage listings" ON "public"."listings" FOR ALL TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
 
 -------------------- AUCTIONS --------------------
 CREATE TABLE IF NOT EXISTS "public"."auctions" (
@@ -143,12 +143,7 @@ GRANT ALL ON TABLE "public"."auctions" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."auctions" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."auctions" FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can manage auctions" ON "public"."auctions" FOR ALL TO "authenticated"
-    USING (EXISTS ( 
-        SELECT 1
-        FROM "public"."listings"
-        WHERE "listings"."id" = "auctions"."listing_id"
-        AND "private"."is_user_account_member"("auth"."email"(), "listings"."account_id")
-    ));
+    USING ("public"."can_user_manage_listing"("listing_id"));
 
 -------------------- DUTCH_AUCTION --------------------
 CREATE TABLE IF NOT EXISTS "public"."dutch_auctions" (
@@ -173,12 +168,7 @@ GRANT ALL ON TABLE "public"."dutch_auctions" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."dutch_auctions" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."dutch_auctions" FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can manage dutch auctions" ON "public"."dutch_auctions" FOR ALL TO "authenticated"
-    USING (EXISTS ( 
-        SELECT 1
-        FROM "public"."listings"
-        WHERE "listings"."id" = "dutch_auctions"."listing_id"
-        AND "private"."is_user_account_member"("auth"."email"(), "listings"."account_id")
-    ));
+    USING ("public"."can_user_manage_listing"("listing_id"));
 
 -------------------- SALES --------------------
 CREATE TABLE IF NOT EXISTS "public"."sales" (
@@ -200,15 +190,25 @@ GRANT ALL ON TABLE "public"."sales" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."sales" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."sales" FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can manage sales" ON "public"."sales" FOR ALL TO "authenticated"
-    USING (EXISTS ( 
-        SELECT 1
-        FROM "public"."listings"
-        WHERE "listings"."id" = "sales"."listing_id"
-        AND "private"."is_user_account_member"("auth"."email"(), "listings"."account_id")
-    ));
+    USING ("public"."can_user_manage_listing"("listing_id"));
 
 
 -------------------- FUNCTIONS --------------------
+CREATE OR REPLACE FUNCTION "private"."can_user_manage_listing"("listing_id" "uuid") RETURNS boolean
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET search_path = ''
+    AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM "public"."listings"
+        WHERE "listings"."id" = "can_user_manage_listing"."listing_id"
+        AND "private"."is_user_account_member"((SELECT "auth"."email"()), "listings"."account_id")
+    )
+$$;
+
+ALTER FUNCTION "public"."can_user_manage_listing"("listing_id" "uuid") OWNER TO "postgres";
+GRANT EXECUTE ON FUNCTION "public"."can_user_manage_listing"("uuid") TO "service_role";
+
 CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RETURNS "public"."composite_listing"
     LANGUAGE "sql" STABLE SECURITY DEFINER
     set search_path = ''

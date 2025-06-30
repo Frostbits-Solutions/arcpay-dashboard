@@ -12,7 +12,7 @@ export type Database = {
       accounts: {
         Row: {
           created_at: string
-          id: number
+          id: string
           name: string
           owner_email: string
           subscription_expiration_date: string | null
@@ -20,7 +20,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           name: string
           owner_email: string
           subscription_expiration_date?: string | null
@@ -28,7 +28,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           name?: string
           owner_email?: string
           subscription_expiration_date?: string | null
@@ -46,19 +46,19 @@ export type Database = {
       }
       accounts_addresses: {
         Row: {
-          account_id: number
+          account_id: string
           address: string
           created_at: string
           name: string | null
         }
         Insert: {
-          account_id: number
+          account_id: string
           address: string
           created_at?: string
           name?: string | null
         }
         Update: {
-          account_id?: number
+          account_id?: string
           address?: string
           created_at?: string
           name?: string | null
@@ -75,21 +75,21 @@ export type Database = {
       }
       accounts_api_keys: {
         Row: {
-          account_id: number
+          account_id: string
           created_at: string
           key: string
           name: string | null
           origin: string
         }
         Insert: {
-          account_id: number
+          account_id: string
           created_at?: string
           key?: string
           name?: string | null
           origin: string
         }
         Update: {
-          account_id?: number
+          account_id?: string
           created_at?: string
           key?: string
           name?: string | null
@@ -149,19 +149,19 @@ export type Database = {
       }
       accounts_currencies: {
         Row: {
-          account_id: number
+          account_id: string
           chain_id: string
           created_at: string
           currency: string
         }
         Insert: {
-          account_id: number
+          account_id: string
           chain_id: string
           created_at?: string
           currency: string
         }
         Update: {
-          account_id?: number
+          account_id?: string
           chain_id?: string
           created_at?: string
           currency?: string
