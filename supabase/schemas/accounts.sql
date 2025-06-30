@@ -243,29 +243,29 @@ CREATE POLICY "Members can view account" ON "public"."accounts" FOR SELECT TO "a
 
 -- accounts_addresses
 CREATE POLICY "Account members can view addresses" ON "public"."accounts_addresses" FOR SELECT TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
-CREATE POLICY "Account admins can insert addresses" ON "public"."accounts_addresses" FOR INSERT TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can insert addresses" ON "public"."accounts_addresses" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can update addresses" ON "public"."accounts_addresses" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete addresses" ON "public"."accounts_addresses" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
 -- accounts_users_association
 CREATE POLICY "Account members can view users in their account" ON "public"."accounts_users_association" FOR SELECT TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
-CREATE POLICY "Account admins can insert account users" ON "public"."accounts_users_association" FOR INSERT TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can insert account users" ON "public"."accounts_users_association" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can update account users" ON "public"."accounts_users_association" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete account users" ON "public"."accounts_users_association" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
 -- accounts_chains_parameters
 CREATE POLICY "Public can view chain parameters" ON "public"."accounts_chains_parameters" FOR SELECT USING (true);
-CREATE POLICY "Account admins can insert accounts chain parameters" ON "public"."accounts_chains_parameters" FOR INSERT TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can insert accounts chain parameters" ON "public"."accounts_chains_parameters" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can update accounts chain parameters" ON "public"."accounts_chains_parameters" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete accounts chain parameters" ON "public"."accounts_chains_parameters" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
 -- accounts_currencies
 CREATE POLICY "Public can view account currencies" ON "public"."accounts_currencies" FOR SELECT USING (true);
-CREATE POLICY "Account admins can insert account currencies" ON "public"."accounts_currencies" FOR INSERT TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can insert account currencies" ON "public"."accounts_currencies" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can update account currencies" ON "public"."accounts_currencies" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete account currencies" ON "public"."accounts_currencies" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
 -- RLS for accounts_secrets
-CREATE POLICY "Account admins can insert secrets" ON "public"."accounts_secrets" FOR INSERT TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can insert secrets" ON "public"."accounts_secrets" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can update secrets" ON "public"."accounts_secrets" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete secrets" ON "public"."accounts_secrets" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));

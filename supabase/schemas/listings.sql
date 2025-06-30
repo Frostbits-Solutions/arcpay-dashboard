@@ -81,6 +81,7 @@ CREATE TYPE "public"."composite_listing" AS (
 );
 
 ALTER TYPE "public"."composite_listing" OWNER TO "postgres";
+
 -------------------- LISTINGS --------------------
 CREATE TABLE IF NOT EXISTS "public"."listings" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
@@ -121,6 +122,22 @@ CREATE POLICY "Enable insert for all users" ON "public"."listings" FOR INSERT WI
 CREATE POLICY "Members can update listings" ON "public"."listings" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Members can delete listings" ON "public"."listings" FOR DELETE TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
 
+-------------------- RLS HELPER FUNCTION --------------------
+CREATE OR REPLACE FUNCTION "private"."can_user_manage_listing"("listing_id" "uuid") RETURNS boolean
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET search_path = ''
+    AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM "public"."listings"
+        WHERE "listings"."id" = "can_user_manage_listing"."listing_id"
+        AND "private"."is_user_account_member"((SELECT "auth"."email"()), "listings"."account_id")
+    )
+$$;
+
+ALTER FUNCTION "private"."can_user_manage_listing"("listing_id" "uuid") OWNER TO "postgres";
+GRANT EXECUTE ON FUNCTION "private"."can_user_manage_listing"("uuid") TO "service_role";
+
 -------------------- AUCTIONS --------------------
 CREATE TABLE IF NOT EXISTS "public"."auctions" (
     "listing_id" "uuid" NOT NULL,
@@ -144,9 +161,9 @@ GRANT ALL ON TABLE "public"."auctions" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."auctions" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."auctions" FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can update auctions" ON "public"."auctions" FOR UPDATE TO "authenticated"
-    USING ("public"."can_user_manage_listing"("listing_id"));
+    USING ("private"."can_user_manage_listing"("listing_id"));
 CREATE POLICY "Members can delete auctions" ON "public"."auctions" FOR DELETE TO "authenticated"
-    USING ("public"."can_user_manage_listing"("listing_id"));
+    USING ("private"."can_user_manage_listing"("listing_id"));
 
 -------------------- DUTCH_AUCTION --------------------
 CREATE TABLE IF NOT EXISTS "public"."dutch_auctions" (
@@ -171,9 +188,9 @@ GRANT ALL ON TABLE "public"."dutch_auctions" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."dutch_auctions" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."dutch_auctions" FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can update dutch auctions" ON "public"."dutch_auctions" FOR UPDATE TO "authenticated"
-    USING ("public"."can_user_manage_listing"("listing_id"));
+    USING ("private"."can_user_manage_listing"("listing_id"));
 CREATE POLICY "Members can delete dutch auctions" ON "public"."dutch_auctions" FOR DELETE TO "authenticated"
-    USING ("public"."can_user_manage_listing"("listing_id"));
+    USING ("private"."can_user_manage_listing"("listing_id"));
 
 -------------------- SALES --------------------
 CREATE TABLE IF NOT EXISTS "public"."sales" (
@@ -195,27 +212,12 @@ GRANT ALL ON TABLE "public"."sales" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."sales" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."sales" FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can update sales" ON "public"."sales" FOR UPDATE TO "authenticated"
-    USING ("public"."can_user_manage_listing"("listing_id"));
+    USING ("private"."can_user_manage_listing"("listing_id"));
 CREATE POLICY "Members can delete sales" ON "public"."sales" FOR DELETE TO "authenticated"
-    USING ("public"."can_user_manage_listing"("listing_id"));
+    USING ("private"."can_user_manage_listing"("listing_id"));
 
 
 -------------------- FUNCTIONS --------------------
-CREATE OR REPLACE FUNCTION "private"."can_user_manage_listing"("listing_id" "uuid") RETURNS boolean
-    LANGUAGE "sql" STABLE SECURITY DEFINER
-    SET search_path = ''
-    AS $$
-    SELECT EXISTS (
-        SELECT 1
-        FROM "public"."listings"
-        WHERE "listings"."id" = "can_user_manage_listing"."listing_id"
-        AND "private"."is_user_account_member"((SELECT "auth"."email"()), "listings"."account_id")
-    )
-$$;
-
-ALTER FUNCTION "public"."can_user_manage_listing"("listing_id" "uuid") OWNER TO "postgres";
-GRANT EXECUTE ON FUNCTION "public"."can_user_manage_listing"("uuid") TO "service_role";
-
 CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RETURNS "public"."composite_listing"
     LANGUAGE "sql" STABLE SECURITY DEFINER
     set search_path = ''
