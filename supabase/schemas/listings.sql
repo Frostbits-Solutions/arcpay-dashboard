@@ -118,7 +118,8 @@ GRANT ALL ON TABLE "public"."listings" TO "service_role";
 
 CREATE POLICY "Enable read access for all users" ON "public"."listings" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."listings" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Members can manage listings" ON "public"."listings" FOR ALL TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Members can update listings" ON "public"."listings" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Members can delete listings" ON "public"."listings" FOR DELETE TO "authenticated" USING ("private"."is_user_account_member"((select "auth"."email"()), "account_id"));
 
 -------------------- AUCTIONS --------------------
 CREATE TABLE IF NOT EXISTS "public"."auctions" (
@@ -142,7 +143,9 @@ GRANT ALL ON TABLE "public"."auctions" TO "service_role";
 
 CREATE POLICY "Enable read access for all users" ON "public"."auctions" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."auctions" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Members can manage auctions" ON "public"."auctions" FOR ALL TO "authenticated"
+CREATE POLICY "Members can update auctions" ON "public"."auctions" FOR UPDATE TO "authenticated"
+    USING ("public"."can_user_manage_listing"("listing_id"));
+CREATE POLICY "Members can delete auctions" ON "public"."auctions" FOR DELETE TO "authenticated"
     USING ("public"."can_user_manage_listing"("listing_id"));
 
 -------------------- DUTCH_AUCTION --------------------
@@ -167,7 +170,9 @@ GRANT ALL ON TABLE "public"."dutch_auctions" TO "service_role";
 
 CREATE POLICY "Enable read access for all users" ON "public"."dutch_auctions" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."dutch_auctions" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Members can manage dutch auctions" ON "public"."dutch_auctions" FOR ALL TO "authenticated"
+CREATE POLICY "Members can update dutch auctions" ON "public"."dutch_auctions" FOR UPDATE TO "authenticated"
+    USING ("public"."can_user_manage_listing"("listing_id"));
+CREATE POLICY "Members can delete dutch auctions" ON "public"."dutch_auctions" FOR DELETE TO "authenticated"
     USING ("public"."can_user_manage_listing"("listing_id"));
 
 -------------------- SALES --------------------
@@ -189,7 +194,9 @@ GRANT ALL ON TABLE "public"."sales" TO "service_role";
 
 CREATE POLICY "Enable read access for all users" ON "public"."sales" FOR SELECT USING (true);
 CREATE POLICY "Enable insert for all users" ON "public"."sales" FOR INSERT WITH CHECK (true);
-CREATE POLICY "Members can manage sales" ON "public"."sales" FOR ALL TO "authenticated"
+CREATE POLICY "Members can update sales" ON "public"."sales" FOR UPDATE TO "authenticated"
+    USING ("public"."can_user_manage_listing"("listing_id"));
+CREATE POLICY "Members can delete sales" ON "public"."sales" FOR DELETE TO "authenticated"
     USING ("public"."can_user_manage_listing"("listing_id"));
 
 
