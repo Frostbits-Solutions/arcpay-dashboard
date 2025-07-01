@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { Clipboard } from '@/lib/ui/clipboard'
 import { Trash2 } from 'lucide-vue-next'
@@ -10,12 +10,12 @@ import {
   removeAccountAddress, 
   updateAccountChainsParameters, 
   createAccountChainsParameters 
-} from '@/features/settings/services/accounts'
+} from '@/features/accounts/services/accounts'
 import { h, ref, watch, type Ref } from 'vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import { useToast } from '@/lib/ui/toast'
-import OrganizationLinkAddressDialog from '@/features/settings/components/OrganizationLinkAddressDialog.vue'
+import OrganizationLinkAddressDialog from '@/features/accounts/components/OrganizationLinkAddressDialog.vue'
 import { Badge } from '@/lib/ui/badge'
 import { Switch } from '@/lib/ui/switch'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/lib/ui/form'

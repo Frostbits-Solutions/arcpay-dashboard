@@ -2,11 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '@/features/auth/views/AuthView.vue'
 import { useSessionStore } from '@/features/auth/stores/session'
 import ListingsView from '@/features/listings/views/ListingsView.vue'
-import OrganizationSettingsView from '@/features/settings/views/OrganizationSettingsView.vue'
-import OrganizationSettingsGeneral from '@/features/settings/components/OrganizationSettingsGeneral.vue'
-import OrganizationSettingsIntegrations from '@/features/settings/components/OrganizationSettingsIntegrations.vue'
-import OrganizationSettingsUsers from '@/features/settings/components/OrganizationSettingsUsers.vue'
-import OrganizationSettingsListings from '@/features/settings/components/OrganizationSettingsListings.vue'
+import AccountSettingsView from '@/features/accounts/views/AccountSettingsView.vue'
+import OrganizationSettingsGeneral from '@/features/accounts/components/OrganizationSettingsGeneral.vue'
+import OrganizationSettingsIntegrations from '@/features/accounts/components/OrganizationSettingsIntegrations.vue'
+import OrganizationSettingsUsers from '@/features/accounts/components/OrganizationSettingsUsers.vue'
+import OrganizationSettingsListings from '@/features/accounts/components/OrganizationSettingsListings.vue'
 import DashboardView from '@/features/dashboard/views/DashboardView.vue'
 import DirectLinkView from '@/features/directlink/views/DirectLinkView.vue'
 import AuthenticatedView from '@/features/auth/views/AuthenticatedView.vue'
@@ -39,7 +39,7 @@ const router = createRouter({
         {
           path: '/organization/:name/settings',
           name: 'organization-organization',
-          component: OrganizationSettingsView,
+          component: AccountSettingsView,
           children: [
             {
               path: '',

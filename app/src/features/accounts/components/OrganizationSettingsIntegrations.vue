@@ -1,16 +1,16 @@
 <script setup lang="ts">
 
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { ArrowUpRight, Trash2, Package } from 'lucide-vue-next'
-import { deleteAccountApiKey, removeAccountUser } from '@/features/settings/services/accounts'
+import { deleteAccountApiKey, removeAccountUser } from '@/features/accounts/services/accounts'
 import { h } from 'vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import { useToast } from '@/lib/ui/toast'
 import { Skeleton } from '@/lib/ui/skeleton'
 import { Clipboard } from '@/lib/ui/clipboard'
-import OrganizationGenerateKeyDialog from '@/features/settings/components/OrganizationGenerateKeyDialog.vue'
+import OrganizationGenerateKeyDialog from '@/features/accounts/components/OrganizationGenerateKeyDialog.vue'
 
 const accounts = useAccountsStore()
 const { toast } = useToast()

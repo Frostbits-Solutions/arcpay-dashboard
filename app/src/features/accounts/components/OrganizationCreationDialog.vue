@@ -9,7 +9,7 @@ import {
 } from '@/lib/ui/dialog'
 import { Button } from '@/lib/ui/button'
 import { useSessionStore } from '@/features/auth/stores/session'
-import { createAccount } from '@/features/settings/services/accounts'
+import { createAccount } from '@/features/accounts/services/accounts'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import {
@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from '@/lib/ui/form'
 import { Input } from '@/lib/ui/input'
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useToast } from '@/lib/ui/toast'
 import { h, ref } from 'vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'

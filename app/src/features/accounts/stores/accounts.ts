@@ -6,7 +6,7 @@ import {
   getAccountApiKeys, getAccountChainsParameters, getAccountSubscription,
   getAccountUsers,
   getAllAccounts,
-} from '@/features/settings/services/accounts'
+} from '@/features/accounts/services/accounts'
 import { useSessionStore } from '@/features/auth/stores/session'
 import type { Database } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'

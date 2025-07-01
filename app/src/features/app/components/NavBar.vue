@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import OrganizationSelectionPopover from '@/features/settings/components/OrganizationSelectionPopover.vue'
+import OrganizationSelectionPopover from '@/features/accounts/components/OrganizationSelectionPopover.vue'
 import NetworkPopover from '@/features/network/components/NetworkPopover.vue'
 </script>
 

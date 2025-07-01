@@ -8,7 +8,7 @@ import {
   DialogTrigger
 } from '@/lib/ui/dialog'
 import { Button } from '@/lib/ui/button'
-import { addAccountAddress } from '@/features/settings/services/accounts'
+import { createAccountApiKey } from '@/features/accounts/services/accounts'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import {
@@ -20,12 +20,11 @@ import {
   FormMessage,
 } from '@/lib/ui/form'
 import { Input } from '@/lib/ui/input'
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useToast } from '@/lib/ui/toast'
 import { h, ref } from 'vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/lib/ui/select'
 
 const accounts = useAccountsStore()
 const {toast} = useToast()
@@ -33,26 +32,26 @@ const open = ref(false)
 
 const formSchema = toTypedSchema(z.object({
   name: z.string().min(4).max(50),
-  address: z.string().length(58)
+  origin: z.string().url(),
 }))
 
 async function onSubmit(values: any) {
   if (accounts.active?.id) {
-    const {data, error} =  await addAccountAddress(accounts.active.id, values.address, values.name)
+    const {data, error} =  await createAccountApiKey(accounts.active.id, values.origin, values.name)
     if (error) {
       toast({
-        title: `Error linking address`,
+        title: `Error generating new key`,
         description: error.message,
         variant: 'destructive',
         action: h(ToastError)
       });
     } else {
       toast({
-        title: `Address linked`,
-        description: `You can now use it to create new listings`,
+        title: `New API key generated`,
+        description: `You can use this key to authenticate with the API`,
         action: h(ToastCheck)
       });
-      await accounts.fetchAccountAddresses(accounts.active.id)
+      await accounts.fetchAccountKeys(accounts.active.id)
       open.value = false
     }
   }
@@ -67,27 +66,27 @@ async function onSubmit(values: any) {
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Link address</DialogTitle>
+        <DialogTitle>New API key</DialogTitle>
         <DialogDescription>
-          Link an address to your organization to create new listings. Listing created by addresses that are not linked to your organization are considered third party listings.
+          Generate a new key to authenticate with the API. Origin must match the domain of the requests.
         </DialogDescription>
       </DialogHeader>
       <div class="py-4">
-        <Form id="link-address-form" :validation-schema="formSchema" @submit="onSubmit" class="space-y-6">
-          <FormField v-slot="{ componentField }" name="address">
+        <Form id="add-user-form" :validation-schema="formSchema" @submit="onSubmit" class="space-y-6">
+          <FormField v-slot="{ componentField }" name="name">
             <FormItem class="flex-1">
-              <FormLabel>Address</FormLabel>
+              <FormLabel>Key name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="address" v-bind="componentField" />
+                <Input type="text" placeholder="name" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="name">
+          <FormField v-slot="{ componentField }" name="origin">
             <FormItem class="flex-1">
-              <FormLabel>Address label</FormLabel>
+              <FormLabel>Allowed origin</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="label" v-bind="componentField" />
+                <Input type="url" placeholder="origin" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,8 +94,8 @@ async function onSubmit(values: any) {
         </Form>
       </div>
       <DialogFooter>
-        <Button type="submit" form="link-address-form" variant="gradient">
-          Link address
+        <Button type="submit" form="add-user-form" variant="gradient">
+          Generate key
         </Button>
       </DialogFooter>
     </DialogContent>

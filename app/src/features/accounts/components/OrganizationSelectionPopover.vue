@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { Badge } from '@/lib/ui/badge'
 import { ChevronDown, HousePlus, Check } from 'lucide-vue-next'
 import { Skeleton } from '@/lib/ui/skeleton'
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover'
-import OrganizationCreationDialog from '@/features/settings/components/OrganizationCreationDialog.vue'
+import OrganizationCreationDialog from '@/features/accounts/components/OrganizationCreationDialog.vue'
 import { ScrollArea } from '@/lib/ui/scroll-area'
 
 const accounts = useAccountsStore()

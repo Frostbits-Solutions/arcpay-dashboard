@@ -9,12 +9,12 @@ import {
 } from '@/features/transactions/services/transaction'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/network/stores/networks'
 import utc from 'dayjs/plugin/utc'
 import type { TransactionWithListings } from '@/models'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { getAccountActiveListingsAppids } from '@/features/settings/services/accounts'
+import { getAccountActiveListingsAppids } from '@/features/accounts/services/accounts'
 import {supabase} from '@/lib/supabase/supabaseClient'
 
 type HourlyTransactionsTimeseries = {time: string, transactions: number}[]

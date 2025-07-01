@@ -2,7 +2,7 @@
 import NavBar from '@/features/app/components/NavBar.vue'
 import SideBar from '@/features/app/components/SideBar.vue'
 import { onMounted } from 'vue'
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 
 onMounted (() => {
   const accounts = useAccountsStore()

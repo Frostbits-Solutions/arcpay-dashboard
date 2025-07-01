@@ -2,14 +2,14 @@
 import { Search, House, Trash2 } from 'lucide-vue-next'
 import { Input } from '@/lib/ui/input'
 import { Button } from '@/lib/ui/button'
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { computed, h, ref } from 'vue'
 import { Skeleton } from '@/lib/ui/skeleton'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
-import { removeAccountUser } from '@/features/settings/services/accounts'
+import { removeAccountUser } from '@/features/accounts/services/accounts'
 import { useToast } from '@/lib/ui/toast'
-import OrganizationAddUsersDialog from '@/features/settings/components/OrganizationAddUsersDialog.vue'
+import OrganizationAddUsersDialog from '@/features/accounts/components/OrganizationAddUsersDialog.vue'
 
 const {toast} = useToast()
 const accounts = useAccountsStore()

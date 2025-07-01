@@ -3,7 +3,7 @@ import {House, LayoutGrid, Plus, Cog, Book } from 'lucide-vue-next'
 import { useDark, useToggle } from '@vueuse/core'
 import { Button } from '@/lib/ui/button'
 import LogoutPopover from '@/features/auth/components/LogoutPopover.vue'
-import { useAccountsStore } from '@/features/app/stores/accounts'
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/network/stores/networks'
 
 const isDark = useDark({
