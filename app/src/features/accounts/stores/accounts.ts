@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import {
   getAccount,
   getAccountAddresses,
-  getAccountApiKeys, getAccountChainsParameters, getAccountSubscription,
+  getAccountChainsParameters, getAccountSubscription,
   getAccountUsers,
   getAllAccounts,
 } from '@/features/accounts/services/accounts'
@@ -12,18 +12,21 @@ import type { Database } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 
-type Account = { id: number, name: string }
+type Account = { id: string, name: string }
 interface AccountSettings{
-  settings?: Database["public"]["Tables"]["accounts"]["Row"] | undefined
-  subscription?: Database["public"]["Tables"]["subscription_tiers"]["Row"] | undefined
+  settings?: Database["public"]["Tables"]["accounts"]["Row"]
+  subscription_id?: number;
+  subscription_expiration_date?: string | null;
+  subscription_tiers?: Partial<Database["public"]["Tables"]["subscription_tiers"]["Row"]> | null
   users?: {
     role: Database["public"]["Tables"]["accounts_users_association"]["Row"]["role"],
     user_email: Database["public"]["Tables"]["accounts_users_association"]["Row"]["user_email"],
     created_at: Database["public"]["Tables"]["accounts_users_association"]["Row"]["created_at"],
-  }[] | undefined
-  keys?: Database["public"]["Tables"]["accounts_api_keys"]["Row"][] | undefined
-  addresses?: Database["public"]["Tables"]["accounts_addresses"]["Row"][] | undefined
-  chainsParameters?: Database['public']['Tables']['accounts_chains_parameters']['Row'][] | undefined
+  }[]
+  secrets?: Database["public"]["Tables"]["accounts_secrets"]["Row"][]
+  addresses?: Database["public"]["Tables"]["accounts_addresses"]["Row"][]
+  chainsParameters?: Database['public']['Tables']['accounts_chains_parameters']['Row'][]
+  currencies?: Database['public']['Tables']['accounts_currencies']['Row'][]
 }
 
 export const useAccountsStore = defineStore('accounts', () => {
@@ -34,7 +37,6 @@ export const useAccountsStore = defineStore('accounts', () => {
   const activeSettings = ref<AccountSettings>({})
 
   async function fetchAll() {
-    // fetch all accounts
     const session = useSessionStore()
     if (session?.user?.email) {
       const { data, error } = await getAllAccounts(session.user.email)
@@ -62,7 +64,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  function selectAccount(id: number) {
+  function selectAccount(id: string) {
     const account = all.value.find(a => a.id === id)
     if (account) {
       loading.value = true
@@ -71,7 +73,6 @@ export const useAccountsStore = defineStore('accounts', () => {
         fetchAccountSettings(account.id),
         fetchAccountUsers(account.id),
         fetchAccountAddresses(account.id),
-        fetchAccountKeys(account.id),
         fetchAccountSubscription(account.id),
         fetchAccountChainsParameters(account.id),
       ]).then(() => {
@@ -80,7 +81,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  async function fetchAccountSettings(accountId: number) {
+  async function fetchAccountSettings(accountId: string) {
     const { data: settings, error } = await getAccount(accountId)
     if (!settings || error) {
       console.error(error)
@@ -95,7 +96,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  async function fetchAccountSubscription(accountId: number) {
+  async function fetchAccountSubscription(accountId: string) {
     const { data, error } = await getAccountSubscription(accountId)
     if (!data || error) {
       console.error(error)
@@ -106,11 +107,13 @@ export const useAccountsStore = defineStore('accounts', () => {
         action: h(ToastError)
       })
     } else {
-      activeSettings.value.subscription = data
+      activeSettings.value.subscription_id = data.subscription_id
+      activeSettings.value.subscription_expiration_date = data.subscription_expiration_date
+      activeSettings.value.subscription_tiers = data.subscription_tiers
     }
   }
 
-  async function fetchAccountUsers(accountId: number) {
+  async function fetchAccountUsers(accountId: string) {
     const { data: users, error } = await getAccountUsers(accountId)
     if (!users || error) {
       console.error(error)
@@ -125,22 +128,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  async function fetchAccountKeys(accountId: number) {
-    const { data: keys, error } = await getAccountApiKeys(accountId)
-    if (!keys || error) {
-      console.error(error)
-      toast({
-        title: 'Error fetching account api keys',
-        description: error?.message || 'Unexpected error',
-        variant: 'destructive',
-        action: h(ToastError)
-      })
-    } else {
-      activeSettings.value.keys = keys
-    }
-  }
-
-  async function fetchAccountAddresses(accountId: number) {
+  async function fetchAccountAddresses(accountId: string) {
     const { data: addresses, error } = await getAccountAddresses(accountId)
     if (!addresses || error) {
       console.error(error)
@@ -155,7 +143,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  async function fetchAccountChainsParameters(accountId: number) {
+  async function fetchAccountChainsParameters(accountId: string) {
     const { data: chainsParameters, error } = await getAccountChainsParameters(accountId)
     if (error) {
       console.error(error)
@@ -172,5 +160,5 @@ export const useAccountsStore = defineStore('accounts', () => {
 
   
 
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountKeys, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, selectAccount }
+  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, selectAccount }
 })
