@@ -4,7 +4,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/lib/ui/input'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import { useAccountsStore } from '@/features/shared/stores/accounts'
+import { useAccountsStore } from '@/features/app/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { deleteAccount, updateAccount } from '@/features/settings/services/accounts'
 import { h } from 'vue'

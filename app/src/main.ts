@@ -1,5 +1,4 @@
 import './assets/index.css'
-import '@/lib/arcpay/arcpay'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

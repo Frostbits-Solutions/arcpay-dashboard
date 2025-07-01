@@ -7,36 +7,61 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       accounts: {
         Row: {
+          authenticate_clients: boolean
           created_at: string
           id: string
           name: string
-          owner_email: string
           subscription_expiration_date: string | null
           subscription_id: number
         }
         Insert: {
+          authenticate_clients?: boolean
           created_at?: string
           id?: string
           name: string
-          owner_email: string
           subscription_expiration_date?: string | null
           subscription_id?: number
         }
         Update: {
+          authenticate_clients?: boolean
           created_at?: string
           id?: string
           name?: string
-          owner_email?: string
           subscription_expiration_date?: string | null
           subscription_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "public_accounts_subscription_id_fkey"
+            foreignKeyName: "accounts_subscription_id_fkey"
             columns: ["subscription_id"]
             isOneToOne: false
             referencedRelation: "subscription_tiers"
@@ -65,39 +90,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "public_accounts_addresses_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      accounts_api_keys: {
-        Row: {
-          account_id: string
-          created_at: string
-          key: string
-          name: string | null
-          origin: string
-        }
-        Insert: {
-          account_id: string
-          created_at?: string
-          key?: string
-          name?: string | null
-          origin: string
-        }
-        Update: {
-          account_id?: string
-          created_at?: string
-          key?: string
-          name?: string | null
-          origin?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_accounts_api_keys_account_id_fkey"
+            foreignKeyName: "accounts_addresses_account_id_fkey"
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "accounts"
@@ -107,7 +100,7 @@ export type Database = {
       }
       accounts_chains_parameters: {
         Row: {
-          account_id: number
+          account_id: string
           chain_id: string
           created_at: string
           enable_secondary: boolean
@@ -115,7 +108,7 @@ export type Database = {
           secondary_percentage_fee: number
         }
         Insert: {
-          account_id: number
+          account_id: string
           chain_id: string
           created_at?: string
           enable_secondary?: boolean
@@ -123,7 +116,7 @@ export type Database = {
           secondary_percentage_fee?: number
         }
         Update: {
-          account_id?: number
+          account_id?: string
           chain_id?: string
           created_at?: string
           enable_secondary?: boolean
@@ -152,19 +145,19 @@ export type Database = {
           account_id: string
           chain_id: string
           created_at: string
-          currency: string
+          currency: number
         }
         Insert: {
           account_id: string
           chain_id: string
           created_at?: string
-          currency: string
+          currency: number
         }
         Update: {
           account_id?: string
           chain_id?: string
           created_at?: string
-          currency?: string
+          currency?: number
         }
         Relationships: [
           {
@@ -175,39 +168,65 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "accounts_currencies_chain_id_fkey"
-            columns: ["chain_id"]
+            foreignKeyName: "accounts_currencies_currency_fkey"
+            columns: ["currency", "chain_id"]
             isOneToOne: false
-            referencedRelation: "chains"
+            referencedRelation: "currencies"
+            referencedColumns: ["id", "chain_id"]
+          },
+        ]
+      }
+      accounts_secrets: {
+        Row: {
+          account_id: string
+          created_at: string
+          name: string
+          secret: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          name: string
+          secret?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          name?: string
+          secret?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_secrets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
             referencedColumns: ["id"]
           },
         ]
       }
       accounts_users_association: {
         Row: {
-          account_id: number
+          account_id: string
           created_at: string
           role: Database["public"]["Enums"]["accounts_users_roles"]
-          updated_at: string | null
           user_email: string
         }
         Insert: {
-          account_id: number
+          account_id: string
           created_at?: string
-          role?: Database["public"]["Enums"]["accounts_users_roles"]
-          updated_at?: string | null
+          role: Database["public"]["Enums"]["accounts_users_roles"]
           user_email: string
         }
         Update: {
-          account_id?: number
+          account_id?: string
           created_at?: string
           role?: Database["public"]["Enums"]["accounts_users_roles"]
-          updated_at?: string | null
           user_email?: string
         }
         Relationships: [
           {
-            foreignKeyName: "public_accounts_users_association_account_id_fkey"
+            foreignKeyName: "accounts_users_association_account_id_fkey"
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "accounts"
@@ -219,7 +238,6 @@ export type Database = {
         Row: {
           created_at: string
           duration: number
-          id: number
           increment: number
           listing_id: string
           start_price: number
@@ -228,7 +246,6 @@ export type Database = {
         Insert: {
           created_at?: string
           duration: number
-          id?: number
           increment: number
           listing_id: string
           start_price: number
@@ -237,7 +254,6 @@ export type Database = {
         Update: {
           created_at?: string
           duration?: number
-          id?: number
           increment?: number
           listing_id?: string
           start_price?: number
@@ -245,9 +261,9 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "public_auctions_listing_id_fkey"
+            foreignKeyName: "auctions_listing_id_fkey"
             columns: ["listing_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
@@ -280,21 +296,21 @@ export type Database = {
           chain_id: string
           created_at: string
           tag: Database["public"]["Enums"]["contract_tag_enum"]
-          version: number
+          version: string
         }
         Insert: {
           byte_code: string
           chain_id: string
           created_at?: string
           tag: Database["public"]["Enums"]["contract_tag_enum"]
-          version: number
+          version: string
         }
         Update: {
           byte_code?: string
           chain_id?: string
           created_at?: string
           tag?: Database["public"]["Enums"]["contract_tag_enum"]
-          version?: number
+          version?: string
         }
         Relationships: [
           {
@@ -310,17 +326,17 @@ export type Database = {
         Row: {
           chain_id: string
           created_at: string
-          version: number
+          version: string
         }
         Insert: {
           chain_id: string
           created_at?: string
-          version: number
+          version: string
         }
         Update: {
           chain_id?: string
           created_at?: string
-          version?: number
+          version?: string
         }
         Relationships: [
           {
@@ -338,7 +354,7 @@ export type Database = {
           created_at: string
           decimals: number
           icon: string | null
-          id: string
+          id: number
           is_public: boolean
           name: string
           ticker: string
@@ -350,7 +366,7 @@ export type Database = {
           created_at?: string
           decimals: number
           icon?: string | null
-          id: string
+          id: number
           is_public?: boolean
           name: string
           ticker: string
@@ -362,7 +378,7 @@ export type Database = {
           created_at?: string
           decimals?: number
           icon?: string | null
-          id?: string
+          id?: number
           is_public?: boolean
           name?: string
           ticker?: string
@@ -383,7 +399,6 @@ export type Database = {
         Row: {
           created_at: string
           duration: number
-          id: number
           listing_id: string
           max_price: number | null
           min_price: number
@@ -392,7 +407,6 @@ export type Database = {
         Insert: {
           created_at?: string
           duration: number
-          id?: number
           listing_id: string
           max_price?: number | null
           min_price: number
@@ -401,7 +415,6 @@ export type Database = {
         Update: {
           created_at?: string
           duration?: number
-          id?: number
           listing_id?: string
           max_price?: number | null
           min_price?: number
@@ -409,9 +422,9 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "public_dutch_auctions_listing_id_fkey"
+            foreignKeyName: "dutch_auctions_listing_id_fkey"
             columns: ["listing_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
@@ -419,69 +432,71 @@ export type Database = {
       }
       listings: {
         Row: {
-          account_id: number
+          account_id: string
           app_id: number
-          asset_creator: string | null
-          asset_id: string
+          asset_id: number
           asset_qty: number
           asset_thumbnail: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
           chain_id: string
-          contract_version: number | null
+          contract_version: string
           created_at: string
-          currency: string
+          creator_address: string
+          currency: number
           id: string
+          metadata: Json
           name: string
-          seller_address: string
           status: Database["public"]["Enums"]["listings_statuses"]
-          tags: string | null
           type: Database["public"]["Enums"]["listings_types"]
           updated_at: string | null
-          transactions:
-            | Database["public"]["Tables"]["transactions"]["Row"]
-            | null
+          transactions: unknown | null
         }
         Insert: {
-          account_id: number
+          account_id: string
           app_id: number
-          asset_creator?: string | null
-          asset_id: string
+          asset_id: number
           asset_qty?: number
           asset_thumbnail?: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
           chain_id: string
-          contract_version?: number | null
+          contract_version: string
           created_at?: string
-          currency: string
+          creator_address: string
+          currency: number
           id?: string
+          metadata?: Json
           name: string
-          seller_address: string
           status: Database["public"]["Enums"]["listings_statuses"]
-          tags?: string | null
           type: Database["public"]["Enums"]["listings_types"]
           updated_at?: string | null
         }
         Update: {
-          account_id?: number
+          account_id?: string
           app_id?: number
-          asset_creator?: string | null
-          asset_id?: string
+          asset_id?: number
           asset_qty?: number
           asset_thumbnail?: string | null
           asset_type?: Database["public"]["Enums"]["assets_types"]
           chain_id?: string
-          contract_version?: number | null
+          contract_version?: string
           created_at?: string
-          currency?: string
+          creator_address?: string
+          currency?: number
           id?: string
+          metadata?: Json
           name?: string
-          seller_address?: string
           status?: Database["public"]["Enums"]["listings_statuses"]
-          tags?: string | null
           type?: Database["public"]["Enums"]["listings_types"]
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "listings_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "listings_chain_id_fkey"
             columns: ["chain_id"]
@@ -497,63 +512,42 @@ export type Database = {
             referencedColumns: ["version", "chain_id"]
           },
           {
-            foreignKeyName: "public_listings_account_id_fkey"
-            columns: ["account_id"]
+            foreignKeyName: "listings_currency_chain_id_fkey"
+            columns: ["currency", "chain_id"]
             isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
+            referencedRelation: "currencies"
+            referencedColumns: ["id", "chain_id"]
           },
         ]
       }
       sales: {
         Row: {
           created_at: string
-          id: number
           listing_id: string
           price: number
           updated_at: string | null
         }
         Insert: {
           created_at?: string
-          id?: number
           listing_id: string
           price: number
           updated_at?: string | null
         }
         Update: {
           created_at?: string
-          id?: number
           listing_id?: string
           price?: number
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "public_sales_listing_id_fkey"
+            foreignKeyName: "sales_listing_id_fkey"
             columns: ["listing_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "listings"
             referencedColumns: ["id"]
           },
         ]
-      }
-      sdk_versions: {
-        Row: {
-          changelog: string | null
-          created_at: string
-          id: string
-        }
-        Insert: {
-          changelog?: string | null
-          created_at?: string
-          id: string
-        }
-        Update: {
-          changelog?: string | null
-          created_at?: string
-          id?: string
-        }
-        Relationships: []
       }
       subscription_tiers: {
         Row: {
@@ -563,7 +557,6 @@ export type Database = {
           duration: number | null
           id: number
           name: string
-          secondary_sale_percentage_fee: number | null
         }
         Insert: {
           allow_custom_currencies?: boolean
@@ -572,7 +565,6 @@ export type Database = {
           duration?: number | null
           id?: number
           name: string
-          secondary_sale_percentage_fee?: number | null
         }
         Update: {
           allow_custom_currencies?: boolean
@@ -581,7 +573,6 @@ export type Database = {
           duration?: number | null
           id?: number
           name?: string
-          secondary_sale_percentage_fee?: number | null
         }
         Relationships: []
       }
@@ -636,11 +627,10 @@ export type Database = {
           app_id: number
           chain_id: string
           created_at: string
-          currency: string | null
+          currency: number
           from_address: string
-          group_id: string | null
           id: string
-          note: string | null
+          metadata: Json
           type: Database["public"]["Enums"]["transaction_type"]
           listings: Database["public"]["Tables"]["listings"]["Row"] | null
         }
@@ -649,11 +639,10 @@ export type Database = {
           app_id: number
           chain_id: string
           created_at?: string
-          currency?: string | null
+          currency: number
           from_address: string
-          group_id?: string | null
           id: string
-          note?: string | null
+          metadata?: Json
           type: Database["public"]["Enums"]["transaction_type"]
         }
         Update: {
@@ -661,11 +650,10 @@ export type Database = {
           app_id?: number
           chain_id?: string
           created_at?: string
-          currency?: string | null
+          currency?: number
           from_address?: string
-          group_id?: string | null
           id?: string
-          note?: string | null
+          metadata?: Json
           type?: Database["public"]["Enums"]["transaction_type"]
         }
         Relationships: [
@@ -676,66 +664,94 @@ export type Database = {
             referencedRelation: "chains"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_currency_fkey"
+            columns: ["currency", "chain_id"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["id", "chain_id"]
+          },
         ]
+      }
+      transactions_2025_06_15: {
+        Row: {
+          amount: number | null
+          app_id: number
+          chain_id: string
+          created_at: string
+          currency: number
+          from_address: string
+          id: string
+          metadata: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Insert: {
+          amount?: number | null
+          app_id: number
+          chain_id: string
+          created_at?: string
+          currency: number
+          from_address: string
+          id: string
+          metadata?: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Update: {
+          amount?: number | null
+          app_id?: number
+          chain_id?: string
+          created_at?: string
+          currency?: number
+          from_address?: string
+          id?: string
+          metadata?: Json
+          type?: Database["public"]["Enums"]["transaction_type"]
+        }
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_account_subscription: {
-        Args: { account_id: number }
-        Returns: {
-          allow_custom_currencies: boolean
-          allow_secondary_listings: boolean
-          created_at: string
-          duration: number | null
-          id: number
-          name: string
-          secondary_sale_percentage_fee: number | null
-        }
+      create_account: {
+        Args: { account_name: string }
+        Returns: string
+      }
+      get_account_subscription_params: {
+        Args: { p_account_id: string; p_chain_id: string }
+        Returns: Database["public"]["CompositeTypes"]["chain_subscription_parameters"]
       }
       get_daily_sales_volume_timeseries: {
-        Args: {
-          account_id: number
-          chain: Database["public"]["Enums"]["chains_enum"]
-        }
+        Args: { account_id: string; chain_id: string }
         Returns: Database["public"]["CompositeTypes"]["transactions_volume"][]
       }
       get_hourly_transactions_timeseries: {
-        Args: {
-          account_id: number
-          chain: Database["public"]["Enums"]["chains_enum"]
-        }
+        Args: { account_id: string; chain_id: string }
         Returns: Database["public"]["CompositeTypes"]["transactions_count"][]
-      }
-      get_key_account_id: {
-        Args: { key: string; origin: string }
-        Returns: number
       }
       get_listing_by_id: {
         Args: { listing_id: string }
         Returns: Database["public"]["CompositeTypes"]["composite_listing"]
       }
       listings: {
-        Args: { "": Database["public"]["Tables"]["transactions"]["Row"] }
+        Args: { "": unknown }
         Returns: {
-          account_id: number
+          account_id: string
           app_id: number
-          asset_creator: string | null
-          asset_id: string
+          asset_id: number
           asset_qty: number
           asset_thumbnail: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
           chain_id: string
-          contract_version: number | null
+          contract_version: string
           created_at: string
-          currency: string
+          creator_address: string
+          currency: number
           id: string
+          metadata: Json
           name: string
-          seller_address: string
           status: Database["public"]["Enums"]["listings_statuses"]
-          tags: string | null
           type: Database["public"]["Enums"]["listings_types"]
           updated_at: string | null
         }[]
@@ -747,23 +763,17 @@ export type Database = {
           app_id: number
           chain_id: string
           created_at: string
-          currency: string | null
+          currency: number
           from_address: string
-          group_id: string | null
           id: string
-          note: string | null
+          metadata: Json
           type: Database["public"]["Enums"]["transaction_type"]
         }[]
       }
     }
     Enums: {
-      accounts_users_roles: "admin" | "moderator" | "member"
+      accounts_users_roles: "owner" | "admin" | "moderator" | "member"
       assets_types: "arc72" | "offchain" | "asa"
-      chains_enum:
-        | "voi:testnet"
-        | "voi:mainnet"
-        | "algo:testnet"
-        | "algo:mainnet"
       contract_tag_enum:
         | "clear"
         | "algo_asa_auction_approval"
@@ -795,17 +805,26 @@ export type Database = {
         | "cancel"
     }
     CompositeTypes: {
+      chain_subscription_parameters: {
+        allow_secondary_listings: boolean | null
+        allow_custom_currencies: boolean | null
+        flat_fees: number | null
+        sales_fees: number | null
+        secondary_flat_fees: number | null
+        secondary_sales_fees: number | null
+      }
       composite_listing: {
         id: string | null
         created_at: string | null
         updated_at: string | null
         status: Database["public"]["Enums"]["listings_statuses"] | null
-        chain: Database["public"]["Enums"]["chains_enum"] | null
-        seller_address: string | null
+        chain_id: string | null
+        contract_version: string | null
+        creator_address: string | null
         name: string | null
         type: Database["public"]["Enums"]["listings_types"] | null
         app_id: number | null
-        currency: string | null
+        currency: number | null
         currency_name: string | null
         currency_ticker: string | null
         currency_icon: string | null
@@ -815,8 +834,7 @@ export type Database = {
         asset_thumbnail: string | null
         asset_type: Database["public"]["Enums"]["assets_types"] | null
         asset_qty: number | null
-        asset_creator: string | null
-        tags: string | null
+        metadata: Json | null
         sale_price: number | null
         auction_start_price: number | null
         auction_increment: number | null
@@ -945,16 +963,13 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
-      accounts_users_roles: ["admin", "moderator", "member"],
+      accounts_users_roles: ["owner", "admin", "moderator", "member"],
       assets_types: ["arc72", "offchain", "asa"],
-      chains_enum: [
-        "voi:testnet",
-        "voi:mainnet",
-        "algo:testnet",
-        "algo:mainnet",
-      ],
       contract_tag_enum: [
         "clear",
         "algo_asa_auction_approval",

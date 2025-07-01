@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { useAccountsStore } from '@/features/shared/stores/accounts'
+import { useAccountsStore } from '@/features/app/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { ArrowUpRight, Trash2, Package } from 'lucide-vue-next'
 import { deleteAccountApiKey, removeAccountUser } from '@/features/settings/services/accounts'

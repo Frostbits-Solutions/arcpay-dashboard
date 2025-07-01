@@ -1,7 +1,7 @@
 import { h, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { Database } from '@/lib/supabase/database.types'
-import { getCurrencies } from '@/features/shared/services/currencies'
+import { getCurrencies } from '@/features/app/services/currencies'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 import { useNetworksStore } from '@/features/network/stores/networks'

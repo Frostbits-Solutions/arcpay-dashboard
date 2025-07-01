@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { onMounted, computed } from 'vue'
-import { useAccountsStore } from '@/features/shared/stores/accounts'
+import { useAccountsStore } from '@/features/app/stores/accounts'
 import { useListingsStore } from '@/features/listings/stores/listings'
 import type { CompositeListing } from '@/models'
 import { columns } from '@/features/listings/components/listings-table/columns'

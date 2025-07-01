@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { useAccountsStore } from '@/features/shared/stores/accounts'
+import { useAccountsStore } from '@/features/app/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { Clipboard } from '@/lib/ui/clipboard'
 import { Trash2 } from 'lucide-vue-next'

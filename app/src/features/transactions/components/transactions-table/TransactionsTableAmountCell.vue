@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
 import type { TransactionWithListings } from '@/models'
-import { useCurrenciesStore } from '@/features/shared/stores/currencies'
+import { useCurrenciesStore } from '@/features/app/stores/currencies'
 import { computed } from 'vue'
 
 const props = defineProps<{row: Row<TransactionWithListings>}>()

@@ -6,7 +6,7 @@ import ChartDailySalesVolume from '@/features/dashboard/components/ChartDailySal
 import { useTransactionsStore } from '@/features/transactions/stores/transactions'
 import { DataTable } from '@/lib/ui/data-table'
 import { columns } from '@/features/transactions/components/transactions-table/columns'
-import { useCurrenciesStore } from '@/features/shared/stores/currencies'
+import { useCurrenciesStore } from '@/features/app/stores/currencies'
 import type { Chain } from '@/models'
 
 const networks = useNetworksStore()

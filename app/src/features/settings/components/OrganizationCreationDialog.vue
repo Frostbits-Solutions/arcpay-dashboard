@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from '@/lib/ui/form'
 import { Input } from '@/lib/ui/input'
-import { useAccountsStore } from '@/features/shared/stores/accounts'
+import { useAccountsStore } from '@/features/app/stores/accounts'
 import { useToast } from '@/lib/ui/toast'
 import { h, ref } from 'vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'

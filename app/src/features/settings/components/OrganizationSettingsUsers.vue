@@ -2,7 +2,7 @@
 import { Search, House, Trash2 } from 'lucide-vue-next'
 import { Input } from '@/lib/ui/input'
 import { Button } from '@/lib/ui/button'
-import { useAccountsStore } from '@/features/shared/stores/accounts'
+import { useAccountsStore } from '@/features/app/stores/accounts'
 import { computed, h, ref } from 'vue'
 import { Skeleton } from '@/lib/ui/skeleton'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
