@@ -1,45 +1,33 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
 import type { PostgrestError } from '@supabase/supabase-js'
 import type { Chain } from '@/models'
-type accountsMemberships = { id: number, name: string, role: 'admin'|'member'|'moderator'|'owner' }[]
+import type { Database } from '@/lib/supabase/database.types'
 
-export async function createAccount(name: string, owner_email: string) {
-  const { data, error } = await supabase
-    .from('accounts')
-    .insert([{
-      name,
-      owner_email
-    }])
+type MembershipsRoles = Database['public']['Enums']['accounts_users_roles']
+type AccountsMemberships = { id: string, name: string, role: MembershipsRoles }[]
+
+export async function createAccount(name: string) {
+  const { data, error } = await supabase.rpc("create_account", { account_name: name })
   return { data, error }
 }
 
-export async function getAllAccounts(user_email: string): Promise<{ data: accountsMemberships | null, error: PostgrestError | null }> {
-  const { data: ownershipData, error: ownershipError } = await supabase
-    .from('accounts')
-    .select('id, name')
-    .eq('owner_email', `${user_email}`)
-    .order('id', { ascending: true })
-  if (ownershipError) return { data: null, error: ownershipError }
-
-  const { data:membershipData, error:membershipError } = await supabase
+export async function getAllAccounts(user_email: string): Promise<{ data: AccountsMemberships | null, error: PostgrestError | null }> {
+  const { data, error } = await supabase
     .from('accounts_users_association')
-    .select('account_id, role, accounts(name)')
+    .select('account_id, role, accounts(id, name)')
     .eq('user_email', user_email)
-  if (membershipError) return { data: null, error: membershipError }
+    .order('accounts(name)', { ascending: true })
 
-  const data:accountsMemberships = []
-  ownershipData?.forEach((account) => {
-    data.push({ ...account, role: 'owner' })
-  })
+  const accountsMemberships: AccountsMemberships | null = data?.map((item) => ({
+    id: item.account_id,
+    name: item.accounts?.name || 'Unknown Account',
+    role: item.role
+  })) || null
 
-  membershipData?.forEach((account) => {
-    data.push({ id: account.account_id, name: account?.accounts?.name || 'account' , role: account.role })
-  })
-
-  return { data, error: null }
+  return { data: accountsMemberships, error }
 }
 
-export async function getAccount(id: number) {
+export async function getAccount(id: string) {
   const { data, error } = await supabase
     .from('accounts')
     .select('*')
@@ -48,21 +36,19 @@ export async function getAccount(id: number) {
   return { data, error }
 }
 
-export async function updateAccount(id: number, name?: string | undefined, website?: string | undefined, enable_secondary_sales?: boolean | undefined, secondary_sales_percentage_fee?: number | undefined){
+export async function updateAccount(id: string, name?: string | undefined, authenticate_clients?: boolean | undefined) {
   const { data, error } = await supabase
     .from('accounts')
     .update({
-      name: name,
-      website: website,
-      s_enable_secondary_sales: enable_secondary_sales,
-      s_secondary_sales_percentage_fee: secondary_sales_percentage_fee
+      name,
+      authenticate_clients
     })
     .eq('id', id)
     .select()
   return { data, error }
 }
 
-export async function deleteAccount(id: number) {
+export async function deleteAccount(id: string) {
   const { data, error } = await supabase
     .from('accounts')
     .delete()
@@ -70,7 +56,7 @@ export async function deleteAccount(id: number) {
   return { data, error }
 }
 
-export async function addAccountUser(account_id: number, user_email: string, role: 'admin' | 'member') {
+export async function addAccountUser(account_id: string, user_email: string, role: MembershipsRoles) {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .insert({
@@ -82,7 +68,7 @@ export async function addAccountUser(account_id: number, user_email: string, rol
   return { data, error }
 }
 
-export async function getAccountUsers(id: number) {
+export async function getAccountUsers(id: string) {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .select('role, user_email, created_at')
@@ -90,7 +76,7 @@ export async function getAccountUsers(id: number) {
   return { data, error }
 }
 
-export async function updateAccountUser(account_id: number, user_email: string, role: 'admin' | 'member') {
+export async function updateAccountUser(account_id: string, user_email: string, role: MembershipsRoles) {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .update({
@@ -102,7 +88,7 @@ export async function updateAccountUser(account_id: number, user_email: string, 
   return { data, error }
 }
 
-export async function removeAccountUser(id: number, email: string) {
+export async function removeAccountUser(id: string, email: string) {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .delete()
@@ -111,7 +97,7 @@ export async function removeAccountUser(id: number, email: string) {
   return { data, error }
 }
 
-export async function addAccountAddress(account_id: number, address: string, name: string) {
+export async function addAccountAddress(account_id: string, address: string, name: string) {
   const { data, error } = await supabase
     .from('accounts_addresses')
     .insert({
@@ -123,7 +109,7 @@ export async function addAccountAddress(account_id: number, address: string, nam
   return { data, error }
 }
 
-export async function getAccountAddresses(id: number) {
+export async function getAccountAddresses(id: string) {
   const { data, error } = await supabase
     .from('accounts_addresses')
     .select('*')
@@ -131,7 +117,7 @@ export async function getAccountAddresses(id: number) {
   return { data, error }
 }
 
-export async function updateAccountAddress(id: number, address: string, name: string) {
+export async function updateAccountAddress(id: string, address: string, name: string) {
   const { data, error } = await supabase
     .from('accounts_addresses')
     .update({
@@ -143,7 +129,7 @@ export async function updateAccountAddress(id: number, address: string, name: st
   return { data, error }
 }
 
-export async function removeAccountAddress(id: number, address: string) {
+export async function removeAccountAddress(id: string, address: string) {
   const { data, error } = await supabase
     .from('accounts_addresses')
     .delete()
@@ -152,59 +138,59 @@ export async function removeAccountAddress(id: number, address: string) {
   return { data, error }
 }
 
-export async function createAccountApiKey(account_id: number, origin: string, name: string) {
+export async function createAccountSecret(account_id: string, name: string) {
   const { data, error } = await supabase
-    .from('accounts_api_keys')
+    .from('accounts_secrets')
     .insert({
       account_id,
-      name,
-      origin
+      name
     })
     .select()
   return { data, error }
 }
 
-export async function getAccountApiKeys(account_id: number) {
+export async function getAccountSecrets(account_id: string) {
   const { data, error } = await supabase
-    .from('accounts_api_keys')
+    .from('accounts_secrets')
     .select('*')
     .eq('account_id', account_id)
   return { data, error }
 }
 
-export async function updateAccountApiKey(account_id: number, key: number, origin: string, name: string) {
+export async function deleteAccountSecret(account_id: string, secret: string) {
   const { data, error } = await supabase
-    .from('accounts_api_keys')
-    .update({
-      origin,
-      name
-    })
-    .eq('account_id', account_id)
-    .eq('key', key)
-    .select()
-  return { data, error }
-}
-
-export async function deleteAccountApiKey(account_id: number, key: string) {
-  const { data, error } = await supabase
-    .from('accounts_api_keys')
+    .from('accounts_secrets')
     .delete()
     .eq('account_id', account_id)
-    .eq('key', key)
+    .eq('secret', secret)
   return { data, error }
 }
 
-export async function getAccountSubscription(account_id: number) {
-  const { data, error } = await supabase.rpc('get_account_subscription', { account_id })
+export async function getAccountSubscription(account_id: string) {
+  const { data, error } = await supabase
+    .from('accounts')
+    .select(`
+      subscription_id,
+      subscription_expiration_date,
+      subscription_tiers (
+        id,
+        name,
+        duration,
+        allow_secondary_listings,
+        allow_custom_currencies
+      )
+    `)
+    .eq('id', account_id)
+    .single()
   return { data, error }
 }
 
-export async function getAccountActiveListingsAppids(account_id: number, chain: Chain) {
+export async function getAccountActiveListingsAppids(account_id: string, chain: Chain) {
   const { data, error } = await supabase.from('listings').select('app_id').eq('account_id', account_id).in('status', ['pending', 'active']).eq('chain', chain)
   return { data, error }
 }
 
-export async function getAccountChainsParameters(account_id: number) {
+export async function getAccountChainsParameters(account_id: string) {
   const { data, error } = await supabase
   .from('accounts_chains_parameters')
   .select('*')
@@ -212,7 +198,7 @@ export async function getAccountChainsParameters(account_id: number) {
   return { data, error }
 }
 
-export async function createAccountChainsParameters(account_id: number, chain_id: string, enable_secondary: boolean, secondary_fee_address: string, secondary_percentage_fee: number) {
+export async function createAccountChainsParameters(account_id: string, chain_id: string, enable_secondary: boolean, secondary_fee_address: string, secondary_percentage_fee: number) {
   const { data, error } = await supabase
     .from('accounts_chains_parameters')
     .insert({
@@ -226,7 +212,7 @@ export async function createAccountChainsParameters(account_id: number, chain_id
   return { data, error }
 }
 
-export async function updateAccountChainsParameters(account_id: number, chain_id: string, enable_secondary: boolean, secondary_fee_address: string, secondary_percentage_fee: number) {
+export async function updateAccountChainsParameters(account_id: string, chain_id: string, enable_secondary: boolean, secondary_fee_address: string, secondary_percentage_fee: number) {
   const { data, error } = await supabase
     .from('accounts_chains_parameters')
     .update({
@@ -237,5 +223,35 @@ export async function updateAccountChainsParameters(account_id: number, chain_id
     .eq('account_id', account_id)
     .eq('chain_id', chain_id)
     .select()
+  return { data, error }
+}
+
+export async function getAccountCurrencies(account_id: string) {
+  const { data, error } = await supabase
+    .from('accounts_currencies')
+    .select('*')
+    .eq('account_id', account_id)
+  return { data, error }
+}
+
+export async function addAccountCurrency(account_id: string, currency: number, chain_id: string) {
+  const { data, error } = await supabase
+    .from('accounts_currencies')
+    .insert({
+      account_id,
+      currency,
+      chain_id
+    })
+    .select()
+  return { data, error }
+}
+
+export async function removeAccountCurrency(account_id: string, currency: number, chain_id: string) {
+  const { data, error } = await supabase
+    .from('accounts_currencies')
+    .delete()
+    .eq('account_id', account_id)
+    .eq('currency', currency)
+    .eq('chain_id', chain_id)
   return { data, error }
 }

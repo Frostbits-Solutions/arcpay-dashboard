@@ -34,7 +34,6 @@ This table provides a comprehensive overview of permissions for different user r
 CREATE TYPE "public"."accounts_users_roles" AS ENUM (
     'owner',
     'admin',
-    'moderator', -- as per active file
     'member'
 );
 ALTER TYPE "public"."accounts_users_roles" OWNER TO "postgres";
@@ -266,6 +265,7 @@ CREATE POLICY "Account admins can update account currencies" ON "public"."accoun
 CREATE POLICY "Account admins can delete account currencies" ON "public"."accounts_currencies" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
 -- RLS for accounts_secrets
+CREATE POLICY "Account admins can select secrets" ON "public"."accounts_secrets" FOR SELECT TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can insert secrets" ON "public"."accounts_secrets" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can update secrets" ON "public"."accounts_secrets" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete secrets" ON "public"."accounts_secrets" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
