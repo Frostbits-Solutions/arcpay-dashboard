@@ -84,7 +84,7 @@ async function onDelete(values: any) {
     <div>
       <h4 class="text-md font-normal">Subscription</h4>
       <p class="text-sm text-muted-foreground">
-        This organization is currently on the <span class="uppercase font-bold text-primary">{{accounts.activeSettings.subscription?.name}}</span> plan.<br>
+        This organization is currently on the <span class="uppercase font-bold text-primary">{{accounts.activeSettings.subscription_tiers?.name}}</span> plan.<br>
       </p>
     </div>
     <Button variant="gradient" class="mt-2">Upgrade to Pro</Button>
@@ -99,19 +99,6 @@ async function onDelete(values: any) {
           </FormControl>
           <FormDescription>
             Organization name must be unique and between 4 and 50 characters. Leave empty to keep the current name.
-          </FormDescription>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="website">
-        <FormItem>
-          <FormLabel>Website</FormLabel>
-          <FormControl>
-            <Skeleton class="w-full h-9" v-if="accounts?.loading"/>
-            <Input v-else type="text" :placeholder="accounts?.activeSettings?.settings?.website" v-bind="componentField" />
-          </FormControl>
-          <FormDescription>
-            Optional, social media or website URL.
           </FormDescription>
           <FormMessage />
         </FormItem>

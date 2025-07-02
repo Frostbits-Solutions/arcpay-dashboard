@@ -10,13 +10,18 @@ import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import { removeAccountUser } from '@/features/accounts/services/accounts'
 import { useToast } from '@/lib/ui/toast'
 import OrganizationAddUsersDialog from '@/features/accounts/components/OrganizationAddUsersDialog.vue'
+import type { Tables } from '@/lib/supabase/database.types'
 
 const {toast} = useToast()
 const accounts = useAccountsStore()
 const searchTerm = ref<string>('')
+
 const filteredUsers = computed(() => {
-  return accounts.activeSettings?.users?.filter(user => user.user_email.includes(searchTerm.value))
+  type User = Omit<Tables<'accounts_users_association'>, 'account_id'>
+  const roleValue = {owner: 1, admin: 2, member: 3}
+  return accounts.activeSettings?.users?.filter(user => user.user_email.includes(searchTerm.value)).sort((a: User, b: User) => roleValue[a.role] - roleValue[b.role]) || []
 })
+
 
 async function onDelete(email: string) {
   if (accounts.active?.id) {
@@ -54,14 +59,6 @@ async function onDelete(email: string) {
         <Button variant="outline">Invite member</Button>
       </OrganizationAddUsersDialog>
     </div>
-    <div v-if="accounts.activeSettings?.settings" class="border border-border bg-muted/50 rounded-lg p-4 flex items-center justify-between my-4">
-      <div>
-        <p class="text-sm text-muted-foreground">
-          <House class="size-5 inline-block mr-2"/> Owner: <span class="text-foreground font-medium">{{accounts.activeSettings.settings.owner_email}}</span>
-        </p>
-      </div>
-    </div>
-    <Skeleton v-else class="h-14 my-4"/>
     <div class="rounded-lg border border-border overflow-hidden">
       <table class="w-full text-sm text-left rtl:text-right text-muted-foreground">
         <thead class="text-xs text-muted-foreground/50 uppercase bg-muted/50">
@@ -82,6 +79,7 @@ async function onDelete(email: string) {
               {{ user.user_email }}
             </td>
             <td class="px-6 py-4">
+              <span v-if="user.role === 'owner'" class="bg-red-100 text-red-600 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">Owner</span>
               <span v-if="user.role === 'admin'" class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300">Admin</span>
               <span v-if="user.role === 'member'" class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Member</span>
             </td>

@@ -17,7 +17,7 @@ const accounts = useAccountsStore()
       <Button variant="outline">
         <template v-if="accounts.active">
           {{ accounts.active?.name }}
-          <Badge variant="secondary" class="ml-1" v-if="accounts.activeSettings?.subscription?.name">{{ accounts.activeSettings?.subscription?.name }}</Badge>
+          <Badge variant="secondary" class="ml-1" v-if="accounts.activeSettings?.subscription_tiers?.name">{{ accounts.activeSettings?.subscription_tiers?.name }}</Badge>
           <ChevronDown class="w-4 h-4 ml-1"/>
         </template>
         <Skeleton v-else class="h-4 w-24 mr-4"/>

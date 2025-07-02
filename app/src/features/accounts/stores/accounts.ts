@@ -8,25 +8,21 @@ import {
   getAllAccounts,
 } from '@/features/accounts/services/accounts'
 import { useSessionStore } from '@/features/auth/stores/session'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Tables } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 
 type Account = { id: string, name: string }
 interface AccountSettings{
-  settings?: Database["public"]["Tables"]["accounts"]["Row"]
+  settings?: Tables<"accounts">
   subscription_id?: number;
   subscription_expiration_date?: string | null;
-  subscription_tiers?: Partial<Database["public"]["Tables"]["subscription_tiers"]["Row"]> | null
-  users?: {
-    role: Database["public"]["Tables"]["accounts_users_association"]["Row"]["role"],
-    user_email: Database["public"]["Tables"]["accounts_users_association"]["Row"]["user_email"],
-    created_at: Database["public"]["Tables"]["accounts_users_association"]["Row"]["created_at"],
-  }[]
-  secrets?: Database["public"]["Tables"]["accounts_secrets"]["Row"][]
-  addresses?: Database["public"]["Tables"]["accounts_addresses"]["Row"][]
-  chainsParameters?: Database['public']['Tables']['accounts_chains_parameters']['Row'][]
-  currencies?: Database['public']['Tables']['accounts_currencies']['Row'][]
+  subscription_tiers?: Partial<Tables<"subscription_tiers">> | null
+  users?: Omit<Tables<"accounts_users_association">, 'account_id'>[]
+  secrets?: Tables<"accounts_secrets">[]
+  addresses?: Tables<"accounts_addresses">[]
+  chainsParameters?: Tables<"accounts_chains_parameters">[]
+  currencies?: Tables<"accounts_currencies">[]
 }
 
 export const useAccountsStore = defineStore('accounts', () => {
@@ -159,6 +155,5 @@ export const useAccountsStore = defineStore('accounts', () => {
   }
 
   
-
   return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, selectAccount }
 })

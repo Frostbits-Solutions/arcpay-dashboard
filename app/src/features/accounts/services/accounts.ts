@@ -255,3 +255,7 @@ export async function removeAccountCurrency(account_id: string, currency: number
     .eq('chain_id', chain_id)
   return { data, error }
 }
+
+export const createAccountApiKey = console.error('createAccountApiKey is deprecated, use createAccountSecret instead')
+export const getAccountApiKeys = console.error('getAccountApiKeys is deprecated, use getAccountSecrets instead')
+export const deleteAccountApiKey = console.error('deleteAccountApiKey is deprecated, use deleteAccountSecret instead')

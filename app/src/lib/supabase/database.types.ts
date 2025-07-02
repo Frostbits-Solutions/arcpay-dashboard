@@ -772,7 +772,7 @@ export type Database = {
       }
     }
     Enums: {
-      accounts_users_roles: "owner" | "admin" | "moderator" | "member"
+      accounts_users_roles: "owner" | "admin" | "member"
       assets_types: "arc72" | "offchain" | "asa"
       contract_tag_enum:
         | "clear"
