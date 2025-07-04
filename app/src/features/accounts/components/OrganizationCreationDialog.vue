@@ -38,7 +38,7 @@ const formSchema = toTypedSchema(z.object({
 async function onSubmit(values: any) {
   const session = useSessionStore()
   if (session?.user?.email) {
-    const {data, error} =  await createAccount(values.name, session.user.email)
+    const {data, error} =  await createAccount(values.name)
     if (error) {
       toast({
         title: `Error creating organization`,

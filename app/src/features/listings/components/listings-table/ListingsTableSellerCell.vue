@@ -8,7 +8,7 @@ import { useNetworksStore } from '@/features/network/stores/networks'
 
 const props = defineProps<{row: Row<CompositeListing>}>()
 const networks = useNetworksStore()
-const address = computed(() => props.row.original.seller_address)
+const address = computed(() => props.row.original.creator_address)
 const link = computed(() => {
   const prefix = networks?.activeNetwork?.split(':')?.[1] === 'testnet' ? 'testnet.' : ''
   return `https://${prefix}explorer.perawallet.app/address/${address.value}/`

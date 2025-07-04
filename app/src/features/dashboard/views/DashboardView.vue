@@ -7,7 +7,6 @@ import { useTransactionsStore } from '@/features/transactions/stores/transaction
 import { DataTable } from '@/lib/ui/data-table'
 import { columns } from '@/features/transactions/components/transactions-table/columns'
 import { useCurrenciesStore } from '@/features/currencies/stores/currencies'
-import type { Chain } from '@/models'
 
 const networks = useNetworksStore()
 const transactions = useTransactionsStore()
@@ -19,7 +18,7 @@ onMounted(async () => {
   const defaultNet = localStorage.getItem("defaultNetwork");
   networks.fetchChains();
   if (defaultNet) {
-    networks.setActive(defaultNet as Chain)
+    networks.setActive(defaultNet)
   } else {
     networks.setActive('algo:mainnet')
   }

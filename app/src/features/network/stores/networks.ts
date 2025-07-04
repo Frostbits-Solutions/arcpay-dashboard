@@ -1,41 +1,17 @@
-import { computed, h, ref } from 'vue'
+import { h, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { supabase } from '@/lib/supabase/supabaseClient'
-import { createClient } from 'arcpay-sdk'
 import type { Chain } from '@/models'
-import { useDark } from '@vueuse/core'
 import { getChains } from '@/features/network/services/network'
 import { toast } from '@/lib/ui/toast'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 
 export const useNetworksStore = defineStore('networks', () => {
-  const clients = ref<Record<string, any>>({})
-  const activeNetwork = ref<Chain | undefined>()
-  const networks = ref<Chain[]>([])
+  const activeNetwork = ref<string | undefined>()
+  const networks = ref<string[]>([])
 
-  const activeClient = computed(() => {
-    if (activeNetwork.value) return clients.value[activeNetwork.value]
-    else return undefined
-  })
-
-  const isDark = useDark({
-    onChanged(dark: boolean) {
-      if (activeClient.value) {
-        activeClient.value.toggleDarkMode(dark)
-      }
-    }
-  })
-
-  function setActive(network: Chain) {
-    if (!clients.value[network]) {
-      clients.value[network] = createClient(network, {
-        //@ts-ignore
-        client: supabase,
-        darkMode: isDark.value
-      })
-    }
-    activeNetwork.value = network
-    localStorage.setItem("defaultNetwork", network)
+  function setActive(chain_id: string) {
+    activeNetwork.value = chain_id
+    localStorage.setItem("defaultNetwork", chain_id)
   }
 
   async function fetchChains() {
@@ -49,9 +25,9 @@ export const useNetworksStore = defineStore('networks', () => {
         action: h(ToastError)
       })
     } else {
-      networks.value = data
+      networks.value = data.map((chain: Chain) => chain.id)
     }
   }
 
-  return { activeNetwork, activeClient, networks, fetchChains, setActive }
+  return { activeNetwork, networks, fetchChains, setActive }
 })

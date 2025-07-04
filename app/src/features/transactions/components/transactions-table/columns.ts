@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { TransactionWithListings } from '@/models'
+import type { Transaction } from '@/models'
 import TransactionsTableAmountCell from '@/features/transactions/components/transactions-table/TransactionsTableAmountCell.vue'
 import TransactionsTableTypeCell from '@/features/transactions/components/transactions-table/TransactionsTableTypeCell.vue'
 import TransactionsTableIdCell from '@/features/transactions/components/transactions-table/TransactionsTableIdCell.vue'
@@ -8,7 +8,7 @@ import TransactionsTableFromCell from '@/features/transactions/components/transa
 import TransactionsTableListingCell from '@/features/transactions/components/transactions-table/TransactionsTableListingCell.vue'
 import TransactionsTableDateCell from '@/features/transactions/components/transactions-table/TransactionsTableDateCell.vue'
 
-export const columns: ColumnDef<TransactionWithListings>[] = [
+export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: 'created_at',
     header: () => h('div', { class: 'text-left' }, ''),

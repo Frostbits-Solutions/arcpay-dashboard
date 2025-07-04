@@ -31,9 +31,17 @@ const network = useNetworksStore()
 
 const { toast } = useToast()
 
-const hasProSubscription : Ref<boolean> = ref(accounts.activeSettings.subscription?.allow_secondary_listings ?? false)
-const chains : Ref<Chain[]> = ref(network.networks)
+const hasProSubscription : Ref<boolean> = ref(accounts.activeSettings.subscription_tiers?.allow_secondary_listings ?? false)
+const chains : Ref<string[]> = ref(network.networks)
 const activeChainTab = ref(0)
+const activeChainParameter: Ref<AccountsChainsParameter>= ref({
+  account_id: '',
+  created_at: '',
+  chain_id: '',
+  enable_secondary: false,
+  secondary_fee_address: null,
+  secondary_percentage_fee: 0,
+})
 
 const formSchema = toTypedSchema(z.object({
   enable_secondary: z.boolean().optional(),
@@ -43,15 +51,6 @@ const formSchema = toTypedSchema(z.object({
     .max(50, "Percentage must be at most 50.00%"),
   secondary_fee_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid chain address") // Regex for Ethereum-like addresses
 }))
-
-const activeChainParameter: Ref<AccountsChainsParameter>= ref({
-          account_id: 0,
-          created_at: '',
-          chain_id: '',
-          enable_secondary: false,
-          secondary_fee_address: null,
-          secondary_percentage_fee: 0,
-        })
 
 const form = useForm({
   validationSchema: formSchema,
@@ -77,13 +76,13 @@ async function onDeleteAccountAddress(address: string) {
   }
 }
 
-function updateChainParamFormValues() {
+function resetForm() {
   const selectedChain = chains.value[activeChainTab.value];
   if (!selectedChain || !accounts.active || !accounts.activeSettings.chainsParameters) return;
 
   // Find the chain parameter for the selected chain
   const chainParameter = accounts.activeSettings.chainsParameters.find(
-    (c) => c.chain_id === selectedChain.id
+    (c) => c.chain_id === selectedChain
   );
 
   // Update the activeChainParameter based on the found chain parameter or set default values
@@ -92,7 +91,7 @@ function updateChainParamFormValues() {
     : {
         account_id: accounts.active.id,
         created_at: '',
-        chain_id: selectedChain.id,
+        chain_id: selectedChain,
         enable_secondary: false,
         secondary_fee_address: null,
         secondary_percentage_fee: 0,
@@ -112,7 +111,7 @@ const onChainParamFormSubmit = form.handleSubmit(async (values) => {
   if (!hasProSubscription.value || !accounts.active?.id || !accounts.activeSettings.chainsParameters) return;
 
   const accountId = activeChainParameter.value.account_id;
-  const chainId = chains.value[activeChainTab.value].id;
+  const chainId = chains.value[activeChainTab.value];
 
   // Check if chain parameter already exists
   const existingChainParameter = accounts.activeSettings.chainsParameters.find(
@@ -156,7 +155,7 @@ const onChainParamFormSubmit = form.handleSubmit(async (values) => {
 watch(
   () => accounts,
   () => {
-    updateChainParamFormValues();
+    resetForm();
   },
   { deep: true }
 );
@@ -164,7 +163,7 @@ watch(
 watch(
   activeChainTab,
   () => {
-    updateChainParamFormValues();
+    resetForm();
   },
   { immediate: true }
 );
@@ -185,7 +184,7 @@ watch(
     </div>
     <div class="rounded-lg border border-border overflow-hidden">
       <table class="w-full text-sm text-left rtl:text-right text-muted-foreground">
-        <thead class="text-xs text-muted-foreground/50 uppercase bg-muted/50">
+        <thead class="text-xs text-muted-foreground/50 border-b">
         <tr>
           <th scope="col" class="px-6 py-3 w-[512px]">
             Address
@@ -248,14 +247,14 @@ watch(
         <div class="flex border-b border-border pt-8">
           <button
             v-for="(chain, index) in chains"
-            :key="chain.id"
+            :key="chain"
             @click="activeChainTab = index"
             :class="[
               'px-4 py-2 text-sm',
               activeChainTab === index ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground',
             ]"
           >
-            {{ chain.id }}
+            {{ chain }}
           </button>
         </div>
         <form  
@@ -264,13 +263,13 @@ watch(
           @submit="onChainParamFormSubmit"
         >
           <div>
-            <div v-for="(chain, index) in chains" :key="chain.id" v-show="activeChainTab === index" class="mt-4">
+            <div v-for="(chain, index) in chains" :key="chain" v-show="activeChainTab === index" class="mt-4">
               <!-- Enable Secondary Listing -->
               <FormField v-slot="{ value, handleChange }" name="enable_secondary">
                 <FormItem>
                   <div class="flex items-center justify-between px-4 py-4">
                     <div>
-                      <FormLabel>Enable secondary listing for {{ chain.id }}</FormLabel>
+                      <FormLabel>Enable secondary listing for {{ chain }}</FormLabel>
                       <FormDescription>
                         Allow fees on secondary listings for this chain.
                       </FormDescription>

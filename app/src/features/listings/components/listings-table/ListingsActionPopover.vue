@@ -20,7 +20,7 @@ const props = defineProps<{id: string}>()
       </Button>
     </PopoverTrigger>
     <PopoverContent class="p-1">
-      <Button variant="ghost" class="w-full justify-start" @click="networks?.activeClient?.cancel(id)">
+      <Button variant="ghost" class="w-full justify-start" @click="console.log('Arcpay SDK - Cancel')">
         <Trash2 class="size-4 mr-2"/>
         Cancel
       </Button>

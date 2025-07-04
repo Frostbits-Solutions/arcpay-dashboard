@@ -1,20 +1,8 @@
 <script lang="ts" setup>
-import type { Chain } from '@/models'
-import { onMounted } from 'vue'
-import { createClient } from 'arcpay-sdk'
 import { useDark } from '@vueuse/core'
 
-const props = defineProps<{ id: string, chain: Chain }>()
-const arcpay = createClient(props.chain, {
-  apiKey: import.meta.env.VITE_ARCPAY_API_KEY
-})
-
+const props = defineProps<{ id: string, chain: string }>()
 const isDark = useDark()
-
-onMounted(() => {
-  arcpay.toggleDarkMode(isDark.value)
-  arcpay.buy(props.id)
-})
 </script>
 
 <template>

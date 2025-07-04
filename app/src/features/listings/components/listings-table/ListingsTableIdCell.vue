@@ -12,7 +12,7 @@ const networks = useNetworksStore()
 </script>
 
 <template>
-  <Button variant="ghost" class="justify-start relative gap-1 pr-8" @click="networks.activeClient?.buy(id)">
+  <Button variant="ghost" class="justify-start relative gap-1 pr-8" @click="console.log('Arcpay SDK - View Listing')">
     <span class="w-48 truncate">{{ id }}</span>
     <ArrowUpRight class="w-4 h-4 text-muted-foreground/20 absolute top-2 right-2"/>
   </Button>
