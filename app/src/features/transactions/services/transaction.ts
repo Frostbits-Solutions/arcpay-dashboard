@@ -1,22 +1,21 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
-import type { Chain } from '@/models'
 import { type RealtimePostgresInsertPayload, SupabaseClient } from '@supabase/supabase-js'
 
-export async function getTransactions(app_ids: string[], chain: Chain) {
+export async function getTransactions(app_ids: string[], chain: string) {
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
-      .eq('chain', chain)
+      .eq('chain_id', chain)
       .in('app_id', app_ids)
     return { data, error }
 }
 
-export async function getTransactionsListings(account_id: number, chain: Chain){
+export async function getTransactionsListings(account_id: string, chain: string){
   const { data, error } = await supabase
     .from('transactions')
     .select('*, listings!inner( * )')
     .eq('listings.account_id', account_id)
-    .eq('chain', chain)
+    .eq('chain_id', chain)
     .order('created_at', { ascending: false })
   return { data, error }
 }
@@ -46,12 +45,12 @@ export function subscribeToTransactions(
   })
   return room
 }
-export async function getHourlyTransactionsCount(account_id: number, chain: Chain){
-  const { data, error } = await supabase.rpc('get_hourly_transactions_timeseries', {account_id, chain})
+export async function getHourlyTransactionsCount(account_id: string, chain: string){
+  const { data, error } = await supabase.rpc('get_hourly_transactions_timeseries', {account_id, chain_id: chain})
   return { data, error }
 }
 
-export async function getDailySalesVolume(account_id: number, chain: Chain){
-  const { data, error } = await supabase.rpc('get_daily_sales_volume_timeseries', {account_id, chain})
+export async function getDailySalesVolume(account_id: string, chain: string){
+  const { data, error } = await supabase.rpc('get_daily_sales_volume_timeseries', {account_id, chain_id: chain})
   return { data, error }
 }

@@ -3,7 +3,6 @@ import { Button } from '@/lib/ui/button'
 import { ChevronDown, Check, GlobeLock } from 'lucide-vue-next'
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover'
 import { useNetworksStore } from '@/features/network/stores/networks'
-import type { Chain } from '@/models'
 
 const networks = useNetworksStore()
 const supportedNetworks = ['algo:mainnet', 'algo:testnet', 'voi:mainnet']
@@ -21,7 +20,7 @@ const supportedNetworks = ['algo:mainnet', 'algo:testnet', 'voi:mainnet']
     <PopoverContent side="bottom" align="start" class="p-1">
       <ul class="text-foreground pb-1">
         <li v-for="network in supportedNetworks" :key="network" class="[&:not(:first-child)]:mt-1 [&:not(:last-child)]:mb-1">
-          <Button variant="ghost" :class="['w-full justify-between px-2 rounded-sm', network === networks.activeNetwork?'bg-muted/70':'']" @click.prevent="networks.setActive(network as Chain)">
+          <Button variant="ghost" :class="['w-full justify-between px-2 rounded-sm', network === networks.activeNetwork?'bg-muted/70':'']" @click.prevent="networks.setActive(network)">
             <span class="truncate">
               {{ network }}
             </span>

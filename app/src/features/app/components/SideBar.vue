@@ -16,8 +16,7 @@ const account = useAccountsStore()
 const networks = useNetworksStore()
 
 function onCreateClick() {
-  networks.activeClient?.toggleDarkMode(isDark.value)
-  networks.activeClient?.create({accountId: account.active?.id})
+  console.log('Call arcpay SDK')
 }
 </script>
 

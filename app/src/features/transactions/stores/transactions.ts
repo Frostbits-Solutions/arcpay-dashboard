@@ -12,7 +12,7 @@ import { useToast } from '@/lib/ui/toast'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/network/stores/networks'
 import utc from 'dayjs/plugin/utc'
-import type { TransactionWithListings } from '@/models'
+import type { Transaction } from '@/models'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { getAccountActiveListingsAppids } from '@/features/accounts/services/accounts'
 import {supabase} from '@/lib/supabase/supabaseClient'
@@ -26,7 +26,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const accounts = useAccountsStore()
   const networks = useNetworksStore()
   const loading = ref(false)
-  const list = ref<TransactionWithListings[]>([])
+  const list = ref<Transaction[]>([])
   const totalSalesVolumes = ref<Record<string, number>>({})
   const top5CurrenciesByVolume = ref<string[]>([])
   const hourlyTransactionsTimeseries = ref<HourlyTransactionsTimeseries>([])

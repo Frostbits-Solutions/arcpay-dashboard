@@ -1,12 +1,11 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
-import type { Chain } from '@/models'
 
-export async function getListings(account_id: number, chain: Chain) {
+export async function getListings(account_id: string, chain: string) {
   const { data, error } = await supabase
     .from('listings')
     .select('*, auctions( * ), sales( * ), dutch_auctions( * )')
     .eq('account_id', account_id)
-    .eq('chain', chain)
+    .eq('chain_id', chain)
     .order('created_at', { ascending: false })
   return { data, error }
 }

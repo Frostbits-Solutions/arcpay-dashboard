@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { TransactionWithListings } from '@/models'
+import type { Transaction } from '@/models'
 import { computed } from 'vue'
 import { Badge } from '@/lib/ui/badge'
 
-const props = defineProps<{row: Row<TransactionWithListings>}>()
+const props = defineProps<{row: Row<Transaction>}>()
 const type = computed(() => props.row.original.type)
 </script>
 

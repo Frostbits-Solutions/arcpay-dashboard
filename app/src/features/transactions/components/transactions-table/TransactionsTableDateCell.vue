@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { TransactionWithListings } from '@/models'
+import type { Transaction } from '@/models'
 import { computed } from 'vue'
 import { formatDate } from '@/lib/utils'
 
-const props = defineProps<{row: Row<TransactionWithListings>}>()
+const props = defineProps<{row: Row<Transaction>}>()
 const date = computed(() => formatDate(props.row.original.created_at))
 </script>
 

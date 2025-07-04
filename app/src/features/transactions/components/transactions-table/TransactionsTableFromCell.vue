@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { TransactionWithListings } from '@/models'
+import type { Transaction } from '@/models'
 import { computed } from 'vue'
 import Jazzicon from '@/lib/ui/jazzicon/Jazzicon.vue'
 import { ArrowUpRight } from 'lucide-vue-next'
 import { useNetworksStore } from '@/features/network/stores/networks'
 
-const props = defineProps<{row: Row<TransactionWithListings>}>()
+const props = defineProps<{row: Row<Transaction>}>()
 const networks = useNetworksStore()
 const from = computed(() => props.row.original.from_address)
 const link = computed(() => {

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { TransactionWithListings } from '@/models'
+import type { Transaction } from '@/models'
 import { useCurrenciesStore } from '@/features/currencies/stores/currencies'
 import { computed } from 'vue'
 
-const props = defineProps<{row: Row<TransactionWithListings>}>()
+const props = defineProps<{row: Row<Transaction>}>()
 const currencies = useCurrenciesStore()
 const currency = computed(() => {
   const id = props.row.original.currency || '0'

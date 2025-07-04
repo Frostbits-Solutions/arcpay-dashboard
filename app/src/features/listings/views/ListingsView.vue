@@ -13,8 +13,8 @@ const accounts = useAccountsStore()
 const listings = computed<CompositeListing[]>(() => listingsStore.list || [])
 const primaryAddresses = computed<string[]>(() => accounts.activeSettings.addresses?.map(a => a.address) || [])
 
-const primaryListings = computed(() => listings.value.filter(listing => primaryAddresses.value.includes(listing.seller_address)))
-const secondaryListings = computed(() => listings.value.filter(listing => !primaryAddresses.value.includes(listing.seller_address)))
+const primaryListings = computed(() => listings.value.filter(listing => primaryAddresses.value.includes(listing.creator_address)))
+const secondaryListings = computed(() => listings.value.filter(listing => !primaryAddresses.value.includes(listing.creator_address)))
 
 
 onMounted(async () => {

@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
 import type { PostgrestError } from '@supabase/supabase-js'
-import type { Chain } from '@/models'
 import type { Database } from '@/lib/supabase/database.types'
 
 type MembershipsRoles = Database['public']['Enums']['accounts_users_roles']
@@ -185,7 +184,7 @@ export async function getAccountSubscription(account_id: string) {
   return { data, error }
 }
 
-export async function getAccountActiveListingsAppids(account_id: string, chain: Chain) {
+export async function getAccountActiveListingsAppids(account_id: string, chain: string) {
   const { data, error } = await supabase.from('listings').select('app_id').eq('account_id', account_id).in('status', ['pending', 'active']).eq('chain', chain)
   return { data, error }
 }

@@ -61,7 +61,7 @@ async function onDelete(email: string) {
     </div>
     <div class="rounded-lg border border-border overflow-hidden">
       <table class="w-full text-sm text-left rtl:text-right text-muted-foreground">
-        <thead class="text-xs text-muted-foreground/50 uppercase bg-muted/50">
+        <thead class="text-xs text-muted-foreground/50 border-b">
         <tr>
           <th scope="col" class="px-6 py-3">
             Email
