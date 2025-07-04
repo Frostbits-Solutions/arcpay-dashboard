@@ -27,9 +27,9 @@ const supabaseUrl = 'http://127.0.0.1:54321';
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 const apiUrl = `${supabaseUrl}/rest/v1/rpc/validate_jwt_request`;
 const testSecret = 'testSecret';
-const accountJwtSecret = '27b0f9be-b08d-4f61-9686-c22682e487f0'; // Set your account secret here
-const validAccountId = '843ab940-1e83-40b4-b359-837f386a34f8'; // Set a valid account ID with authenticate_clients set to true
-const disabledAuthAccountId = 'dcb0a48a-82a9-42d1-9730-b19c484ab815'; // Set a valid account ID with authenticate_clients set to false
+const accountJwtSecret = ''; // Set your account secret here
+const validAccountId = ''; // Set a valid account ID with authenticate_clients set to true
+const disabledAuthAccountId = ''; // Set a valid account ID with authenticate_clients set to false
 const now = Math.floor(Date.now() / 1000);
 
 // Helper to generate a valid JWT for tests
