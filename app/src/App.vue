@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDark } from '@vueuse/core'
-import { Toaster } from '@/components/ui/toast'
+import { Toaster } from '@/lib/ui/toast'
 
 useDark({
   selector: 'body',

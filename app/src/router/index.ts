@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AuthView from '@/views/AuthView.vue'
-import { useSessionStore } from '@/stores/session'
-import ListingsView from '@/views/ListingsView.vue'
-import OrganizationSettingsView from '@/views/OrganizationSettingsView.vue'
-import OrganizationSettingsGeneral from '@/components/organization/OrganizationSettingsGeneral.vue'
-import OrganizationSettingsSecurity from '@/components/organization/OrganizationSettingsSecurity.vue'
-import OrganizationSettingsUsers from '@/components/organization/OrganizationSettingsUsers.vue'
-import OrganizationSettingsListings from '@/components/organization/OrganizationSettingsListings.vue'
-import DashboardView from '@/views/DashboardView.vue'
-import DirectLinkView from '@/views/DirectLinkView.vue'
-import AuthenticatedView from '@/views/AuthenticatedView.vue'
+import AuthView from '@/features/auth/views/AuthView.vue'
+import { useSessionStore } from '@/features/auth/stores/session'
+import ListingsView from '@/features/listings/views/ListingsView.vue'
+import AccountSettingsView from '@/features/accounts/views/AccountSettingsView.vue'
+import OrganizationSettingsGeneral from '@/features/accounts/components/OrganizationSettingsGeneral.vue'
+import OrganizationSettingsSecurity from '@/features/accounts/components/OrganizationSettingsSecurity.vue'
+import OrganizationSettingsUsers from '@/features/accounts/components/OrganizationSettingsUsers.vue'
+import OrganizationSettingsListings from '@/features/accounts/components/OrganizationSettingsListings.vue'
+import DashboardView from '@/features/dashboard/views/DashboardView.vue'
+import DirectLinkView from '@/features/directlink/views/DirectLinkView.vue'
+import AuthenticatedView from '@/features/auth/views/AuthenticatedView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,7 +39,7 @@ const router = createRouter({
         {
           path: '/organization/:name/settings',
           name: 'organization-organization',
-          component: OrganizationSettingsView,
+          component: AccountSettingsView,
           children: [
             {
               path: '',

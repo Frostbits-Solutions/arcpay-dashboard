@@ -8,7 +8,7 @@ enabled = true
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. public and storage are always included.
-schemas = ["public", "storage", "graphql_public"]
+schemas = ["public", "graphql_public"]
 # Extra schemas to add to the search_path of every request. public is always included.
 extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
@@ -35,6 +35,20 @@ pool_mode = "transaction"
 default_pool_size = 20
 # Maximum number of client connections allowed.
 max_client_conn = 100
+
+[db.migrations]
+schema_paths = [
+    "./schemas/init.sql",
+    "./schemas/chains.sql",
+    "./schemas/currencies.sql",
+    "./schemas/subscription_tiers.sql",
+    "./schemas/accounts.sql",
+    "./schemas/contracts.sql",
+    "./schemas/listings.sql",
+    "./schemas/transactions.sql",
+    "./schemas/realtime.sql",
+  "./schemas/*.sql"
+]
 
 [realtime]
 enabled = true
@@ -69,9 +83,9 @@ file_size_limit = "50MiB"
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://127.0.0.1:3000"
+site_url = "http://localhost:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+additional_redirect_urls = ["https://localhost:3000"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # If disabled, the refresh token will never expire.
@@ -89,7 +103,7 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+enable_confirmations = true
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
@@ -102,7 +116,7 @@ enable_signup = true
 # If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = false
 # Template for sending OTP to users
-template = "Your code is {{ .Code }} ."
+template = "Your code is {{ .Code }}"
 
 # Use pre-defined map of phone number to OTP for testing.
 [auth.sms.test_otp]

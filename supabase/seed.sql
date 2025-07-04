@@ -1,30 +1,32 @@
-INSERT INTO "public"."subscription_tiers" ("name", "listing_flat_fee", "sale_percentage_fee", "allow_secondary_sales", "secondary_listing_flat_fee", "secondary_sale_percentage_fee", "allow_premium_contracts", "duration") VALUES ('free', '100', '2', 'false', null, null, 'false', null);
-INSERT INTO "public"."currencies" ("id", "chain", "name", "ticker", "icon", "type", "decimals", "visible") VALUES
+-- Partition transactions table
+DO $$
+DECLARE partition_name text='transactions_' || to_char(CURRENT_DATE, 'YYYY_MM_DD');
+BEGIN
+    EXECUTE 'CREATE TABLE ' || partition_name || ' PARTITION OF public.transactions
+        FOR VALUES FROM (CURRENT_DATE) TO (CURRENT_DATE + INTERVAL ''1 day'')';
+    EXECUTE format('ALTER TABLE "public"."%I" ENABLE ROW LEVEL SECURITY', partition_name);
+    EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "anon"', partition_name);
+    EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "authenticated"', partition_name);
+    EXECUTE format('GRANT ALL ON TABLE "public"."%I" TO "service_role"', partition_name);
+    EXECUTE format('CREATE POLICY "Enable read access for all users" ON "public"."%I" FOR SELECT USING (true)', partition_name);
+END $$;
+SELECT cron.schedule('create_daily_transactions_partition', '0 0 * * *', 'SELECT "private"."create_daily_transactions_partition"();');
+
+-- Seed data
+INSERT INTO "public"."chains" ("id") VALUES
+('voi:testnet'),
+('voi:mainnet'),
+('algo:testnet'),
+('algo:mainnet');
+INSERT INTO "public"."subscription_tiers" ("name", "allow_secondary_listings", "allow_custom_currencies", "duration") VALUES ('free', false, false, null);
+INSERT INTO "public"."subscriptions_chains_parameters" ("subscription_id", "chain_id", "flat_fees", "sales_fees", "secondary_flat_fees", "secondary_sales_fees") VALUES
+(1, 'voi:testnet', 1000, 0.2, 1000, 0.2),
+(1, 'voi:mainnet', 1000, 0.2, 1000, 0.2),
+(1, 'algo:testnet', 10, 0.2, 20, 0.2),
+(1, 'algo:mainnet', 10, 0.2, 20, 0.2);
+INSERT INTO "public"."currencies" ("id", "chain_id", "name", "ticker", "icon", "type", "decimals", "is_public") VALUES
 ('0', 'voi:testnet', 'voi', 'voi', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAACl0lEQVQ4jY2VwUtUURTGf/fOzBtncsTIQCfFIlPHiIpsIbTQFoU7BZVauIhaWrpK8g8IykUulCA3FrRxsLSIqISSCoKKQBEqJiLLdKWmzTjz3sy7Ld5zeDO+CT+4vMt3zvnOvYfzzhW9DQu4QAPa7NUEhAEd+AV8Ah4CUzaXA6+LWDtwE6hxSVJvr/NADOgHHjidpGPvAW7YDvlibqgBJuwYj9sJrwNXdyCUj62YfucJO5xiCjBSJsmEiZ40UQoQIBQYukkyaWKkTITKEe3YEtSAW86URkpRVa/R0h3iUGMRRkqBgs2kSfl+jeZzISJNAQzDSm5jCNC8QCdQucVuxk0OHPFzaXgPZdU+4msZxvpWePMsTl2dxsWRMsK1PvSEyf2BFd4/SqEFTIB9QJfEag3AvlJaETlVRFm1D4BdpR5ar5QQ9AtaLoQI11q8FpRETqcwMZyXa5PAyWztBHilYGFeJ76WyXpVRjR6bu/l6NlgljMzGV5OxfD5lVOwUQLlTqYoKJmb2WTuRSLLaQHB8dYgpeXZ7mD23TKfZwJ4ZE4rV0jyut3rBRQ8H/3L6lIGN6QzacYGvrLbX7HNJoElJ2EqKC6RfJ/XeTu+4So4fW8RfTnsZlqSwGw+ayoIhQTTo+v8/pJTdBJ/TF7f8aB5g/lhAB8kMOlmkR5BMq54MrRmNbaNV3c32FhVbiEAk6K3YUEDvuHoRScMXdHcXcyxM0F+zOo8HV4nnVYIsc11ETgo7PHVCYwXSmukFD6/wEiZeLwC6dmuBnQBUQkwNF8VBQYLCfr8wv7KQmKDQBRyx9c1YLiQ6H8wYseSFew7/BMgA1zGmhqxHQjFsErVY8cC7hN7AnhsO7cDJ7B+fLAK/xHrCYji8gT8A4dR1BOLPGfhAAAAAElFTkSuQmCC', 'voi', '6', 'true'),
 ('0', 'voi:mainnet', 'voi', 'voi', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAACl0lEQVQ4jY2VwUtUURTGf/fOzBtncsTIQCfFIlPHiIpsIbTQFoU7BZVauIhaWrpK8g8IykUulCA3FrRxsLSIqISSCoKKQBEqJiLLdKWmzTjz3sy7Ld5zeDO+CT+4vMt3zvnOvYfzzhW9DQu4QAPa7NUEhAEd+AV8Ah4CUzaXA6+LWDtwE6hxSVJvr/NADOgHHjidpGPvAW7YDvlibqgBJuwYj9sJrwNXdyCUj62YfucJO5xiCjBSJsmEiZ40UQoQIBQYukkyaWKkTITKEe3YEtSAW86URkpRVa/R0h3iUGMRRkqBgs2kSfl+jeZzISJNAQzDSm5jCNC8QCdQucVuxk0OHPFzaXgPZdU+4msZxvpWePMsTl2dxsWRMsK1PvSEyf2BFd4/SqEFTIB9QJfEag3AvlJaETlVRFm1D4BdpR5ar5QQ9AtaLoQI11q8FpRETqcwMZyXa5PAyWztBHilYGFeJ76WyXpVRjR6bu/l6NlgljMzGV5OxfD5lVOwUQLlTqYoKJmb2WTuRSLLaQHB8dYgpeXZ7mD23TKfZwJ4ZE4rV0jyut3rBRQ8H/3L6lIGN6QzacYGvrLbX7HNJoElJ2EqKC6RfJ/XeTu+4So4fW8RfTnsZlqSwGw+ayoIhQTTo+v8/pJTdBJ/TF7f8aB5g/lhAB8kMOlmkR5BMq54MrRmNbaNV3c32FhVbiEAk6K3YUEDvuHoRScMXdHcXcyxM0F+zOo8HV4nnVYIsc11ETgo7PHVCYwXSmukFD6/wEiZeLwC6dmuBnQBUQkwNF8VBQYLCfr8wv7KQmKDQBRyx9c1YLiQ6H8wYseSFew7/BMgA1zGmhqxHQjFsErVY8cC7hN7AnhsO7cDJ7B+fLAK/xHrCYji8gT8A4dR1BOLPGfhAAAAAElFTkSuQmCC', 'voi', '6', 'true'),
 ('0', 'algo:testnet', 'algo', 'algo', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB+klEQVQ4jaWVP4saYRDGHz3YdAEFyxUrKwu3USz8Blok0SVwQVNZilj4DSzOyj+pt7Qwh9hZqbCyn8AixkPuwIAgWLjLogb1SaEeRneNXB6YZt6ZH/O+M8wLWEsAIAOoA3gGsAZgAPhx8CUPMTfpA4AnAPyHPQH4eA10B+DhBtC5PRxyL/QW2Cn0LyWuJXg8HmqaxuFwyEgkYheXOMIEAJNrwGKxyKPy+bxd3C8Awh2AzwC+2j1sIBBArVbDcrnEer2G2+2GrutYLBYwDOM09D2AEQB8v1Zds9nkZrNhKpVivV7nbrfjZDJhKBSyin8EgBc7mCzLXK1WbLfbBMBqtUqSrFQqdDqdVjkvALCygrlcLvb7fW63W0qSRFEUORgMSJKFQsHuRmsA0K0Os9nsazUAWC6XXxvTarUoCIIt8Of5gc/n43g85nQ6pSiKDAaD1HWdqqqy1+txNpvR7/fbXvmiKaVSiSSZy+UIgN1ul6ZpMhwOM5PJkCRlWbZtyv2pMxqN0jAMappGQRCYTqdJko1GgwAYi8VomiYVRbECfgHOBltRFM7nc8bjcTocDnY6HY5GI0qSRAD0er1UVZX9ft9qsN8dhzJ5bRZvtCTOVPoPWOkcBuxXUO0NsG+wWV9HfcLtCzZhw7iQgH33H7H/An4f7Pngu4fNF/AHyizBiLQAefwAAAAASUVORK5CYII=', 'algo', '6', 'true'),
 ('0', 'algo:mainnet', 'algo', 'algo', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB+klEQVQ4jaWVP4saYRDGHz3YdAEFyxUrKwu3USz8Blok0SVwQVNZilj4DSzOyj+pt7Qwh9hZqbCyn8AixkPuwIAgWLjLogb1SaEeRneNXB6YZt6ZH/O+M8wLWEsAIAOoA3gGsAZgAPhx8CUPMTfpA4AnAPyHPQH4eA10B+DhBtC5PRxyL/QW2Cn0LyWuJXg8HmqaxuFwyEgkYheXOMIEAJNrwGKxyKPy+bxd3C8Awh2AzwC+2j1sIBBArVbDcrnEer2G2+2GrutYLBYwDOM09D2AEQB8v1Zds9nkZrNhKpVivV7nbrfjZDJhKBSyin8EgBc7mCzLXK1WbLfbBMBqtUqSrFQqdDqdVjkvALCygrlcLvb7fW63W0qSRFEUORgMSJKFQsHuRmsA0K0Os9nsazUAWC6XXxvTarUoCIIt8Of5gc/n43g85nQ6pSiKDAaD1HWdqqqy1+txNpvR7/fbXvmiKaVSiSSZy+UIgN1ul6ZpMhwOM5PJkCRlWbZtyv2pMxqN0jAMappGQRCYTqdJko1GgwAYi8VomiYVRbECfgHOBltRFM7nc8bjcTocDnY6HY5GI0qSRAD0er1UVZX9ft9qsN8dhzJ5bRZvtCTOVPoPWOkcBuxXUO0NsG+wWV9HfcLtCzZhw7iQgH33H7H/An4f7Pngu4fNF/AHyizBiLQAefwAAAAASUVORK5CYII=', 'algo', '6', 'true'),
-('40427782', 'voi:testnet', 'TacoCoin', 'Tacos', null, 'arc200', '0', 'false'),
-('48703447', 'voi:testnet', 'UNIT', 'UNIT', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFCklEQVQ4jX2Ue1DTBQDHP9t4iGyAyGOCjB+oyOvclIckD0GhVErz0lTMOzlB6cSuK6+zszutzGdZ9jgtKs06Ka3OJPIRqadgDgFRmBvgwZRtgC7YGIzn9uuv7rzT/P7/+dz3r49EFEX+b73N5dlWbe0lH9FMsAC6RgWhM5X4xWXM9pu+uPFJjORJwvvVBwtsZ/YU1ly2TreM+wiBSbMYEnu4c72POLkdjYrWoHh1c8Tydz4OU6+ofqqwZndaueUXbdpdVYLQEZNL0NRw6nVmWq2jpCSGE4ET060mlKbbJMvuGZPfLC2LW/nZ7v946aOyi9uEs6ZKbdqdF7cK2swtzEvWIOobYWyQVfNjKMlQ4bDaODkShaRgBXXTcoTfCz4vrtlXuOexh/WfPH9Y/3XlomuFe4U6+QzCGxuRWTtpDY0gdVY0YV0dPOjQc71zmLC0pbwa+zvxMWZamwIQ7FWNo6lf7VBnFp+RAphqy7Pbv6hcVJ3/hnA+LJ1lbT+yNb6SwKm9pKVGc9/wkHrzKAOBkWxev4ic0D6W7ldgvuFF+hwLf7mDNb9+uPFdANnOnTvp+rJozzWbJONc/ItQexVX1RlK55tYmDaZBJcBTZoXhpEA5E45XW1dHDpwinXF01iS6CD52V4q2jSskbUOhyo9Bj0Gu/WKjrpaTUPIy0gtFtaoPNhRFYdz41X27+rHipQpgzc4utyLdns4F64McL4ykcwFFr7f8BeW3O0UpCgY190SHmrPlslKX8q21p07FX7VHY3oOYENa3LJnB1B9fhkqo9cICrURUeDG9H0ACGoh6w8XyKV41x+9Q8KjwexpGQFbd1DjN1rJ1HRioePpAf/EOgyDOBy29HqzCQEjPP6tlfYNzJE2ZnfkAyaWDwxAj8hkBNvV2G+CRe9laSUFsGdW9iH/WnuduGVYEfqdo0j9QJN/nymqBPotvbTqL+P3P6QeQufIW/vAWJKt7C3aggCasl9N5ZdTCawpIjNL6nx9xZRDHWjnJ1Mpw08bENKXAMgdViwtAyjXKamzzKGw9qDsacfT183JaUr8U3QsOnTY7y35CqHPljAnxZPtOdqmJOpJtrpZlhXi9QiR9LfY/C9/nrs9R9NSYmylFw8vT1wOOwEuJ1EzU1l/683WC34EJM6B4MYgE1bQ+7ECjqd07GGZnCr3Uyz3sx6x2kKC7KRKkJmDgZGpt+O7KtnrnoqUaogym/3UWlwMnHcyaZlSZyu1nP6h18I/qeVqTnzqY95H7+M5Rg6TIziTXqsnDlyjK7ovA0SURRpu/JT9o23Vh+1Zq8QHkzJYqS3i0mhkzDojfiMOpk1Q0Vb7wCRUSE4bUN89F01Mh9vXlg4mw7Rh7yGA2QE2xuyTohJUoAZWasuRy5ffCHk5s9G2z0duj4ZiSEKkjWJDPqFUl3TQHqsCm3bEM3WETaunUtxUT4NYwqm3TlFrM1uVK4r2/FYbS5ujau4f8WQ2DSvWNC7gpgw4EBIicdgsSK26Aj2EnFExPFQ5k+99iZr+i+xxG0yTiksOZq++fB7T8xXxebYSsndlnid70zhQid4CQnEL32Zgyf/hsqfWbtKzaSAcHwbviUn2GWc9Nym46lbjux4amCvHdv+2vDF3Wvv3SWkvRdBlTWLll43ss5m5HYI8cEYm5dcF7XyrUOqlJVPD+yjaz33zfP9Lc0Vo/80ERTkwj4WjWdYJMFxSUnhmvyGJzH/Aus5OVhyt/ChAAAAAElFTkSuQmCC', 'arc200', '0', 'false'),
-('51060671', 'voi:testnet', 'Testnet Phase 2 Points', 'POINTS', null, 'arc200', '6', 'false'),
-('57774022', 'voi:testnet', 'Nautilus', 'NAUT', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAESElEQVQ4jV2UW2yURRiGn/n/3f2X3XZ3e9jSAz3T0lBACgoKKCRqQyWGEPRKr0Dv0BgTDzcGQgzRK0Oi3hhNSBQiCaiRhKiUtFhDBLTQI6WldG2B3W2XpXve/Q/jxZBInGQyFzPzZr7nfb8R0WGJtCG7BMID3gpEeoG+O/28npyWuwrLotYsIoQEzQ3eoFysXiMuru7jayPAwOIUpu6BQD24DIl4XNCooH38JJ/MX+XFUhq/Y6FLG+HYgADdDUIDIbDdKyi29/JjeAMfYzNZXvc/Qasgn7nypfgiPsE6M4fbsiBQC/U9EGwCx4L4OERHwMyDywApMZu2Mtyxl/d9FQzqnkeCupfuix/J08kZ0ZVNolW3w+aDsGobFNKQjYHugYpWJTZ2EsbPglkAAXbbC/RvOsAhacpp/YO3DnPjW/HVwp9iWyaJ3roDXvocbAuun4DoMOSXIHETJs6CmYaeN6CmC+5dg3wKLb9Ik6bjC3dzToyflnsuf8Z32QTBYB3sOwGzA7A4Bu27oawWHBM0XZl28wzkEtBzEGI3YOgY5DMQXs2tLYd4R9/XeuTY/VE2OiVE76eQiUPsb+h5ExIzMH0eHszA/BBkYrD2FchGYWkcGreBVYL7IxI7L4Llq7C0xBTbsdFquqBqLcwNwJr9EPkd4qPQsRvWvQZb3wZpwa1zsHI9OBKSc9C8A/yVAsvEtTRGt5Z/SI1jQf0WWJ4DXzVoLoheh849yt2rx2HqJ2h5HopZyKfBF1ZsV1RBoAaEgEyMoFbKouNAoA7yCQg0QnwSwt1QykDyDjRvh4UrkIpAqAHsDOi6mk4JvBWKcTGN4RKo0EobcED3QiEKZXWwvABOAdr2Q6gNjDKIjSluQgPhBttUd5Bqai4DR3NDYhYsGwRqQwiQJhiVEJ8Ax4bwejAqwC78d0Y8Wh0HPD5KLiMok7mkqIqPQHk9hJphRSUUl8HtV3l0uWHiDNy7ooJeuwGsIthFcPmglAazBIEWUlqgUfwlQWYWlcPJGahaA4vjimNhSRnTvBOKOajsUOUXUspA21LV6Rp2VQeTWudevtFcCMeBB7dh5hf1Qk85ZO8r9x9GQDeg4SnV37ERKKuBQJNktl/yMCYJNXCvupPTWv1mzq3u5byVU6ATczD5A6x8AiKX1euCzYqVxwu2LSmrhVAL/DMkGDkl8PmF2d7Hz76wvKB/+O4RU2iMOTmeTEao1z0QG1X8Mgsw/4dy0R9W5UkNBILZ32D4BORT0PYc/S27OKp7iIrlu5LIJdBg18yvHL17jWeLWdA08FdBMaW6ItSo+toqwINZSMXBY0DXyww0PM1hp8ClsjqJEhxUUfCG2DR3kfeWbrIzm6TOsR+F11LZk46KiG6AN8DtyjaGNh7guL+G4cgghFolLh4bVo6R5p0c81aSnb/Mq8U0ARyVOY9P/YnSAf9K7lR38r3L4FQxy4Qnr/gD/AvsF+mCR9TDUwAAAABJRU5ErkJggg==', 'arc200', '18', 'false'),
-('6779767', 'voi:testnet', 'Voi Incentive Asset', 'VIA', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAACl0lEQVQ4jY2VwUtUURTGf/fOzBtncsTIQCfFIlPHiIpsIbTQFoU7BZVauIhaWrpK8g8IykUulCA3FrRxsLSIqISSCoKKQBEqJiLLdKWmzTjz3sy7Ld5zeDO+CT+4vMt3zvnOvYfzzhW9DQu4QAPa7NUEhAEd+AV8Ah4CUzaXA6+LWDtwE6hxSVJvr/NADOgHHjidpGPvAW7YDvlibqgBJuwYj9sJrwNXdyCUj62YfucJO5xiCjBSJsmEiZ40UQoQIBQYukkyaWKkTITKEe3YEtSAW86URkpRVa/R0h3iUGMRRkqBgs2kSfl+jeZzISJNAQzDSm5jCNC8QCdQucVuxk0OHPFzaXgPZdU+4msZxvpWePMsTl2dxsWRMsK1PvSEyf2BFd4/SqEFTIB9QJfEag3AvlJaETlVRFm1D4BdpR5ar5QQ9AtaLoQI11q8FpRETqcwMZyXa5PAyWztBHilYGFeJ76WyXpVRjR6bu/l6NlgljMzGV5OxfD5lVOwUQLlTqYoKJmb2WTuRSLLaQHB8dYgpeXZ7mD23TKfZwJ4ZE4rV0jyut3rBRQ8H/3L6lIGN6QzacYGvrLbX7HNJoElJ2EqKC6RfJ/XeTu+4So4fW8RfTnsZlqSwGw+ayoIhQTTo+v8/pJTdBJ/TF7f8aB5g/lhAB8kMOlmkR5BMq54MrRmNbaNV3c32FhVbiEAk6K3YUEDvuHoRScMXdHcXcyxM0F+zOo8HV4nnVYIsc11ETgo7PHVCYwXSmukFD6/wEiZeLwC6dmuBnQBUQkwNF8VBQYLCfr8wv7KQmKDQBRyx9c1YLiQ6H8wYseSFew7/BMgA1zGmhqxHQjFsErVY8cC7hN7AnhsO7cDJ7B+fLAK/xHrCYji8gT8A4dR1BOLPGfhAAAAAElFTkSuQmCC', 'arc200', '6', 'false'),
 ('718663983', 'algo:testnet', 'Test', 'test', null, 'asa', '6', 'false');
-INSERT INTO "public"."contracts_tags" ("tag") VALUES
-('clear'),
-('algo_asa_auction_approval'),
-('algo_asa_dutch_approval'),
-('algo_asa_sale_approval'),
-('algo_offchain_sale_approval'),
-('asa_asa_auction_approval'),
-('asa_asa_dutch_approval'),
-('asa_asa_sale_approval'),
-('asa_offchain_sale_approval'),
-('arc200_arc72_auction_approval'),
-('arc200_arc72_dutch_approval'),
-('arc200_arc72_sale_approval'),
-('arc200_offchain_sale_approval'),
-('voi_arc72_auction_approval'),
-('voi_arc72_dutch_approval'),
-('voi_arc72_sale_approval'),
-('voi_offchain_sale_approval');
