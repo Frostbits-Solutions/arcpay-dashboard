@@ -1,0 +1,19 @@
+{
+  "name": "supabase-tests",
+  "version": "1.0.0",
+  "description": "Unit and integration tests for Supabase custom functions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
+    "vitest": "^1.4.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}

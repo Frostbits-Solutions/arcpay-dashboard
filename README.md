@@ -30,6 +30,16 @@ Before running the application, make sure to set VITE_SUPABASE_URL, VITE_SUPABAS
 ### Usage
 For detailed guides on how to use Arcpay Dashboard, visit the [documentation](https://docs.arcpay.dev).
 
+### Updating Supabase Types
+To regenerate the TypeScript types for your Supabase database (e.g., after making schema changes), run the following command from the project root:
+
+```bash
+npx supabase gen types typescript --local > app/src/lib/supabase/database.types.ts
+```
+
+This will connect to your local Supabase instance and overwrite the `database.types.ts` file with the latest types based on your current schema.
+
+
 ### Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
 
