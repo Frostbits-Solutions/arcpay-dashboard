@@ -2,7 +2,7 @@
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { updateAccountChainsParameters, createAccountChainsParameters } from '@/features/accounts/services/accounts'
-import { h, ref, watch, type Ref } from 'vue'
+import { h, ref, watch, type Ref, computed } from 'vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import { useToast } from '@/lib/ui/toast'
@@ -20,7 +20,7 @@ const accounts = useAccountsStore()
 const network = useNetworksStore()
 
 const { toast } = useToast()
-const hasProSubscription: Ref<boolean> = ref(accounts.activeSettings.subscription_tiers?.allow_secondary_listings ?? false)
+const hasProSubscription = computed<boolean>(() => accounts.activeSettings.subscription_tiers?.allow_secondary_listings ?? false)
 const chains: Ref<string[]> = ref(network.networks)
 const activeChainTab = ref(0)
 const activeChainParameter: Ref<AccountsChainsParameter> = ref({
