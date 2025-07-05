@@ -11,7 +11,7 @@ import {
   updateAccountChainsParameters, 
   createAccountChainsParameters 
 } from '@/features/accounts/services/accounts'
-import { h, ref, watch, type Ref } from 'vue'
+import { computed, h, ref, watch, type Ref } from 'vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import { useToast } from '@/lib/ui/toast'
@@ -31,7 +31,7 @@ const network = useNetworksStore()
 
 const { toast } = useToast()
 
-const hasProSubscription : Ref<boolean> = ref(accounts.activeSettings.subscription_tiers?.allow_secondary_listings ?? false)
+const hasProSubscription : Ref<boolean> = computed(() => accounts.activeSettings.subscription_tiers?.allow_secondary_listings ?? false)
 const chains : Ref<string[]> = ref(network.networks)
 const activeChainTab = ref(0)
 const activeChainParameter: Ref<AccountsChainsParameter>= ref({
@@ -236,12 +236,14 @@ watch(
     <div class="border border-border bg-muted/50 rounded-lg p-4 mt-6">
       <div class="flex items-center justify-between">
         <div>
-          <h4 class="text-md font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
+          <div class="flex items-center justify-between pb-8">
+            <h4 class="text-md font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
+            <Button v-if="!hasProSubscription" variant="gradient" class="">Upgrade to Pro</Button>
+          </div>
           <p class="text-sm text-muted-foreground">
             Allow third party listings to be created by addresses that are not linked to your organization. Your organization collects fees on each third party listing sold.
           </p>
         </div>
-        <Switch :default-checked="hasProSubscription" :disabled="true"/>
       </div>
       <div v-if="hasProSubscription" >
         <div class="flex border-b border-border pt-8">
