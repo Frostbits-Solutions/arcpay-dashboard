@@ -6,7 +6,6 @@ import { Clipboard } from '@/lib/ui/clipboard'
 import { Trash2 } from 'lucide-vue-next'
 import { Skeleton } from '@/lib/ui/skeleton'
 import { 
-  deleteAccountApiKey, 
   removeAccountAddress, 
   updateAccountChainsParameters, 
   createAccountChainsParameters 
