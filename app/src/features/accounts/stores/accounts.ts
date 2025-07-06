@@ -12,25 +12,25 @@ import { useSessionStore } from '@/features/auth/stores/session'
 import type { Tables } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
+import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountChainParameter, AccountSecret, AccountUser, SubscriptionTier } from '@/models'
 
-type Account = { id: string, name: string }
 interface AccountSettings{
-  settings?: Tables<"accounts">
+  settings?: Account | null
   subscription_id?: number;
   subscription_expiration_date?: string | null;
-  subscription_tiers?: Partial<Tables<"subscription_tiers">> | null
-  users?: Omit<Tables<"accounts_users_association">, 'account_id'>[]
-  secrets?: Tables<"accounts_secrets">[]
-  addresses?: Tables<"accounts_addresses">[]
-  chainsParameters?: Tables<"accounts_chains_parameters">[]
-  currencies?: Tables<"accounts_currencies">[]
+  subscription_tiers?: Partial<SubscriptionTier> | null
+  users?: Omit<AccountUser, 'account_id'>[]
+  secrets?: AccountSecret[]
+  addresses?: AccountAddress[]
+  chainsParameters?: AccountChainParameter[]
+  currencies?: AccountCurrency[]
 }
 
 export const useAccountsStore = defineStore('accounts', () => {
   const {toast} = useToast()
-  const all = ref<Account[]>([])
+  const all = ref<AccountMembership[]>([])
   const loading = ref(false)
-  const active = ref<Account | undefined>()
+  const active = ref<AccountMembership | undefined>()
   const activeSettings = ref<AccountSettings>({})
 
   async function fetchAll() {

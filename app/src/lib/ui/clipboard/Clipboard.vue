@@ -9,6 +9,7 @@ import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 
 const props = defineProps<{
   source: string
+  secret?: boolean
   class?: HTMLAttributes['class']
 }>()
 const { toast } = useToast()
@@ -24,8 +25,11 @@ function onClick() {
 </script>
 
 <template>
-  <Button variant="outline" @click="onClick" :class="cn('h-12 p-4', props.class)">
-    {{ source.length > 60 ? source.slice(0, 60) + '...' : source }}
+  <Button variant="outline" @click="onClick" :class="cn('flex h-12 items-center justify-between p-4', props.class)">
+    <template v-if="!secret">
+      {{ source.length > 60 ? source.slice(0, 60) + '...' : source }}
+    </template>
+    <template v-else> ****************************** </template>
     <template v-if="isSupported">
       <Clipboard v-if="!copied" class="ms-2 size-4" />
       <ClipboardCheck v-else class="ms-2 size-4" />

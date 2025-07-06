@@ -13,7 +13,7 @@ import { Input } from '@/lib/ui/input'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
-import type { AccountsChainsParameter } from '@/models'
+import type { AccountChainParameter } from '@/models'
 import { useNetworksStore } from '@/features/network/stores/networks'
 
 const accounts = useAccountsStore()
@@ -23,7 +23,7 @@ const { toast } = useToast()
 const hasProSubscription = computed<boolean>(() => accounts.activeSettings.subscription_tiers?.allow_secondary_listings ?? false)
 const chains: Ref<string[]> = ref(network.networks)
 const activeChainTab = ref(0)
-const activeChainParameter: Ref<AccountsChainsParameter> = ref({
+const activeChainParameter: Ref<AccountChainParameter> = ref({
   account_id: '',
   created_at: '',
   chain_id: '',
@@ -129,7 +129,7 @@ watch(
 
 <template>
   <div class="relative mt-6">
-    <div v-if="!hasProSubscription" class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
+    <div v-if="!hasProSubscription || accounts.loading" class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
       <div class="flex items-center justify-between">
         <div>
           <h4 class="text-md font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
@@ -140,12 +140,14 @@ watch(
         </div>
       </div>
     </div>
-    <div v-else class="mb-12 mt-6">
-      <h4 class="text-md font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
-      <p class="text-sm text-muted-foreground">
-        Allow third party listings to be created by addresses that are not linked to your organization. Your organization collects fees on each third party listing sold.
-      </p>
-      <div class="mt-4 rounded-lg border border-border p-4">
+    <div v-else class="mt-6">
+      <div class="rounded-lg border border-border bg-muted/50 p-4">
+        <h4 class="text-md font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
+        <p class="text-sm text-muted-foreground">
+          Allow third party listings to be created by addresses that are not linked to your organization. Your organization collects fees on each third party listing sold.
+        </p>
+      </div>
+      <div class="mt-2 rounded-lg border border-border p-4">
         <div class="flex border-b border-border">
           <button
             v-for="(chain, index) in chains"
