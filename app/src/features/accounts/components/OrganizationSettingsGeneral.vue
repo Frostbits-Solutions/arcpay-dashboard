@@ -100,7 +100,7 @@ async function onDelete(values: any) {
         <FormItem>
           <FormLabel>Organization ID</FormLabel>
           <FormControl>
-            <div><Clipboard :source="accounts.active?.id.toString() || ''" class="rounded bg-muted px-3 py-1 font-mono text-sm text-primary" /></div>
+            <div><Clipboard :source="accounts.active?.id.toString() || ''" class="text-xs" /></div>
           </FormControl>
           <FormDescription> This is your organization ID. It is used to identify your organization when using the Arcpay SDK or the Arcpay API.</FormDescription>
           <FormMessage />

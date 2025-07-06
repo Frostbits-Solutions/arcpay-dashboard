@@ -97,7 +97,7 @@ async function onDeleteJwtSecret(secret: string) {
           <template v-if="!accounts.loading">
             <tr v-for="secret in accounts.activeSettings.secrets" :key="secret.secret" class="border-b border-border last:border-b-0">
               <td class="truncate px-6 py-4">
-                <Clipboard :secret="true" :source="secret.secret" class="min-w-64" />
+                <Clipboard :secret="true" :source="secret.secret" class="text-xs" />
               </td>
               <td class="truncate px-6 py-4">
                 {{ secret.name }}
