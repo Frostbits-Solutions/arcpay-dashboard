@@ -255,6 +255,35 @@ export async function removeAccountCurrency(account_id: string, currency: number
   return { data, error }
 }
 
-export const createAccountApiKey = console.error('createAccountApiKey is deprecated, use createAccountSecret instead')
-export const getAccountApiKeys = console.error('getAccountApiKeys is deprecated, use getAccountSecrets instead')
-export const deleteAccountApiKey = console.error('deleteAccountApiKey is deprecated, use deleteAccountSecret instead')
+export async function createAccountJwtSecret(account_id: string, name: string) {
+  const { data, error } = await supabase
+    .from('accounts_secrets')
+    .insert({
+      account_id,
+      name,
+    })
+    .select();
+  return { data, error };
+}
+
+export async function getAccountJwtSecrets(account_id: string) {
+  const { data, error } = await supabase
+    .from('accounts_secrets')
+    .select('*')
+    .eq('account_id', account_id);
+  return { data, error };
+}
+
+/**
+ * Delete a JWT secret for an account.
+ * @param account_id - The ID of the account.
+ * @param secret_id - The secret to delete.
+ */
+export async function deleteAccountJwtSecret(account_id: string, secret: string) {
+  const { data, error } = await supabase
+    .from('accounts_secrets')
+    .delete()
+    .eq('account_id', account_id)
+    .eq('secret', secret);
+  return { data, error };
+}

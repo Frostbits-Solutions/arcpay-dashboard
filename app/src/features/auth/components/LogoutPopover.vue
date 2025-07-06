@@ -20,15 +20,15 @@ async function logOut() {
       <TooltipTrigger>
         <Button variant="ghost" class="w-full h-auto flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link">
           <CircleUser class="shrink-0 w-5 h-5"/>
-          <span class="w-[172px] ms-3 font-light invisible group-hover/sidebar:visible truncate">{{ session?.user?.email || 'user@email.com' }}</span>
+          <span class="w-[172px] ms-3 font-light hidden group-aria-expanded/sidebar:block truncate">{{ session?.user?.email || 'user@email.com' }}</span>
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="top" align="start" class="p-1 w-[230px]" :disable-portal="true">
-        <Button variant="ghost" @click="logOut" class="w-full justify-start p-2">
-          <Power class="w-4 h-4 me-2"/>
-          Logout
-        </Button>
-      </TooltipContent>
+        <TooltipContent side="right" align="end" class="p-1 w-[230px]" :disable-portal="true">
+          <Button variant="ghost" @click="logOut" class="w-full justify-start p-2">
+            <Power class="w-4 h-4 me-2"/>
+            Logout
+          </Button>
+        </TooltipContent>
     </Tooltip>
   </TooltipProvider>
 </template>

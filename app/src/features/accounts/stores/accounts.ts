@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import {
   getAccount,
   getAccountAddresses,
+  getAccountSecrets,
   getAccountChainsParameters, getAccountSubscription,
   getAccountUsers,
   getAllAccounts,
@@ -70,6 +71,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         fetchAccountUsers(account.id),
         fetchAccountAddresses(account.id),
         fetchAccountSubscription(account.id),
+        fetchAccountSecrets(account.id),
         fetchAccountChainsParameters(account.id),
       ]).then(() => {
         loading.value = false
@@ -139,6 +141,21 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
+  async function fetchAccountSecrets(accountId: string) {
+    const { data: secrets, error } = await getAccountSecrets(accountId)
+    if (!secrets || error) {
+      console.error(error)
+      toast({
+        title: 'Error fetching account secrets',
+        description: error?.message || 'Unexpected error',
+        variant: 'destructive',
+        action: h(ToastError)
+      })
+    } else {
+      activeSettings.value.secrets = secrets
+    }
+  }
+  
   async function fetchAccountChainsParameters(accountId: string) {
     const { data: chainsParameters, error } = await getAccountChainsParameters(accountId)
     if (error) {
@@ -155,5 +172,5 @@ export const useAccountsStore = defineStore('accounts', () => {
   }
 
   
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, selectAccount }
+  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, fetchAccountSecrets, selectAccount }
 })

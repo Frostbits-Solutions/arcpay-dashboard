@@ -4,7 +4,7 @@ import { useSessionStore } from '@/features/auth/stores/session'
 import ListingsView from '@/features/listings/views/ListingsView.vue'
 import AccountSettingsView from '@/features/accounts/views/AccountSettingsView.vue'
 import OrganizationSettingsGeneral from '@/features/accounts/components/OrganizationSettingsGeneral.vue'
-import OrganizationSettingsIntegrations from '@/features/accounts/components/OrganizationSettingsIntegrations.vue'
+import OrganizationSettingsSecurity from '@/features/accounts/components/OrganizationSettingsSecurity.vue'
 import OrganizationSettingsUsers from '@/features/accounts/components/OrganizationSettingsUsers.vue'
 import OrganizationSettingsListings from '@/features/accounts/components/OrganizationSettingsListings.vue'
 import OrganizationSettingsCurrencies from '@/features/accounts/components/OrganizationSettingsCurrencies.vue'
@@ -53,9 +53,9 @@ const router = createRouter({
               component: OrganizationSettingsUsers,
             },
             {
-              path: 'integrations',
-              name: 'organization-organization-integrations',
-              component: OrganizationSettingsIntegrations,
+              path: 'security',
+              name: 'organization-organization-security',
+              component: OrganizationSettingsSecurity,
             },
             {
               path: 'listings',
