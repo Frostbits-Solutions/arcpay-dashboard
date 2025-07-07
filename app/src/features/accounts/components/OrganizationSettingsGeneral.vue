@@ -43,6 +43,8 @@ async function onSubmit(values: any) {
         action: h(ToastError),
       })
     } else {
+      accounts.active.name = values?.name || accounts.active.name
+      await accounts.fetchAccountSettings(accounts.active.id)
       toast({
         title: `Organization updated`,
         action: h(ToastCheck),
