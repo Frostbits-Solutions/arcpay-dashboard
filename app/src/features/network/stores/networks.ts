@@ -25,7 +25,7 @@ export const useNetworksStore = defineStore('networks', () => {
         action: h(ToastError)
       })
     } else {
-      networks.value = data.map((chain: Chain) => chain.id)
+      networks.value = data.map((chain: Chain) => chain.id).sort((a, b) => a.localeCompare(b))
     }
   }
 
