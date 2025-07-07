@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import {House, LayoutGrid, Plus, Cog, Book } from 'lucide-vue-next'
+import { House, LayoutGrid, Plus, Cog, Book } from 'lucide-vue-next'
 import { useDark, useToggle } from '@vueuse/core'
 import { Button } from '@/lib/ui/button'
 import LogoutPopover from '@/features/auth/components/LogoutPopover.vue'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 
 const isDark = useDark({
   selector: '#app',
-  valueDark: 'dark'
+  valueDark: 'dark',
 })
 
 const toggleDark = useToggle(isDark)
@@ -25,54 +25,75 @@ function onMouseLeave() {
   setTimeout(() => {
     expanded.value = false
   }, 50)
-} 
+}
 </script>
 
 <template>
-  <aside id="sidebar" class="group/sidebar fixed top-0 left-0 z-40 w-16 aria-expanded:w-64 h-screen transition-[width]" aria-label="Sidebar" :aria-expanded="expanded" @mouseenter="expanded = true" @mouseleave="onMouseLeave">
-    <div class="h-full px-3 py-4 border-r border-r-border group-aria-expanded/sidebar:border-r-transparent group-aria-expanded/sidebar:bg-background/50 group-aria-expanded/sidebar:backdrop-blur-md flex flex-col justify-between text-sm" style="scrollbar-width: none;">
+  <aside
+    id="sidebar"
+    class="group/sidebar fixed left-0 top-0 z-40 h-screen w-16 transition-[width] aria-expanded:w-64"
+    aria-label="Sidebar"
+    :aria-expanded="expanded"
+    @mouseenter="expanded = true"
+    @mouseleave="onMouseLeave"
+  >
+    <div
+      class="flex h-full flex-col justify-between border-r border-r-border px-3 py-4 text-sm group-aria-expanded/sidebar:border-r-transparent group-aria-expanded/sidebar:bg-background/50 group-aria-expanded/sidebar:backdrop-blur-md"
+      style="scrollbar-width: none"
+    >
       <div>
         <ul class="space-y-2 font-medium">
           <li>
-            <Button variant="ghost" size="icon" class="flex mb-6 hover:bg-foreground size-10" @click="toggleDark()">
-              <img src="../../../assets/logo.png" alt="arcpay logo" class="h-8"/>
+            <Button variant="ghost" size="icon" class="mb-6 flex size-10 hover:bg-foreground" @click="toggleDark()">
+              <img src="../../../assets/logo.png" alt="arcpay logo" class="h-8" />
             </Button>
           </li>
           <li>
-            <RouterLink to="/dashboard" class="flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link">
-              <House class="shrink-0 w-5 h-5"/>
-              <span class="ms-3 font-light hidden group-aria-expanded/sidebar:block truncate">Home</span>
+            <RouterLink to="/dashboard" class="group/link flex items-center justify-start rounded-md p-2.5 text-muted-foreground hover:bg-foreground/5 hover:text-foreground hover:backdrop-blur-lg">
+              <House class="h-5 w-5 shrink-0" />
+              <span class="ms-3 hidden truncate font-light group-aria-expanded/sidebar:block">Home</span>
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/listings" class="flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link">
-              <LayoutGrid class="shrink-0 w-5 h-5"/>
-              <span class="ms-3 font-light hidden group-aria-expanded/sidebar:block truncate">Listings</span>
+            <RouterLink to="/listings" class="group/link flex items-center justify-start rounded-md p-2.5 text-muted-foreground hover:bg-foreground/5 hover:text-foreground hover:backdrop-blur-lg">
+              <LayoutGrid class="h-5 w-5 shrink-0" />
+              <span class="ms-3 hidden truncate font-light group-aria-expanded/sidebar:block">Listings</span>
             </RouterLink>
           </li>
           <li v-if="account.active?.name">
-            <Button variant="ghost" class="w-full h-auto flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link" @click="onCreateClick">
-              <Plus class="shrink-0 w-5 h-5"/>
-              <span class="ms-3 font-light hidden group-aria-expanded/sidebar:block truncate">New listing</span>
+            <Button
+              variant="ghost"
+              class="group/link flex h-auto w-full items-center justify-start rounded-md p-2.5 text-muted-foreground hover:bg-foreground/5 hover:text-foreground hover:backdrop-blur-lg"
+              @click="onCreateClick"
+            >
+              <Plus class="h-5 w-5 shrink-0" />
+              <span class="ms-3 hidden truncate font-light group-aria-expanded/sidebar:block">New listing</span>
             </Button>
           </li>
         </ul>
       </div>
       <ul class="space-y-2 font-medium">
         <li>
-          <a href="https://docs.arcpay.dev" class="flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link" target="_blank">
-            <Book class="shrink-0 w-5 h-5"/>
-            <span class="ms-3 font-light hidden group-aria-expanded/sidebar:block truncate">Documentation</span>
+          <a
+            href="https://docs.arcpay.dev"
+            class="group/link flex items-center justify-start rounded-md p-2.5 text-muted-foreground hover:bg-foreground/5 hover:text-foreground hover:backdrop-blur-lg"
+            target="_blank"
+          >
+            <Book class="h-5 w-5 shrink-0" />
+            <span class="ms-3 hidden truncate font-light group-aria-expanded/sidebar:block">Documentation</span>
           </a>
         </li>
         <li v-if="account.active?.name">
-          <RouterLink :to="`/organization/${account.active.name}/settings`" class="flex justify-start items-center p-2.5 text-muted-foreground rounded-md hover:bg-foreground/5 hover:backdrop-blur-lg hover:text-foreground group/link">
-            <Cog class="shrink-0 w-5 h-5"/>
-            <span class="ms-3 font-light hidden group-aria-expanded/sidebar:block truncate">Settings</span>
+          <RouterLink
+            :to="`/organization/${account.active.name}/settings`"
+            class="group/link flex items-center justify-start rounded-md p-2.5 text-muted-foreground hover:bg-foreground/5 hover:text-foreground hover:backdrop-blur-lg"
+          >
+            <Cog class="h-5 w-5 shrink-0" />
+            <span class="ms-3 hidden truncate font-light group-aria-expanded/sidebar:block">Settings</span>
           </RouterLink>
         </li>
         <li>
-          <LogoutPopover/>
+          <LogoutPopover />
         </li>
       </ul>
     </div>

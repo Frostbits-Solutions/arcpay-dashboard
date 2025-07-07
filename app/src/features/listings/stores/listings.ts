@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 import { getListings } from '@/features/listings/services/listings'
 import type { CompositeListing } from '@/models'
 

@@ -14,7 +14,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
 import type { AccountChainParameter } from '@/models'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 
 const accounts = useAccountsStore()
 const network = useNetworksStore()

@@ -4,9 +4,9 @@ import type { Transaction } from '@/models'
 import { computed } from 'vue'
 import Jazzicon from '@/lib/ui/jazzicon/Jazzicon.vue'
 import { ArrowUpRight } from 'lucide-vue-next'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 
-const props = defineProps<{row: Row<Transaction>}>()
+const props = defineProps<{ row: Row<Transaction> }>()
 const networks = useNetworksStore()
 const from = computed(() => props.row.original.from_address)
 const link = computed(() => {
@@ -16,12 +16,14 @@ const link = computed(() => {
 </script>
 
 <template>
-  <a :href="link" target="_blank" class="relative whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-muted-foreground p-2 pr-8 inline-flex items-center font-normal hover:bg-accent hover:text-accent-foreground">
-    <Jazzicon :diameter="20" :address="`0x${from}`" class="mr-2 mt-1"/> <span class="w-48 truncate">{{ from }}</span>
-    <ArrowUpRight class="w-4 h-4 text-muted-foreground/20 absolute top-2 right-2"/>
+  <a
+    :href="link"
+    target="_blank"
+    class="relative inline-flex items-center whitespace-nowrap rounded-md p-2 pr-8 font-normal text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+  >
+    <Jazzicon :diameter="20" :address="`0x${from}`" class="mr-2 mt-1" /> <span class="w-48 truncate">{{ from }}</span>
+    <ArrowUpRight class="absolute right-2 top-2 h-4 w-4 text-muted-foreground/20" />
   </a>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
