@@ -4,7 +4,7 @@ import type { Database } from '@/lib/supabase/database.types'
 import { getCurrencies } from '@/features/currencies/services/currencies'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 
 type Currency = Database['public']['Tables']['currencies']['Row']
 

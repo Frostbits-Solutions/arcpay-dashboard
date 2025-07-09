@@ -1,23 +1,21 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
 import type { PostgrestError } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase/database.types'
-
-type MembershipsRoles = Database['public']['Enums']['accounts_users_roles']
-type AccountsMemberships = { id: string, name: string, role: MembershipsRoles }[]
+import type { AccountMembership, MembershipRole } from '@/models'
 
 export async function createAccount(name: string) {
   const { data, error } = await supabase.rpc("create_account", { account_name: name })
   return { data, error }
 }
 
-export async function getAllAccounts(user_email: string): Promise<{ data: AccountsMemberships | null, error: PostgrestError | null }> {
+export async function getAllAccounts(user_email: string): Promise<{ data: AccountMembership[] | null, error: PostgrestError | null }> {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .select('account_id, role, accounts(id, name)')
     .eq('user_email', user_email)
     .order('accounts(name)', { ascending: true })
 
-  const accountsMemberships: AccountsMemberships | null = data?.map((item) => ({
+  const accountsMemberships: AccountMembership[] | null = data?.map((item) => ({
     id: item.account_id,
     name: item.accounts?.name || 'Unknown Account',
     role: item.role
@@ -35,12 +33,12 @@ export async function getAccount(id: string) {
   return { data, error }
 }
 
-export async function updateAccount(id: string, name?: string | undefined, authenticate_clients?: boolean | undefined) {
+export async function updateAccount(id: string, values?: {name?: string, authorize_requests?: boolean}) {
   const { data, error } = await supabase
     .from('accounts')
     .update({
-      name,
-      authenticate_clients
+      name: values?.name,
+      authorize_requests: values?. authorize_requests
     })
     .eq('id', id)
     .select()
@@ -55,7 +53,7 @@ export async function deleteAccount(id: string) {
   return { data, error }
 }
 
-export async function addAccountUser(account_id: string, user_email: string, role: MembershipsRoles) {
+export async function addAccountUser(account_id: string, user_email: string, role: MembershipRole) {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .insert({
@@ -75,7 +73,7 @@ export async function getAccountUsers(id: string) {
   return { data, error }
 }
 
-export async function updateAccountUser(account_id: string, user_email: string, role: MembershipsRoles) {
+export async function updateAccountUser(account_id: string, user_email: string, role: MembershipRole) {
   const { data, error } = await supabase
     .from('accounts_users_association')
     .update({

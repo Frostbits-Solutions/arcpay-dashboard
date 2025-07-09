@@ -1,7 +1,7 @@
 import { h, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Chain } from '@/models'
-import { getChains } from '@/features/network/services/network'
+import { getChains } from '@/features/networks/services/networks'
 import { toast } from '@/lib/ui/toast'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 
@@ -25,7 +25,7 @@ export const useNetworksStore = defineStore('networks', () => {
         action: h(ToastError)
       })
     } else {
-      networks.value = data.map((chain: Chain) => chain.id)
+      networks.value = data.map((chain: Chain) => chain.id).sort((a, b) => a.localeCompare(b))
     }
   }
 

@@ -10,7 +10,7 @@ import {
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 import utc from 'dayjs/plugin/utc'
 import type { Transaction } from '@/models'
 import type { RealtimeChannel } from '@supabase/supabase-js'

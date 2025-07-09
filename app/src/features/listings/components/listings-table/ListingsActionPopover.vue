@@ -1,27 +1,23 @@
 <script setup lang="ts">
-import {EllipsisVertical, Trash2, ShieldBan} from 'lucide-vue-next'
+import { EllipsisVertical, Trash2, ShieldBan } from 'lucide-vue-next'
 import { Button } from '@/lib/ui/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/lib/ui/popover'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 
 const networks = useNetworksStore()
-const props = defineProps<{id: string}>()
+const props = defineProps<{ id: string }>()
 </script>
 
 <template>
   <Popover>
     <PopoverTrigger>
       <Button variant="ghost" size="icon">
-        <EllipsisVertical class="size-4 text-muted-foreground"/>
+        <EllipsisVertical class="size-4 text-muted-foreground" />
       </Button>
     </PopoverTrigger>
     <PopoverContent class="p-1">
       <Button variant="ghost" class="w-full justify-start" @click="console.log('Arcpay SDK - Cancel')">
-        <Trash2 class="size-4 mr-2"/>
+        <Trash2 class="mr-2 size-4" />
         Cancel
       </Button>
       <!--<Button variant="ghost" class="w-full justify-start">
@@ -32,6 +28,4 @@ const props = defineProps<{id: string}>()
   </Popover>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -12,105 +12,119 @@ import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import { useToast } from '@/lib/ui/toast'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { Skeleton } from '@/lib/ui/skeleton'
-import { Users, ArrowUpRight, Key, WalletMinimal, Receipt } from 'lucide-vue-next'
+import { Users, ArrowUpRight, Key, WalletMinimal, Receipt, Package } from 'lucide-vue-next'
+import { Clipboard } from '@/lib/ui/clipboard'
+import OrganizationSettingsListingsAddress from '@/features/accounts/components/OrganizationSettingsAddress.vue'
 
-const {toast} = useToast()
+const { toast } = useToast()
 const accounts = useAccountsStore()
-const formSchema = toTypedSchema(z.object({
-  name: z.string().min(4).max(50).optional(),
-  website: z.string().url().optional(),
-}))
+const formSchema = toTypedSchema(
+  z.object({
+    name: z.string().min(4).max(50).optional(),
+    website: z.string().url().optional(),
+  })
+)
 
 const quickLinks = [
-  {name: 'Invite new team members', icon: Users, to: {name: 'organization-organization-users'}},
-  {name: 'Manage account security', icon: Key, to: {name: 'organization-organization-security'}},
-  {name: 'Link address to organization', icon: WalletMinimal, to: {name: 'organization-organization-listings'}},
+  { name: 'Get started with Arcpay SDK', icon: Package, to: { name: 'organization-organization-listings' } },
+  { name: 'Invite new team members', icon: Users, to: { name: 'organization-organization-users' } },
+  { name: 'Manage account security', icon: Key, to: { name: 'organization-organization-security' } },
   // {name: 'Billing and subscription', icon: Receipt, to: {name: 'organization-organization-general'}},
 ]
 
 async function onSubmit(values: any) {
   if (accounts.active?.id) {
-    const {data, error} = await updateAccount(accounts.active.id, values?.name, values?.website)
+    const { data, error } = await updateAccount(accounts.active.id, { name: values?.name })
     if (error) {
       toast({
         title: `Error updating organization`,
         description: error.message,
         variant: 'destructive',
-        action: h(ToastError)
-      });
+        action: h(ToastError),
+      })
     } else {
+      accounts.active.name = values?.name || accounts.active.name
+      await accounts.fetchAccountSettings(accounts.active.id)
       toast({
         title: `Organization updated`,
-        action: h(ToastCheck)
-      });
+        action: h(ToastCheck),
+      })
     }
   }
 }
 
 async function onDelete(values: any) {
   if (accounts.active?.id) {
-    const {data, error} = await deleteAccount(accounts.active.id)
+    const { data, error } = await deleteAccount(accounts.active.id)
     if (error) {
       toast({
         title: `Error deleting organization`,
         description: error.message,
         variant: 'destructive',
-        action: h(ToastError)
-      });
+        action: h(ToastError),
+      })
     } else {
       await accounts.fetchAll()
       accounts.selectAccount(accounts.all[0]?.id)
       toast({
         title: `Organization deleted`,
-        action: h(ToastCheck)
-      });
+        action: h(ToastCheck),
+      })
     }
   }
 }
 </script>
 
 <template>
-  <h2 class="text-2xl font-bold dark:text-white">General</h2>
-  <ul class="grid grid-cols-6 gap-4 my-10">
+  <h2 class="text-2xl font-bold dark:text-white">{{ accounts.active?.name }}</h2>
+  <ul class="my-10 grid grid-cols-6 gap-4">
     <li v-for="(link, index) in quickLinks" :key="index">
-      <router-link :to="link.to" class="border border-border rounded-lg h-24 flex items-center justify-center p-4 relative text-sm">
-        <component :is="link.icon" class="w-8 h-8 mr-4"/>
+      <router-link :to="link.to" class="relative flex h-24 items-center justify-center rounded-lg border border-border p-4 text-sm">
+        <component :is="link.icon" class="mr-4 h-8 w-8" />
         {{ link.name }}
-        <ArrowUpRight class="w-4 h-4 text-border absolute top-2 right-2"/>
+        <ArrowUpRight class="absolute right-2 top-2 h-4 w-4 text-border" />
       </router-link>
     </li>
   </ul>
-  <div class="border border-border bg-muted/50 rounded-lg p-4 flex items-center justify-between mt-10 mb-4">
+  <div class="mb-2 mt-10 flex items-center justify-between rounded-lg border border-border bg-muted/50 p-4">
     <div>
       <h4 class="text-md font-normal">Subscription</h4>
       <p class="text-sm text-muted-foreground">
-        This organization is currently on the <span class="uppercase font-bold text-primary">{{accounts.activeSettings.subscription_tiers?.name}}</span> plan.<br>
+        This organization is currently on the <span class="font-bold uppercase text-primary">{{ accounts.activeSettings.subscription_tiers?.name }}</span> plan.<br />
       </p>
     </div>
-    <Button variant="gradient" class="mt-2">Upgrade to Pro</Button>
+    <Button variant="gradient" class="mt-2" v-if="accounts.activeSettings.subscription_tiers?.name !== 'pro'">Upgrade to Pro</Button>
+    <Button variant="outline" class="mt-2 border-foreground/10 bg-transparent" v-else>Manage subscription</Button>
   </div>
-  <SettingsCard>
+  <div class="rounded-lg border border-border p-4">
     <Form id="general-form" :validation-schema="formSchema" @submit="onSubmit" class="space-y-6">
+      <FormField name="id">
+        <FormItem>
+          <FormLabel>Organization ID</FormLabel>
+          <FormControl>
+            <div><Clipboard :source="accounts.active?.id.toString() || ''" class="text-xs" /></div>
+          </FormControl>
+          <FormDescription> This is your organization ID. It is used to identify your organization when using the Arcpay SDK or the Arcpay API.</FormDescription>
+          <FormMessage />
+        </FormItem>
+      </FormField>
       <FormField v-slot="{ componentField }" name="name">
         <FormItem>
           <FormLabel>Organization name</FormLabel>
           <FormControl>
             <Input type="text" :placeholder="accounts?.active?.name" v-bind="componentField" />
           </FormControl>
-          <FormDescription>
-            Organization name must be unique and between 4 and 50 characters. Leave empty to keep the current name.
-          </FormDescription>
+          <FormDescription> Organization name must be unique and between 4 and 50 characters. Leave empty to keep the current name. </FormDescription>
           <FormMessage />
         </FormItem>
       </FormField>
       <div class="flex justify-end">
-        <Button variant="outline"  type="submit">
-          Save
-        </Button>
+        <Button variant="outline" type="submit"> Save </Button>
       </div>
     </Form>
-  </SettingsCard>
-  <div class="border border-destructive bg-destructive/20 rounded-lg p-4 flex items-center justify-between mt-10">
+  </div>
+  <OrganizationSettingsListingsAddress />
+  <div class="mt-10 flex items-center justify-between rounded-lg border border-destructive bg-destructive/20 p-4">
     <div>
       <h4 class="text-md font-normal text-destructive">Delete organization</h4>
       <p class="text-sm text-destructive">This action cannot be undone. This will permanently delete your organization and all its data.</p>
@@ -119,5 +133,4 @@ async function onDelete(values: any) {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

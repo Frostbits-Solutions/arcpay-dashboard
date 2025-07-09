@@ -2,11 +2,11 @@
 import type { Row } from '@tanstack/vue-table'
 import type { CompositeListing } from '@/models'
 import { ArrowUpRight } from 'lucide-vue-next'
-import { useNetworksStore } from '@/features/network/stores/networks'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 import { computed } from 'vue'
 
 const networks = useNetworksStore()
-const props = defineProps<{row: Row<CompositeListing>}>()
+const props = defineProps<{ row: Row<CompositeListing> }>()
 const listing = computed(() => props.row.original)
 const link = computed(() => {
   const prefix = networks?.activeNetwork?.split(':')?.[1] === 'testnet' ? 'testnet.' : ''
@@ -15,13 +15,17 @@ const link = computed(() => {
 </script>
 
 <template>
-  <a :href="link" target="_blank" class="relative whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-muted-foreground p-2 pr-8 inline-flex items-center font-normal hover:bg-accent hover:text-accent-foreground">
-    <span class="text-muted-foreground max-w-48 truncate">{{ listing.name }}</span>
-    <span class="text-xs text-muted-foreground opacity-50">(<span class="uppercase">{{ listing.asset_type }}</span> {{ listing.asset_id }})</span>
-    <ArrowUpRight class="w-4 h-4 text-muted-foreground/20 absolute top-2 right-2"/>
+  <a
+    :href="link"
+    target="_blank"
+    class="relative inline-flex items-center whitespace-nowrap rounded-md p-2 pr-8 font-normal text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+  >
+    <span class="max-w-48 truncate text-muted-foreground">{{ listing.name }}</span>
+    <span class="text-xs text-muted-foreground opacity-50"
+      >(<span class="uppercase">{{ listing.asset_type }}</span> {{ listing.asset_id }})</span
+    >
+    <ArrowUpRight class="absolute right-2 top-2 h-4 w-4 text-muted-foreground/20" />
   </a>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

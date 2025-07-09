@@ -4,8 +4,8 @@ import { ScrollArea } from '@/lib/ui/scroll-area'
 const sections = {
   general: 'organization-organization-general',
   team: 'organization-organization-users',
-  security: 'organization-organization-security',
   listings: 'organization-organization-listings',
+  security: 'organization-organization-security',
   currencies: 'organization-organization-currencies',
 }
 </script>

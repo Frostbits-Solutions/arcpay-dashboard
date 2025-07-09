@@ -11,7 +11,7 @@ export type Database = {
     Tables: {
       accounts: {
         Row: {
-          authenticate_clients: boolean
+          authorize_requests: boolean
           created_at: string
           id: string
           name: string
@@ -19,7 +19,7 @@ export type Database = {
           subscription_id: number
         }
         Insert: {
-          authenticate_clients?: boolean
+          authorize_requests?: boolean
           created_at?: string
           id?: string
           name: string
@@ -27,7 +27,7 @@ export type Database = {
           subscription_id?: number
         }
         Update: {
-          authenticate_clients?: boolean
+          authorize_requests?: boolean
           created_at?: string
           id?: string
           name?: string
@@ -650,7 +650,7 @@ export type Database = {
           },
         ]
       }
-      transactions_2025_06_15: {
+      transactions_2025_07_01: {
         Row: {
           amount: number | null
           app_id: number
@@ -684,15 +684,187 @@ export type Database = {
           metadata?: Json
           type?: Database["public"]["Enums"]["transaction_type"]
         }
-        Relationships: [
-          {
-            foreignKeyName: "transactions_chain_id_fkey"
-            columns: ["chain_id"]
-            isOneToOne: false
-            referencedRelation: "chains"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      transactions_2025_07_03: {
+        Row: {
+          amount: number | null
+          app_id: number
+          chain_id: string
+          created_at: string
+          currency: number
+          from_address: string
+          id: string
+          metadata: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Insert: {
+          amount?: number | null
+          app_id: number
+          chain_id: string
+          created_at?: string
+          currency: number
+          from_address: string
+          id: string
+          metadata?: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Update: {
+          amount?: number | null
+          app_id?: number
+          chain_id?: string
+          created_at?: string
+          currency?: number
+          from_address?: string
+          id?: string
+          metadata?: Json
+          type?: Database["public"]["Enums"]["transaction_type"]
+        }
+        Relationships: []
+      }
+      transactions_2025_07_04: {
+        Row: {
+          amount: number | null
+          app_id: number
+          chain_id: string
+          created_at: string
+          currency: number
+          from_address: string
+          id: string
+          metadata: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Insert: {
+          amount?: number | null
+          app_id: number
+          chain_id: string
+          created_at?: string
+          currency: number
+          from_address: string
+          id: string
+          metadata?: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Update: {
+          amount?: number | null
+          app_id?: number
+          chain_id?: string
+          created_at?: string
+          currency?: number
+          from_address?: string
+          id?: string
+          metadata?: Json
+          type?: Database["public"]["Enums"]["transaction_type"]
+        }
+        Relationships: []
+      }
+      transactions_2025_07_05: {
+        Row: {
+          amount: number | null
+          app_id: number
+          chain_id: string
+          created_at: string
+          currency: number
+          from_address: string
+          id: string
+          metadata: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Insert: {
+          amount?: number | null
+          app_id: number
+          chain_id: string
+          created_at?: string
+          currency: number
+          from_address: string
+          id: string
+          metadata?: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Update: {
+          amount?: number | null
+          app_id?: number
+          chain_id?: string
+          created_at?: string
+          currency?: number
+          from_address?: string
+          id?: string
+          metadata?: Json
+          type?: Database["public"]["Enums"]["transaction_type"]
+        }
+        Relationships: []
+      }
+      transactions_2025_07_06: {
+        Row: {
+          amount: number | null
+          app_id: number
+          chain_id: string
+          created_at: string
+          currency: number
+          from_address: string
+          id: string
+          metadata: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Insert: {
+          amount?: number | null
+          app_id: number
+          chain_id: string
+          created_at?: string
+          currency: number
+          from_address: string
+          id: string
+          metadata?: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Update: {
+          amount?: number | null
+          app_id?: number
+          chain_id?: string
+          created_at?: string
+          currency?: number
+          from_address?: string
+          id?: string
+          metadata?: Json
+          type?: Database["public"]["Enums"]["transaction_type"]
+        }
+        Relationships: []
+      }
+      transactions_2025_07_07: {
+        Row: {
+          amount: number | null
+          app_id: number
+          chain_id: string
+          created_at: string
+          currency: number
+          from_address: string
+          id: string
+          metadata: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Insert: {
+          amount?: number | null
+          app_id: number
+          chain_id: string
+          created_at?: string
+          currency: number
+          from_address: string
+          id: string
+          metadata?: Json
+          type: Database["public"]["Enums"]["transaction_type"]
+        }
+        Update: {
+          amount?: number | null
+          app_id?: number
+          chain_id?: string
+          created_at?: string
+          currency?: number
+          from_address?: string
+          id?: string
+          metadata?: Json
+          type?: Database["public"]["Enums"]["transaction_type"]
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -754,10 +926,6 @@ export type Database = {
           metadata: Json
           type: Database["public"]["Enums"]["transaction_type"]
         }[]
-      }
-      verify_arcpay_jwt_request: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
       }
     }
     Enums: {
@@ -952,12 +1120,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
-      accounts_users_roles: ["owner", "admin", "moderator", "member"],
+      accounts_users_roles: ["owner", "admin", "member"],
       assets_types: ["arc72", "offchain", "asa"],
       contract_tag_enum: [
         "clear",
