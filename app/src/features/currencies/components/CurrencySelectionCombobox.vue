@@ -10,17 +10,23 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover'
 import { Skeleton } from '@/lib/ui/skeleton'
 import { type Database } from '@/lib/supabase/database.types'
 import { useCurrenciesStore } from '@/features/currencies/stores/currencies'
-import { useNetworksStore } from '@/features/network/stores/networks'
 
 type Currency = Database['public']['Tables']['currencies']['Row']
+
+const props = defineProps({
+  activeChain: {
+    type: String,
+    required: true,
+  },
+})
+
 const currencyStore = useCurrenciesStore()
-const networks = useNetworksStore()
 const currencies = computed(() => currencyStore.list)
 const selectedCurrency = computed(() => {
   return currencies.value.find((currency) => currency.ticker === value.value)
 })
 const open = ref(false)
-const value = ref<string | undefined>(networks.activeNetwork)
+const value = ref<string | undefined>(props.activeChain || undefined)
 const loading = ref(true)
 
 defineExpose({
@@ -28,13 +34,14 @@ defineExpose({
 })
 
 watch(
-  () => networks.activeNetwork,
+  () => props,
   () => {
     loading.value = true
-    currencyStore.fetchCurrencies()
+    currencyStore.fetchCurrencies(props.activeChain)
+    console.log('Listed currencies:', currencyStore.list)
     loading.value = false
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 </script>
 

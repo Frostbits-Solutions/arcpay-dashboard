@@ -7,7 +7,6 @@ import OrganizationSettingsGeneral from '@/features/accounts/components/Organiza
 import OrganizationSettingsSecurity from '@/features/accounts/components/OrganizationSettingsSecurity.vue'
 import OrganizationSettingsUsers from '@/features/accounts/components/OrganizationSettingsUsers.vue'
 import OrganizationSettingsListings from '@/features/accounts/components/OrganizationSettingsListings.vue'
-import OrganizationSettingsCurrencies from '@/features/accounts/components/OrganizationSettingsCurrencies.vue'
 import DashboardView from '@/features/dashboard/views/DashboardView.vue'
 import DirectLinkView from '@/features/directlink/views/DirectLinkView.vue'
 import AuthenticatedView from '@/features/auth/views/AuthenticatedView.vue'
@@ -62,11 +61,6 @@ const router = createRouter({
               name: 'organization-organization-listings',
               component: OrganizationSettingsListings,
             },
-            {
-              path: 'currencies',
-              name: 'organization-organization-currencies',
-              component: OrganizationSettingsCurrencies,
-            }
           ]
         }
       ]

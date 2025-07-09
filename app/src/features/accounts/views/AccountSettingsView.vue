@@ -6,7 +6,6 @@ const sections = {
   team: 'organization-organization-users',
   listings: 'organization-organization-listings',
   security: 'organization-organization-security',
-  currencies: 'organization-organization-currencies',
 }
 </script>
 
