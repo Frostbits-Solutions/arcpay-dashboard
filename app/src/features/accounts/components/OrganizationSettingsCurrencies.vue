@@ -1,18 +1,38 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/network/stores/networks'
 import { Button } from '@/lib/ui/button'
 import { Badge } from '@/lib/ui/badge'
 import CurrencySelectionCombobox from '@/features/currencies/components/CurrencySelectionCombobox.vue'
+import { type Database } from '@/lib/supabase/database.types'
+import { useCurrenciesStore } from '@/features/currencies/stores/currencies'
 
 const accounts = useAccountsStore()
-const network = useNetworksStore()
+const networks = useNetworksStore()
 const currencySelectorRef = ref<typeof CurrencySelectionCombobox | null>(null)
-
+type Currency = Database['public']['Tables']['currencies']['Row']
+const currencyStore = useCurrenciesStore()
 const hasProSubscription = computed(() => accounts.activeSettings.subscription_tiers?.allow_custom_currencies ?? false)
-const chains = computed(() => network.networks)
+const chains = computed(() => networks.networks)
 const activeChainTab = ref(0)
+
+const listedCurrencies = computed(() => {
+  return currencyStore.list.filter((currency: Currency) => {
+    return networks.networks[activeChainTab.value] === currency.chain_id && currency.is_public
+  })
+})
+
+watch(
+  () => activeChainTab,
+  () => {
+    console.log('Active chain tab changed:', activeChainTab.value)
+    console.log('Active chain tab changed:', networks.networks[activeChainTab.value])
+    currencyStore.fetchCurrencies()
+    console.log('Listed currencies:', currencyStore.list)
+  },
+  { immediate: true }
+)
 
 //TODO
 // Reuse the component from CurrencySelectionCombobox.vue
@@ -51,8 +71,8 @@ const activeChainTab = ref(0)
               </tr>
             </thead>
             <tbody>
-              <tr v-if="chains.length" v-for="(chain, index) in chains" :key="chain" v-show="activeChainTab === index">
-                <td class="px-6 py-4">{{ chain }}</td>
+              <tr v-for="(currency, index) in listedCurrencies" :key="currency.id" v-show="activeChainTab === index">
+                <td class="px-6 py-4">{{ currency.name }}</td>
                 <td class="px-6 py-4"><CurrencySelectionCombobox ref="currencySelectorRef" /></td>
               </tr>
               <tr v-if="!chains.length">
