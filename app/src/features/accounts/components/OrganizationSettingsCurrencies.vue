@@ -114,14 +114,6 @@ watch(
   },
   { immediate: true, deep: true }
 )
-
-//TODO
-// Reuse the component from CurrencySelectionCombobox.vue
-// to allow adding custom currencies for each chain
-// Import only the files not already present in the repo
-// in the table display all public currencies and allow adding private currencies
-// added private currencies can be deleted
-// add an emit in the CurrencySelectionCombobox.vue to emit the selected currency and import it
 </script>
 <template>
   <div v-if="hasProSubscription">
