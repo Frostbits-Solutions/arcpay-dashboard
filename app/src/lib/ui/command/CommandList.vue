@@ -5,32 +5,26 @@ import { ComboboxContent, useForwardPropsEmits } from 'radix-vue'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/lib/ui/scroll-area'
 
-const props = withDefaults(
-    defineProps<ComboboxContentProps & { class?: HTMLAttributes['class'] }>(),
-    {
-        dismissable: false,
-    }
-)
+const props = withDefaults(defineProps<ComboboxContentProps & { class?: HTMLAttributes['class'] }>(), {
+  dismissable: false,
+})
 const emits = defineEmits<ComboboxContentEmits>()
 
 const delegatedProps = computed(() => {
-    const { class: _, ...delegated } = props
+  const { class: _, ...delegated } = props
 
-    return delegated
+  return delegated
 })
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
 <template>
-    <ComboboxContent
-        :class="cn('ap-overflow-x-hidden', props.class)"
-        v-bind="forwarded"
-    >
-        <ScrollArea class="ap-h-[300px]">
-            <div role="presentation">
-                <slot />
-            </div>
-        </ScrollArea>
-    </ComboboxContent>
+  <ComboboxContent :class="cn('overflow-x-hidden', props.class)" v-bind="forwarded">
+    <ScrollArea class="h-[300px]">
+      <div role="presentation">
+        <slot />
+      </div>
+    </ScrollArea>
+  </ComboboxContent>
 </template>

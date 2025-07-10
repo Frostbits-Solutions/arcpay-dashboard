@@ -243,12 +243,12 @@ export async function addAccountCurrency(account_id: string, currency: number, c
   return { data, error }
 }
 
-export async function removeAccountCurrency(account_id: string, currency: number, chain_id: string) {
+export async function removeAccountCurrency(account_id: string, currencyId: number, chain_id: string) {
   const { data, error } = await supabase
     .from('accounts_currencies')
     .delete()
     .eq('account_id', account_id)
-    .eq('currency', currency)
+    .eq('currency', currencyId)
     .eq('chain_id', chain_id)
   return { data, error }
 }

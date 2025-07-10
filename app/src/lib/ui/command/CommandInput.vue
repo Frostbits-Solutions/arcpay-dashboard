@@ -1,19 +1,21 @@
 <script lang="ts" setup>
-import {computed, type HTMLAttributes} from 'vue'
-import {MagnifyingGlassIcon} from '@radix-icons/vue'
-import {ComboboxInput, type ComboboxInputProps, useForwardProps} from 'radix-vue'
-import {cn} from '@/lib/utils'
+import { computed, type HTMLAttributes } from 'vue'
+import { MagnifyingGlassIcon } from '@radix-icons/vue'
+import { ComboboxInput, type ComboboxInputProps, useForwardProps } from 'radix-vue'
+import { cn } from '@/lib/utils'
 
 defineOptions({
   inheritAttrs: false,
 })
 
-const props = defineProps<ComboboxInputProps & {
-  class?: HTMLAttributes['class']
-}>()
+const props = defineProps<
+  ComboboxInputProps & {
+    class?: HTMLAttributes['class']
+  }
+>()
 
 const delegatedProps = computed(() => {
-  const {class: _, ...delegated} = props
+  const { class: _, ...delegated } = props
 
   return delegated
 })
@@ -22,11 +24,11 @@ const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
-  <div class="ap-flex ap-items-center ap-border-b ap-border-border ap-px-3" cmdk-input-wrapper>
-    <MagnifyingGlassIcon class="ap-mr-2 ap-h-4 ap-w-4 ap-shrink-0 ap-opacity-50"/>
+  <div class="flex items-center border-b border-border px-3" cmdk-input-wrapper>
+    <MagnifyingGlassIcon class="mr-2 h-4 w-4 shrink-0 opacity-50" />
     <ComboboxInput
-        :class="cn('ap-flex ap-h-10 ap-w-full ap-rounded-md ap-bg-transparent ap-py-3 ap-text-sm ap-outline-none placeholder:ap-text-muted-foreground disabled:ap-cursor-not-allowed disabled:ap-opacity-50', props.class)"
-        v-bind="{ ...forwardedProps, ...$attrs }"
+      :class="cn('flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50', props.class)"
+      v-bind="{ ...forwardedProps, ...$attrs }"
     />
   </div>
 </template>

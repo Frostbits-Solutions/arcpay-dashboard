@@ -18,27 +18,30 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  excludeCurrencyIds: {
+    type: Array as () => number[],
+    default: () => [],
+  },
 })
 
+const emit = defineEmits<{
+  (e: 'select', currency: Currency): void
+}>()
+
 const currencyStore = useCurrenciesStore()
-const currencies = computed(() => currencyStore.list)
+const currencies = computed(() => currencyStore.list.filter((c) => !props.excludeCurrencyIds.includes(c.id)))
 const selectedCurrency = computed(() => {
   return currencies.value.find((currency) => currency.ticker === value.value)
 })
 const open = ref(false)
-const value = ref<string | undefined>(props.activeChain || undefined)
+const value = ref<string | undefined>(undefined)
 const loading = ref(true)
-
-defineExpose({
-  selectedCurrency,
-})
 
 watch(
   () => props,
   () => {
     loading.value = true
     currencyStore.fetchCurrencies(props.activeChain)
-    console.log('Listed currencies:', currencyStore.list)
     loading.value = false
   },
   { immediate: true, deep: true }
@@ -48,27 +51,28 @@ watch(
 <template>
   <Popover v-if="!loading" v-model:open="open">
     <PopoverTrigger as-child>
-      <Button :aria-expanded="open" class="ap-justify-between ap-w-[120px] ap-p-1" role="combobox" size="lg" variant="outline">
-        <template v-if="!value"> Select currency </template>
+      <Button :aria-expanded="open" class="w-[160px] justify-between p-3" role="combobox" size="lg" variant="outline">
+        <template v-if="!selectedCurrency"> Select currency </template>
         <template v-else-if="selectedCurrency">
-          <div class="ap-flex ap-items-center ap-gap-1 ap-min-w-0 ap-px-1">
-            <img :alt="`${selectedCurrency.ticker} icon`" :src="selectedCurrency?.icon || defaultCurrencyIcon" class="ap-h-5 ap-w-5 ap-rounded-full ap-bg-border" />
-            <div class="ap-text-xs ap-text-muted-foreground ap-min-w-0">
-              <div class="ap-font-semibold ap-text-foreground ap-truncate">
+          <div class="flex min-w-0 items-center gap-1 px-1">
+            <img :alt="`${selectedCurrency.ticker} icon`" :src="selectedCurrency?.icon || defaultCurrencyIcon" class="h-5 w-5 rounded-full bg-border" />
+            <div class="min-w-0 text-xs text-muted-foreground">
+              <div class="truncate font-semibold text-foreground">
                 {{ selectedCurrency.ticker.toUpperCase() }}
               </div>
             </div>
           </div>
         </template>
-        <CaretSortIcon class="ap-ml-2 ap-h-4 ap-w-4 ap-shrink-0 ap-opacity-50" />
+        <CaretSortIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
     </PopoverTrigger>
-    <PopoverContent align="end" class="ap-p-0 ap-w-[334px] ap-h-[250px]" side="bottom">
+
+    <PopoverContent align="end" class="h-[250px] w-[334px] p-0" side="bottom">
       <Command>
-        <CommandInput class="ap-h-9" placeholder="Search by ticker" />
+        <CommandInput placeholder="Search by ticker" />
         <CommandEmpty>No currency found.</CommandEmpty>
         <CommandList>
-          <CommandGroup class="ap-w-[327px]">
+          <CommandGroup class="w-[327px]">
             <CommandItem
               v-for="currency in currencies.filter((c: Currency) => !c.is_public)"
               :key="currency.id"
@@ -77,26 +81,31 @@ watch(
                 (e: CustomEvent) => {
                   if (typeof e.detail.value === 'string') {
                     value = e.detail.value
+                    const selected = currencies.find((c) => c.ticker === value)
+                    if (selected) {
+                      emit('select', selected)
+                    }
                   }
                   open = false
                 }
               "
             >
-              <div class="ap-flex ap-items-center ap-gap-1 ap-min-w-0">
-                <img :alt="`${currency.ticker} icon`" :src="currency?.icon || defaultCurrencyIcon" class="ap-h-5 ap-w-5 ap-rounded-full ap-bg-border" />
-                <div class="ap-text-xs ap-text-muted-foreground ap-min-w-0">
-                  <div class="ap-font-semibold ap-text-foreground ap-truncate">
+              <div class="flex min-w-0 items-center gap-1">
+                <img :alt="`${currency.ticker} icon`" :src="currency?.icon || defaultCurrencyIcon" class="h-5 w-5 rounded-full bg-border" />
+                <div class="min-w-0 text-xs text-muted-foreground">
+                  <div class="truncate font-semibold text-foreground">
                     {{ currency.ticker.toUpperCase() }}
                   </div>
                   ID: {{ currency.id }}
                 </div>
               </div>
-              <CheckIcon :class="cn('ap-ml-auto ap-h-4 ap-w-4', value === currency.ticker ? 'ap-opacity-100' : 'ap-opacity-0')" />
+              <CheckIcon :class="cn('ml-auto h-4 w-4', value === currency.ticker ? 'opacity-100' : 'opacity-0')" />
             </CommandItem>
           </CommandGroup>
         </CommandList>
       </Command>
     </PopoverContent>
   </Popover>
-  <Skeleton v-else class="ap-w-[120px] ap-h-9 ap-p-2" />
+
+  <Skeleton v-else class="h-9 w-[120px] p-2" />
 </template>
