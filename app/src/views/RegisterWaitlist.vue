@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 const router = useRouter()
 const loading = ref(false)
 const email = ref('')
-const register = ref(false)
 const success = ref(false)
 const errorMessage = ref('')
 
