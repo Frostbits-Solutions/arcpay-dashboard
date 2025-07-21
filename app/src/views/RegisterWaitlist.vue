@@ -11,8 +11,10 @@ const loading = ref(false)
 const email = ref('')
 const register = ref(false)
 const success = ref(false)
+const errorMessage = ref('')
 
 const handleWaitlistSignup = async () => {
+    errorMessage.value = ''
     try {
         loading.value = true
         const { error } = await supabase
@@ -20,9 +22,12 @@ const handleWaitlistSignup = async () => {
             .insert([{ email: email.value }])
 
         if (error) {
-            // Postgres unique violation error code
-            if ('code' in error && error.code === '23505') {
-                alert('This email is already on the waitlist.')
+            const lowerMsg = error.message?.toLowerCase() || ''
+            if (
+                lowerMsg.includes('duplicate') ||
+                lowerMsg.includes('already exists')
+            ) {
+                errorMessage.value = 'This email is already on the waitlist.'
                 return
             }
             throw error
@@ -30,9 +35,10 @@ const handleWaitlistSignup = async () => {
 
         success.value = true
     } catch (error) {
-        if (error instanceof Error) {
-            alert(error.message)
-        }
+        errorMessage.value =
+            error instanceof Error
+                ? error.message
+                : 'An unexpected error occurred.'
     } finally {
         loading.value = false
     }
@@ -59,10 +65,11 @@ onMounted(() => {
                 <img src="@/assets/logo.png" alt="Logo" class="mr-2 h-14" />
                 <h1 class="text-5xl text-foreground">arcpay</h1>
             </div>
+
             <form
                 v-if="!success"
                 class="mt-8 border-t border-border pt-10"
-                @submit.prevent="handleLogin"
+                @submit.prevent="handleWaitlistSignup"
             >
                 <div>
                     <label
@@ -80,47 +87,37 @@ onMounted(() => {
                         required
                     />
                 </div>
+
                 <Button
                     variant="gradient"
                     type="submit"
                     size="lg"
                     class="mb-2 mt-12 w-full"
                 >
-                    <template v-if="!loading">
-                        <template v-if="register"
-                            >Register with magic link</template
-                        >
-                        <template v-else>Login with magic link</template>
-                    </template>
+                    <template v-if="!loading">Join the waitlist</template>
                     <Spinner v-else class="h-6 w-6 text-white" />
                 </Button>
+
                 <div
-                    v-if="register"
-                    class="text-center text-xs font-medium text-muted-foreground"
+                    v-if="errorMessage"
+                    class="mt-2 text-center text-xs text-red-600"
                 >
-                    Already registered?
-                    <a
-                        @click.prevent="register = false"
-                        href="#"
-                        class="text-blue-700 hover:underline dark:text-blue-500"
-                        >Sign-in</a
-                    >
+                    {{ errorMessage }}
                 </div>
-                <div class="mb-3 text-center text-xs text-muted-foreground">
+
+                <div
+                    class="mb-3 mt-6 text-center text-xs text-muted-foreground"
+                >
                     Registration is temporarily closed.
-                    <router-link
-                        to="/waitlist"
-                        class="text-blue-600 hover:underline"
-                    >
-                        Join the waitlist
-                    </router-link>
                 </div>
             </form>
+
             <div
                 v-else
                 class="space-y-6 border-t pt-8 text-center text-gray-700 dark:border-gray-700 dark:text-gray-200"
             >
-                Check your email for the login link!
+                You're on the list! 🎉<br />We'll reach out as soon as
+                registration reopens.
             </div>
         </div>
     </div>
