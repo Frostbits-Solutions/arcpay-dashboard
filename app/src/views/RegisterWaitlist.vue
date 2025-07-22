@@ -107,7 +107,8 @@ onMounted(() => {
                 <div
                     class="mb-3 mt-6 text-center text-xs text-muted-foreground"
                 >
-                    Registration is temporarily closed.
+                    Registration is temporarily closed. But you can join the
+                    waitlist to be notified when it reopens.
                 </div>
             </form>
 
