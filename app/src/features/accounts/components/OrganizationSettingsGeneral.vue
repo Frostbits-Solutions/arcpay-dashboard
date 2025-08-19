@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import SettingsCard from '@/features/accounts/components/SettingsCard.vue'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/lib/ui/form'
 import { Input } from '@/lib/ui/input'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -7,12 +6,11 @@ import * as z from 'zod'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { deleteAccount, updateAccount } from '@/features/accounts/services/accounts'
-import { h } from 'vue'
+import { h, computed } from 'vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import { useToast } from '@/lib/ui/toast'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
-import { Skeleton } from '@/lib/ui/skeleton'
-import { Users, ArrowUpRight, Key, WalletMinimal, Receipt, Package } from 'lucide-vue-next'
+import { Users, ArrowUpRight, Key, Package } from 'lucide-vue-next'
 import { Clipboard } from '@/lib/ui/clipboard'
 import OrganizationSettingsListingsAddress from '@/features/accounts/components/OrganizationSettingsAddress.vue'
 
@@ -31,6 +29,8 @@ const quickLinks = [
   { name: 'Manage account security', icon: Key, to: { name: 'organization-organization-security' } },
   // {name: 'Billing and subscription', icon: Receipt, to: {name: 'organization-organization-general'}},
 ]
+
+const isPro = computed(() => accounts.activeSettings.subscription_tiers?.name === 'pro')
 
 async function onSubmit(values: any) {
   if (accounts.active?.id) {
@@ -86,15 +86,18 @@ async function onDelete(values: any) {
       </router-link>
     </li>
   </ul>
-  <div class="mb-2 mt-10 flex items-center justify-between rounded-lg border border-border bg-muted/50 p-4">
-    <div>
-      <h4 class="text-md font-normal">Subscription</h4>
-      <p class="text-sm text-muted-foreground">
-        This organization is currently on the <span class="font-bold uppercase text-primary">{{ accounts.activeSettings.subscription_tiers?.name }}</span> plan.<br />
-      </p>
+  <div :class="['mb-2 mt-10 rounded-lg p-2 p-[1px]', isPro ? 'bg-gradient' : 'bg-border']">
+    <div class="flex items-center justify-between rounded-lg bg-background p-4">
+      <div>
+        <h4 class="text-md font-normal">Subscription</h4>
+        <p class="text-sm text-muted-foreground">
+          This organization is currently on the
+          <span :class="['font-bold uppercase', isPro ? 'bg-gradient bg-clip-text text-transparent' : 'text-primary']">{{ accounts.activeSettings.subscription_tiers?.name }}</span> plan.<br />
+        </p>
+      </div>
+      <Button variant="gradient" class="mt-2" v-if="isPro">Manage</Button>
+      <Button variant="gradient" class="mt-2" v-else>Upgrade to Pro</Button>
     </div>
-    <Button variant="gradient" class="mt-2" v-if="accounts.activeSettings.subscription_tiers?.name !== 'pro'">Upgrade to Pro</Button>
-    <Button variant="outline" class="mt-2 border-foreground/10 bg-transparent" v-else>Manage subscription</Button>
   </div>
   <div class="rounded-lg border border-border p-4">
     <Form id="general-form" :validation-schema="formSchema" @submit="onSubmit" class="space-y-6">
