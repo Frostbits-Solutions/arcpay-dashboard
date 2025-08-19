@@ -1,24 +1,10 @@
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription, DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/lib/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/lib/ui/dialog'
 import { Button } from '@/lib/ui/button'
-import { createAccountJwtSecret } from '@/features/accounts/services/accounts'
+import { createAccountJwtSecret } from '@/services/accounts'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/lib/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/lib/ui/form'
 import { Input } from '@/lib/ui/input'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useToast } from '@/lib/ui/toast'
@@ -35,9 +21,11 @@ function handleOpenChange(val: boolean) {
 }
 
 // Form schema includes only name for JWT secret
-const formSchema = toTypedSchema(z.object({
-  name: z.string().min(4).max(50),
-}))
+const formSchema = toTypedSchema(
+  z.object({
+    name: z.string().min(4).max(50),
+  })
+)
 
 async function onSubmit(values: any) {
   if (accounts.active?.id) {
@@ -49,14 +37,14 @@ async function onSubmit(values: any) {
           title: `Error generating new JWT secret`,
           description: error.message,
           variant: 'destructive',
-          action: h(ToastError)
-        });
+          action: h(ToastError),
+        })
       } else {
         toast({
           title: `New JWT secret generated`,
           description: `You can use this secret to authenticate`,
-          action: h(ToastCheck)
-        });
+          action: h(ToastCheck),
+        })
         await accounts.fetchAccountSecrets(accounts.active.id)
         open.value = false
       }
@@ -68,14 +56,12 @@ async function onSubmit(values: any) {
 <template>
   <Dialog v-model:open="open" @update:open="handleOpenChange">
     <DialogTrigger as-child>
-      <slot/>
+      <slot />
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
         <DialogTitle>New JWT secret</DialogTitle>
-        <DialogDescription>
-          Generate a new secret to authenticate and communicate with the API. 
-        </DialogDescription>
+        <DialogDescription> Generate a new secret to authenticate and communicate with the API. </DialogDescription>
       </DialogHeader>
       <div class="py-4">
         <Form id="add-user-form" :validation-schema="formSchema" @submit="onSubmit" class="space-y-6">
@@ -91,14 +77,10 @@ async function onSubmit(values: any) {
         </Form>
       </div>
       <DialogFooter>
-        <Button type="submit" form="add-user-form" variant="gradient">
-          Generate secret
-        </Button>
+        <Button type="submit" form="add-user-form" variant="gradient"> Generate secret </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

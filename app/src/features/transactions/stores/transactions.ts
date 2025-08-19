@@ -1,12 +1,7 @@
 import { h, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import dayjs from 'dayjs'
-import {
-  getDailySalesVolume,
-  getHourlyTransactionsCount,
-  getTransactionsListings,
-  subscribeToTransactions
-} from '@/features/transactions/services/transaction'
+import { getDailySalesVolume, getHourlyTransactionsCount, getTransactionsListings, subscribeToTransactions } from '@/services/transaction'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
@@ -14,11 +9,11 @@ import { useNetworksStore } from '@/features/networks/stores/networks'
 import utc from 'dayjs/plugin/utc'
 import type { Transaction } from '@/models'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { getAccountActiveListingsAppids } from '@/features/accounts/services/accounts'
-import {supabase} from '@/lib/supabase/supabaseClient'
+import { getAccountActiveListingsAppids } from '@/services/accounts'
+import { supabase } from '@/lib/supabase/supabaseClient'
 
-type HourlyTransactionsTimeseries = {time: string, transactions: number}[]
-type DailySalesVolumeTimeseries = Record<string, string|number>[]
+type HourlyTransactionsTimeseries = { time: string; transactions: number }[]
+type DailySalesVolumeTimeseries = Record<string, string | number>[]
 
 const { toast } = useToast()
 
@@ -42,7 +37,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
           title: 'Error fetching hourly transaction count',
           description: error?.message || 'Unexpected error',
           variant: 'destructive',
-          action: h(ToastError)
+          action: h(ToastError),
         })
       } else {
         list.value = data
@@ -60,7 +55,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
           title: 'Error fetching hourly transaction count',
           description: error?.message || 'Unexpected error',
           variant: 'destructive',
-          action: h(ToastError)
+          action: h(ToastError),
         })
       } else {
         if (data.length) {
@@ -68,11 +63,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
           for (let i = 0; i < 168; i++) {
             const time = dayjs().utc().subtract(i, 'hour').format('YYYY-MM-DDTHH')
             const dataPoint = data.find((item) => item.time?.includes(time))
-            tm.push(dataPoint?{time: new Date(`${time}:00:00Z`).toLocaleString(), transactions: dataPoint?.count || 0}:{time: new Date(`${time}:00:00Z`).toLocaleString(), transactions: 0})
+            tm.push(dataPoint ? { time: new Date(`${time}:00:00Z`).toLocaleString(), transactions: dataPoint?.count || 0 } : { time: new Date(`${time}:00:00Z`).toLocaleString(), transactions: 0 })
           }
           hourlyTransactionsTimeseries.value = tm.reverse()
-        }
-        else hourlyTransactionsTimeseries.value = []
+        } else hourlyTransactionsTimeseries.value = []
       }
     }
   }
@@ -87,35 +81,37 @@ export const useTransactionsStore = defineStore('transactions', () => {
           title: 'Error fetching daily sales volume',
           description: error?.message || 'Unexpected error',
           variant: 'destructive',
-          action: h(ToastError)
+          action: h(ToastError),
         })
       } else {
         if (data.length) {
           dayjs.extend(utc)
           const totalVolumes: Record<string, number> = {}
-          data.forEach(dp => {
+          data.forEach((dp) => {
             if (dp.currency_ticker && dp.volume) {
               if (totalVolumes[dp.currency_ticker]) totalVolumes[dp.currency_ticker] += dp.volume
               else totalVolumes[dp.currency_ticker] = dp.volume
             }
           })
           totalSalesVolumes.value = totalVolumes
-          top5CurrenciesByVolume.value = Object.entries(totalVolumes).sort((a, b) => b[1] - a[1]).slice(0,5).map(i => i[0])
+          top5CurrenciesByVolume.value = Object.entries(totalVolumes)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map((i) => i[0])
           for (let i = 0; i < 30; i++) {
             const time = dayjs().utc().subtract(i, 'day').format('YYYY-MM-DD')
-            const dataPoint: Record<string, string|number> = { time: new Date(time).toLocaleDateString() }
-            top5CurrenciesByVolume.value.forEach(currency => {
+            const dataPoint: Record<string, string | number> = { time: new Date(time).toLocaleDateString() }
+            top5CurrenciesByVolume.value.forEach((currency) => {
               dataPoint[currency] = 0
             })
-            const dataPoints: Record<string, string|number|null>[] = data.filter((item: any) => item.time.includes(time))
+            const dataPoints: Record<string, string | number | null>[] = data.filter((item: any) => item.time.includes(time))
             dataPoints.forEach((point: any) => {
               dataPoint[point.currency_ticker] = point.volume
             })
             tm.push(dataPoint)
           }
           dailySalesVolumeTimeseries.value = tm.reverse()
-        }
-        else {
+        } else {
           dailySalesVolumeTimeseries.value = []
           totalSalesVolumes.value = {}
           top5CurrenciesByVolume.value = []
@@ -124,22 +120,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
     }
   }
 
-  async function fetchAll(toggleLoading:boolean = true) {
+  async function fetchAll(toggleLoading: boolean = true) {
     loading.value = toggleLoading
-    await Promise.allSettled([
-      await fetchTransactions(),
-      await fetchDailySalesVolume(),
-      await fetchHourlyTransactionsCount()
-    ])
+    await Promise.allSettled([await fetchTransactions(), await fetchDailySalesVolume(), await fetchHourlyTransactionsCount()])
     loading.value = false
   }
 
   async function subscribe() {
     if (accounts.active && networks.activeNetwork) {
       console.log('subribing to transactions')
-      const {data, error} = await getAccountActiveListingsAppids(accounts.active.id, networks.activeNetwork)
+      const { data, error } = await getAccountActiveListingsAppids(accounts.active.id, networks.activeNetwork)
       if (data && data.length) {
-        const appIds = data.map((item: {app_id: number}) => item.app_id)
+        const appIds = data.map((item: { app_id: number }) => item.app_id)
         realtimeChannel.value = subscribeToTransactions(supabase, appIds, () => {
           fetchAll(false)
         })
@@ -153,8 +145,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
     }
   }
 
-  watch(() => networks.activeNetwork, () => {fetchAll(true)})
-  watch(() => accounts.active, () => {fetchAll(true)})
+  watch(
+    () => networks.activeNetwork,
+    () => {
+      fetchAll(true)
+    }
+  )
+  watch(
+    () => accounts.active,
+    () => {
+      fetchAll(true)
+    }
+  )
 
   return { loading, list, totalSalesVolumes, top5CurrenciesByVolume, hourlyTransactionsTimeseries, dailySalesVolumeTimeseries, fetchAll, subscribe, unsubscribe }
 })

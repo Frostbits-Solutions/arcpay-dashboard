@@ -8,7 +8,6 @@ import OrganizationSettingsSecurity from '@/features/accounts/components/Organiz
 import OrganizationSettingsUsers from '@/features/accounts/components/OrganizationSettingsUsers.vue'
 import OrganizationSettingsListings from '@/features/accounts/components/OrganizationSettingsListings.vue'
 import DashboardView from '@/features/dashboard/views/DashboardView.vue'
-import DirectLinkView from '@/features/directlink/views/DirectLinkView.vue'
 import AuthenticatedView from '@/features/auth/views/AuthenticatedView.vue'
 
 const router = createRouter({
@@ -17,7 +16,7 @@ const router = createRouter({
     {
       path: '/auth',
       name: 'authentication',
-      component: AuthView
+      component: AuthView,
     },
     {
       path: '/',
@@ -60,18 +59,12 @@ const router = createRouter({
               path: 'listings',
               name: 'organization-organization-listings',
               component: OrganizationSettingsListings,
-            }
-          ]
-        }
-      ]
+            },
+          ],
+        },
+      ],
     },
-    {
-      path: '/:chain/listing/:id',
-      name: 'listing',
-      component: DirectLinkView,
-      props: true
-    }
-  ]
+  ],
 })
 
 router.beforeEach((to, from) => {

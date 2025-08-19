@@ -5,8 +5,7 @@ import { createPinia } from 'pinia'
 import { MotionPlugin } from '@vueuse/motion'
 
 import App from './App.vue'
-import router from './router'
-
+import router from './features/app/router'
 
 const app = createApp(App)
 

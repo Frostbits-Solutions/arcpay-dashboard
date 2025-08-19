@@ -6,11 +6,9 @@ import ChartDailySalesVolume from '@/features/dashboard/components/ChartDailySal
 import { useTransactionsStore } from '@/features/transactions/stores/transactions'
 import { DataTable } from '@/lib/ui/data-table'
 import { columns } from '@/features/transactions/components/transactions-table/columns'
-import { useCurrenciesStore } from '@/features/currencies/stores/currencies'
 
 const networks = useNetworksStore()
 const transactions = useTransactionsStore()
-useCurrenciesStore()
 const pollingInterval = ref<NodeJS.Timeout>()
 
 onMounted(async () => {

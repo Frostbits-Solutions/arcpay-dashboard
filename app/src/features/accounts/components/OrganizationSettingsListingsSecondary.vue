@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
-import { updateAccountChainsParameters, createAccountChainsParameters } from '@/features/accounts/services/accounts'
+import { updateAccountChainsParameters, createAccountChainsParameters } from '@/services/accounts'
 import { h, ref, watch, type Ref, computed } from 'vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'

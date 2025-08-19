@@ -4,10 +4,8 @@ import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
-import { getListings } from '@/features/listings/services/listings'
+import { getListings } from '@/services/listings'
 import type { CompositeListing } from '@/models'
-
-
 
 const { toast } = useToast()
 
@@ -27,7 +25,7 @@ export const useListingsStore = defineStore('listings', () => {
           title: 'Error fetching listings',
           description: error?.message || 'Unexpected error',
           variant: 'destructive',
-          action: h(ToastError)
+          action: h(ToastError),
         })
       } else {
         list.value = data as CompositeListing[]
@@ -36,8 +34,18 @@ export const useListingsStore = defineStore('listings', () => {
     }
   }
 
-  watch(() => networks.activeNetwork, () => {fetchListings()})
-  watch(() => accounts.active, () => {fetchListings()})
+  watch(
+    () => networks.activeNetwork,
+    () => {
+      fetchListings()
+    }
+  )
+  watch(
+    () => accounts.active,
+    () => {
+      fetchListings()
+    }
+  )
 
   return { loading, list, fetchListings }
 })

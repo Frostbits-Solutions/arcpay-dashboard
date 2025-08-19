@@ -1,23 +1,16 @@
 import { h, ref } from 'vue'
 import { defineStore } from 'pinia'
-import {
-  getAccount,
-  getAccountAddresses,
-  getAccountSecrets,
-  getAccountChainsParameters, getAccountSubscription,
-  getAccountUsers,
-  getAllAccounts,
-} from '@/features/accounts/services/accounts'
+import { getAccount, getAccountAddresses, getAccountSecrets, getAccountChainsParameters, getAccountSubscription, getAccountUsers, getAllAccounts } from '@/services/accounts'
 import { useSessionStore } from '@/features/auth/stores/session'
 import type { Tables } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountChainParameter, AccountSecret, AccountUser, SubscriptionTier } from '@/models'
 
-interface AccountSettings{
+interface AccountSettings {
   settings?: Account | null
-  subscription_id?: number;
-  subscription_expiration_date?: string | null;
+  subscription_id?: number
+  subscription_expiration_date?: string | null
   subscription_tiers?: Partial<SubscriptionTier> | null
   users?: Omit<AccountUser, 'account_id'>[]
   secrets?: AccountSecret[]
@@ -27,7 +20,7 @@ interface AccountSettings{
 }
 
 export const useAccountsStore = defineStore('accounts', () => {
-  const {toast} = useToast()
+  const { toast } = useToast()
   const all = ref<AccountMembership[]>([])
   const loading = ref(false)
   const active = ref<AccountMembership | undefined>()
@@ -43,7 +36,7 @@ export const useAccountsStore = defineStore('accounts', () => {
           title: 'Error fetching organizations',
           description: error?.message || 'Unexpected error',
           variant: 'destructive',
-          action: h(ToastError)
+          action: h(ToastError),
         })
       } else {
         all.value = data || []
@@ -56,13 +49,13 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'No user session',
         description: 'Please login and try again',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     }
   }
 
   function selectAccount(id: string) {
-    const account = all.value.find(a => a.id === id)
+    const account = all.value.find((a) => a.id === id)
     if (account) {
       loading.value = true
       active.value = account
@@ -87,7 +80,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'Error fetching account organization',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     } else {
       activeSettings.value.settings = settings
@@ -102,7 +95,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'Error fetching account subscription',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     } else {
       activeSettings.value.subscription_id = data.subscription_id
@@ -119,7 +112,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'Error fetching account users',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     } else {
       activeSettings.value.users = users
@@ -134,7 +127,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'Error fetching account addresses',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     } else {
       activeSettings.value.addresses = addresses
@@ -149,13 +142,13 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'Error fetching account secrets',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     } else {
       activeSettings.value.secrets = secrets
     }
   }
-  
+
   async function fetchAccountChainsParameters(accountId: string) {
     const { data: chainsParameters, error } = await getAccountChainsParameters(accountId)
     if (error) {
@@ -164,13 +157,24 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'Error fetching account chains paramaters',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     } else {
       activeSettings.value.chainsParameters = chainsParameters ?? []
     }
   }
 
-  
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, fetchAccountSecrets, selectAccount }
+  return {
+    all,
+    active,
+    activeSettings,
+    loading,
+    fetchAll,
+    fetchAccountSettings,
+    fetchAccountUsers,
+    fetchAccountAddresses,
+    fetchSubscriptionChainsParameters: fetchAccountChainsParameters,
+    fetchAccountSecrets,
+    selectAccount,
+  }
 })

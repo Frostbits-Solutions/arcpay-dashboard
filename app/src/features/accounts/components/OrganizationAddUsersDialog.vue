@@ -1,32 +1,11 @@
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription, DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/lib/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/lib/ui/dialog'
 import { Button } from '@/lib/ui/button'
-import { addAccountUser } from '@/features/accounts/services/accounts'
+import { addAccountUser } from '@/services/accounts'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/lib/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/lib/ui/select'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/lib/ui/form'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/lib/ui/select'
 import { Input } from '@/lib/ui/input'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useToast } from '@/lib/ui/toast'
@@ -35,51 +14,52 @@ import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 
 const accounts = useAccountsStore()
-const {toast} = useToast()
+const { toast } = useToast()
 const open = ref(false)
 
-const formSchema = toTypedSchema(z.object({
-  email: z.string({
-    required_error: 'Email is required',
-  }).email(),
-  role: z.enum(['admin', 'member']),
-}))
+const formSchema = toTypedSchema(
+  z.object({
+    email: z
+      .string({
+        required_error: 'Email is required',
+      })
+      .email(),
+    role: z.enum(['admin', 'member']),
+  })
+)
 
 async function onSubmit(values: any) {
   if (accounts.active?.id) {
-    const {data, error} =  await addAccountUser(accounts.active.id, values.email, values.role)
+    const { data, error } = await addAccountUser(accounts.active.id, values.email, values.role)
     if (error) {
       toast({
         title: `Error inviting member`,
         description: error.message,
         variant: 'destructive',
-        action: h(ToastError)
-      });
+        action: h(ToastError),
+      })
     } else {
       toast({
         title: `New member added`,
         description: `The will automatically see the organization next time they log-in`,
-        action: h(ToastCheck)
-      });
+        action: h(ToastCheck),
+      })
       await accounts.fetchAccountUsers(accounts.active.id)
       open.value = false
     }
   }
 }
-
 </script>
 
 <template>
   <Dialog v-model:open="open">
     <DialogTrigger as-child>
-      <slot/>
+      <slot />
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Invite team member</DialogTitle>
-        <DialogDescription>
-          Invite a new team member to manage the organization.
-        </DialogDescription>
+        <DialogDescription> Invite a new team member to manage the organization. </DialogDescription>
       </DialogHeader>
       <div class="py-4">
         <Form id="add-user-form" :validation-schema="formSchema" @submit="onSubmit" class="flex items-start gap-2">
@@ -103,12 +83,8 @@ async function onSubmit(values: any) {
                 </FormControl>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="admin">
-                      admin
-                    </SelectItem>
-                    <SelectItem value="member">
-                      member
-                    </SelectItem>
+                    <SelectItem value="admin"> admin </SelectItem>
+                    <SelectItem value="member"> member </SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -117,14 +93,10 @@ async function onSubmit(values: any) {
         </Form>
       </div>
       <DialogFooter>
-        <Button type="submit" form="add-user-form" variant="gradient">
-          Add member
-        </Button>
+        <Button type="submit" form="add-user-form" variant="gradient"> Add member </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

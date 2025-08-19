@@ -2,7 +2,7 @@
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
 import { Trash2, Package } from 'lucide-vue-next'
-import { deleteAccountJwtSecret, updateAccount } from '@/features/accounts/services/accounts'
+import { deleteAccountJwtSecret, updateAccount } from '@/services/accounts'
 import { h } from 'vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
