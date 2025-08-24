@@ -135,13 +135,15 @@ watch(
           <thead class="border-b text-xs text-muted-foreground/50">
             <tr>
               <th scope="col" class="px-6 py-3">Icon</th>
-              <th scope="col" class="px-6 py-3">Chain</th>
+              <th scope="col" class="px-6 py-3">Name</th>
+              <th scope="col" class="px-6 py-3">Ticker</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(currency, index) in listedPublicCurrencies" :key="currency.id">
               <td class="px-6 py-4"><img :src="currency.icon" alt="Icone" width="24" height="24" /></td>
               <td class="px-6 py-4">{{ currency.name }}</td>
+              <td class="px-6 py-4">{{ currency.ticker }}</td>
               <td class="px-6 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                   <span class="rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground"> Default </span>
@@ -151,6 +153,7 @@ watch(
             <tr v-for="(currency, index) in listedPrivateCurrencies" :key="currency.id">
               <td class="px-6 py-4"><img :src="currency.icon" alt="Icone" width="24" height="24" /></td>
               <td class="px-6 py-4">{{ currency.name }}</td>
+              <td class="px-6 py-4">{{ currency.ticker }}</td>
               <td class="px-6 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                   <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="removeCurrencyToUser(currency.id)">
