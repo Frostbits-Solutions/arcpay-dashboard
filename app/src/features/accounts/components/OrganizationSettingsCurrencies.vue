@@ -140,8 +140,8 @@ watch(
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(currency, index) in listedPublicCurrencies" :key="currency.id">
-              <td class="px-6 py-4"><img :src="currency.icon" alt="Icone" width="24" height="24" /></td>
+            <tr v-for="(currency) in listedPublicCurrencies" :key="currency.id">
+              <td class="px-6 py-4"><img :src="currency.icon ?? ''" alt="Icone" width="24" height="24" /></td>
               <td class="px-6 py-4">{{ currency.name }}</td>
               <td class="px-6 py-4">{{ currency.ticker }}</td>
               <td class="px-6 py-4 text-center">
@@ -150,8 +150,8 @@ watch(
                 </div>
               </td>
             </tr>
-            <tr v-for="(currency, index) in listedPrivateCurrencies" :key="currency.id">
-              <td class="px-6 py-4"><img :src="currency.icon" alt="Icone" width="24" height="24" /></td>
+            <tr v-for="(currency) in listedPrivateCurrencies" :key="currency.id">
+              <td class="px-6 py-4"><img :src="currency.icon ?? ''" alt="Icone" width="24" height="24" /></td>
               <td class="px-6 py-4">{{ currency.name }}</td>
               <td class="px-6 py-4">{{ currency.ticker }}</td>
               <td class="px-6 py-4 text-center">
