@@ -62,7 +62,6 @@ onMounted(() => {
             <form
                 v-if="!success"
                 class="mt-8 border-t border-border pt-10"
-                @submit.prevent="handleLogin"
             >
                 <div>
                     <label
