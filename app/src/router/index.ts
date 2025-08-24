@@ -10,6 +10,7 @@ import OrganizationSettingsListings from '@/components/organization/Organization
 import DashboardView from '@/views/DashboardView.vue'
 import DirectLinkView from '@/views/DirectLinkView.vue'
 import AuthenticatedView from '@/views/AuthenticatedView.vue'
+import RegisterWaitlist from '@/views/RegisterWaitlist.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,11 @@ const router = createRouter({
       path: '/auth',
       name: 'authentication',
       component: AuthView
+    },
+    {
+      path: '/waitlist',
+      name: 'waitlist',
+      component: RegisterWaitlist
     },
     {
       path: '/',

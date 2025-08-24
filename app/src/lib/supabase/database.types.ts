@@ -476,6 +476,21 @@ export type Database = {
           },
         ]
       }
+      mailing_wait_list: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
       sales: {
         Row: {
           created_at: string
