@@ -1,4 +1,5 @@
 create schema if not exists "private";
+create schema if not exists "parts";
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 set check_function_bodies = off;
@@ -22,15 +23,15 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.tables 
         WHERE table_name = partition_name 
-        AND table_schema = 'public'
+        AND table_schema = 'parts'
     ) THEN
-        EXECUTE format('CREATE TABLE "public"."%I" PARTITION OF public.transactions FOR VALUES FROM (%L) TO (%L)',
+        EXECUTE format('CREATE TABLE "parts"."%I" PARTITION OF public.transactions FOR VALUES FROM (%L) TO (%L)',
                       partition_name, start_date, end_date);
-        EXECUTE format('ALTER TABLE "public"."%I" ENABLE ROW LEVEL SECURITY', partition_name);
-        EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "anon"', partition_name);
-        EXECUTE format('GRANT SELECT ON TABLE "public"."%I" TO "authenticated"', partition_name);
-        EXECUTE format('GRANT ALL ON TABLE "public"."%I" TO "service_role"', partition_name);
-        EXECUTE format('CREATE POLICY "Enable read access for all users" ON "public"."%I" FOR SELECT USING (true)', partition_name);
+        EXECUTE format('ALTER TABLE "parts"."%I" ENABLE ROW LEVEL SECURITY', partition_name);
+        EXECUTE format('GRANT SELECT ON TABLE "parts"."%I" TO "anon"', partition_name);
+        EXECUTE format('GRANT SELECT ON TABLE "parts"."%I" TO "authenticated"', partition_name);
+        EXECUTE format('GRANT ALL ON TABLE "parts"."%I" TO "service_role"', partition_name);
+        EXECUTE format('CREATE POLICY "Enable read access for all users" ON "parts"."%I" FOR SELECT USING (true)', partition_name);
     END IF;
 END;
 $$;
