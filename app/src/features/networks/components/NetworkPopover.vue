@@ -13,18 +13,18 @@ const supportedNetworks = ['algo:mainnet', 'algo:testnet', 'voi:mainnet']
     <PopoverTrigger>
       <Button variant="outline">
         <GlobeLock class="mr-1 h-4 w-4" />
-        {{ networks.activeNetwork }}
+        {{ networks.activeNetwork?.id }}
         <ChevronDown class="ml-4 h-4 w-4" />
       </Button>
     </PopoverTrigger>
     <PopoverContent side="bottom" align="start" class="p-1">
       <ul class="pb-1 text-foreground">
         <li v-for="network in supportedNetworks" :key="network" class="[&:not(:first-child)]:mt-1 [&:not(:last-child)]:mb-1">
-          <Button variant="ghost" :class="['w-full justify-between rounded-sm px-2', network === networks.activeNetwork ? 'bg-muted/70' : '']" @click.prevent="networks.setActive(network)">
+          <Button variant="ghost" :class="['w-full justify-between rounded-sm px-2', network === networks.activeNetwork?.id ? 'bg-muted/70' : '']" @click.prevent="networks.setActive(network)">
             <span class="truncate">
               {{ network }}
             </span>
-            <Check v-if="network === networks.activeNetwork" class="ml-2 h-4 w-4 shrink-0 text-foreground" />
+            <Check v-if="network === networks.activeNetwork?.id" class="ml-2 h-4 w-4 shrink-0 text-foreground" />
           </Button>
         </li>
       </ul>

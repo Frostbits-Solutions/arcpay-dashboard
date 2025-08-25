@@ -54,7 +54,7 @@ CREATE TYPE "public"."composite_listing" AS (
 	"created_at" timestamp without time zone,
 	"updated_at" timestamp without time zone,
 	"status" "public"."listings_statuses",
-	"chain_id" "text",
+	"network_id" "text",
     "contract_version" text,
 	"creator_address" "text",
 	"name" "text",
@@ -99,17 +99,17 @@ CREATE TABLE IF NOT EXISTS "public"."listings" (
     "asset_type" "public"."assets_types" NOT NULL,
     "asset_qty" double precision DEFAULT '1'::double precision NOT NULL,
     "metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
-    "chain_id" "text" NOT NULL,
+    "network_id" "text" NOT NULL,
     "contract_version" text NOT NULL,
     CONSTRAINT "listings_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "listings_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
-    CONSTRAINT "listings_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id"),
-    CONSTRAINT "listings_currency_chain_id_fkey" FOREIGN KEY ("currency", "chain_id") REFERENCES "public"."currencies"("id", "chain_id") ON DELETE CASCADE,
-    CONSTRAINT "listings_contract_version_chain_id_fkey" FOREIGN KEY ("contract_version", "chain_id") REFERENCES "public"."contracts_versions"("version", "chain_id") ON DELETE RESTRICT
+    CONSTRAINT "listings_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id"),
+    CONSTRAINT "listings_currency_network_id_fkey" FOREIGN KEY ("currency", "network_id") REFERENCES "public"."currencies"("id", "network_id") ON DELETE CASCADE,
+    CONSTRAINT "listings_contract_version_network_id_fkey" FOREIGN KEY ("contract_version", "network_id") REFERENCES "public"."contracts_versions"("version", "network_id") ON DELETE RESTRICT
 );
 
 ALTER TABLE "public"."listings" OWNER TO "postgres";
-CREATE INDEX IF NOT EXISTS "idx_listings" ON "public"."listings" ("account_id", "status", "chain_id", "currency", "type", "asset_type", "asset_id", "creator_address");
+CREATE INDEX IF NOT EXISTS "idx_listings" ON "public"."listings" ("account_id", "status", "network_id", "currency", "type", "asset_type", "asset_id", "creator_address");
 
 -- RLS Policies for listings
 ALTER TABLE "public"."listings" ENABLE ROW LEVEL SECURITY;
@@ -239,7 +239,7 @@ CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RET
         l.created_at,
         l.updated_at,
         l.status,
-        l.chain_id,
+        l.network_id,
         l.contract_version,
         l.creator_address,
         l.name,
@@ -267,7 +267,7 @@ CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RET
         left join public.auctions a on a.listing_id = get_listing_by_id.listing_id
         left join public.dutch_auctions d on d.listing_id = get_listing_by_id.listing_id
         left join public.sales s on s.listing_id = get_listing_by_id.listing_id
-        left join public.currencies c on (c.id = l.currency and c.chain_id = l.chain_id)
+        left join public.currencies c on (c.id = l.currency and c.network_id = l.network_id)
     where l.id = get_listing_by_id.listing_id$$;
 
 ALTER FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") OWNER TO "postgres";

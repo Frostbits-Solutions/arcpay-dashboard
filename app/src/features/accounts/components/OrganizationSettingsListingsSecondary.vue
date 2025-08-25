@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { Button } from '@/lib/ui/button'
-import { updateAccountChainsParameters, createAccountChainsParameters } from '@/services/accounts'
+import { updateAccountNetworksParameters, createAccountNetworksParameters } from '@/services/accounts'
 import { h, ref, watch, type Ref, computed } from 'vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
@@ -13,7 +13,7 @@ import { Input } from '@/lib/ui/input'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
-import type { AccountChainParameter } from '@/models'
+import type { AccountNetworkParameter } from '@/models'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 
 const accounts = useAccountsStore()
@@ -21,12 +21,12 @@ const network = useNetworksStore()
 
 const { toast } = useToast()
 const hasProSubscription = computed<boolean>(() => accounts.activeSettings.subscription_tiers?.allow_secondary_listings ?? false)
-const chains: Ref<string[]> = ref(network.networks)
-const activeChainTab = ref(0)
-const activeChainParameter: Ref<AccountChainParameter> = ref({
+const networks: Ref<string[]> = ref(network.networks)
+const activeNetworkTab = ref(0)
+const activeNetworkParameter: Ref<AccountNetworkParameter> = ref({
   account_id: '',
   created_at: '',
-  chain_id: '',
+  network_id: '',
   enable_secondary: false,
   secondary_fee_address: null,
   secondary_percentage_fee: 0,
@@ -36,7 +36,8 @@ const formSchema = toTypedSchema(
   z.object({
     enable_secondary: z.boolean().optional(),
     secondary_percentage_fee: z.number().min(0, 'Percentage must be at least 0.00%').max(50, 'Percentage must be at most 50.00%'),
-    secondary_fee_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid chain address'), // Regex for Ethereum-like addresses
+    // TODO - Update the regex to match algo addresses
+    secondary_fee_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid network address'), // Regex for Ethereum-like addresses
   })
 )
 
@@ -45,54 +46,54 @@ const form = useForm({
 })
 
 function resetForm() {
-  const selectedChain = chains.value[activeChainTab.value]
-  if (!selectedChain || !accounts.active || !accounts.activeSettings.chainsParameters) return
+  const selectedNetwork = networks.value[activeNetworkTab.value]
+  if (!selectedNetwork || !accounts.active || !accounts.activeSettings.networksParameters) return
 
-  // Find the chain parameter for the selected chain
-  const chainParameter = accounts.activeSettings.chainsParameters.find((c) => c.chain_id === selectedChain)
+  // Find the network parameter for the selected network
+  const networkParameter = accounts.activeSettings.networksParameters.find((c) => c.network_id === selectedNetwork)
 
-  // Update the activeChainParameter based on the found chain parameter or set default values
-  activeChainParameter.value = chainParameter
-    ? { ...chainParameter, account_id: accounts.active.id }
+  // Update the activeNetworkParameter based on the found network parameter or set default values
+  activeNetworkParameter.value = networkParameter
+    ? { ...networkParameter, account_id: accounts.active.id }
     : {
         account_id: accounts.active.id,
         created_at: '',
-        chain_id: selectedChain,
+        network_id: selectedNetwork,
         enable_secondary: false,
         secondary_fee_address: null,
         secondary_percentage_fee: 0,
       }
 
-  // Reset the form with the updated activeChainParameter values
+  // Reset the form with the updated activeNetworkParameter values
   form.resetForm({
     values: {
-      enable_secondary: activeChainParameter.value.enable_secondary,
-      secondary_fee_address: activeChainParameter.value.secondary_fee_address ?? '',
-      secondary_percentage_fee: activeChainParameter.value.secondary_percentage_fee,
+      enable_secondary: activeNetworkParameter.value.enable_secondary,
+      secondary_fee_address: activeNetworkParameter.value.secondary_fee_address ?? '',
+      secondary_percentage_fee: activeNetworkParameter.value.secondary_percentage_fee,
     },
   })
 }
 
-const onChainParamFormSubmit = form.handleSubmit(async (values) => {
-  if (!hasProSubscription.value || !accounts.active?.id || !accounts.activeSettings.chainsParameters) return
+const onNetworkParamFormSubmit = form.handleSubmit(async (values) => {
+  if (!hasProSubscription.value || !accounts.active?.id || !accounts.activeSettings.networksParameters) return
 
-  const accountId = activeChainParameter.value.account_id
-  const chainId = chains.value[activeChainTab.value]
+  const accountId = activeNetworkParameter.value.account_id
+  const networkId = networks.value[activeNetworkTab.value]
 
-  // Check if chain parameter already exists
-  const existingChainParameter = accounts.activeSettings.chainsParameters.find((c) => c.chain_id === chainId)
+  // Check if network parameter already exists
+  const existingNetworkParameter = accounts.activeSettings.networksParameters.find((c) => c.network_id === networkId)
 
-  const apiCall = existingChainParameter
-    ? updateAccountChainsParameters // Update if exists
-    : createAccountChainsParameters // Create if not exists
+  const apiCall = existingNetworkParameter
+    ? updateAccountNetworksParameters // Update if exists
+    : createAccountNetworksParameters // Create if not exists
 
   // Call the appropriate API
-  const { data, error } = await apiCall(accountId, chainId, values.enable_secondary ?? false, values.secondary_fee_address ?? '', values.secondary_percentage_fee)
+  const { data, error } = await apiCall(accountId, networkId, values.enable_secondary ?? false, values.secondary_fee_address ?? '', values.secondary_percentage_fee)
 
   if (error) {
     // Show error toast
     toast({
-      title: `Error ${existingChainParameter ? 'updating' : 'creating'} chain parameter`,
+      title: `Error ${existingNetworkParameter ? 'updating' : 'creating'} network parameter`,
       description: error.message,
       variant: 'destructive',
       action: h(ToastError),
@@ -100,12 +101,12 @@ const onChainParamFormSubmit = form.handleSubmit(async (values) => {
     return
   }
 
-  // Update local state with the new/updated chain parameters
-  if (data) accounts.activeSettings.chainsParameters = data
+  // Update local state with the new/updated network parameters
+  if (data) accounts.activeSettings.networksParameters = data
 
   // Show success toast
   toast({
-    title: `${existingChainParameter ? 'Updated' : 'Created'} chain parameter for ${chainId}`,
+    title: `${existingNetworkParameter ? 'Updated' : 'Created'} network parameter for ${networkId}`,
     action: h(ToastCheck),
   })
 })
@@ -119,7 +120,7 @@ watch(
 )
 
 watch(
-  activeChainTab,
+  activeNetworkTab,
   () => {
     resetForm()
   },
@@ -150,24 +151,24 @@ watch(
       <div class="mt-2 rounded-lg border border-border p-4">
         <div class="flex border-b border-border">
           <button
-            v-for="(chain, index) in chains"
-            :key="chain"
-            @click="activeChainTab = index"
-            :class="['border-b-2 px-4 py-2 text-sm', activeChainTab === index ? 'border-primary text-primary' : 'border-transparent text-muted-foreground']"
+            v-for="(network, index) in networks"
+            :key="network"
+            @click="activeNetworkTab = index"
+            :class="['border-b-2 px-4 py-2 text-sm', activeNetworkTab === index ? 'border-primary text-primary' : 'border-transparent text-muted-foreground']"
           >
-            {{ chain }}
+            {{ network }}
           </button>
         </div>
-        <form id="chains-parameters-form" class="mt-6 space-y-6" @submit="onChainParamFormSubmit">
+        <form id="networks-parameters-form" class="mt-6 space-y-6" @submit="onNetworkParamFormSubmit">
           <div>
-            <div v-for="(chain, index) in chains" :key="chain" v-show="activeChainTab === index" class="mt-4">
+            <div v-for="(network, index) in networks" :key="network" v-show="activeNetworkTab === index" class="mt-4">
               <!-- Enable Secondary Listing -->
               <FormField v-slot="{ value, handleChange }" name="enable_secondary">
                 <FormItem>
                   <div class="flex items-center justify-between px-4 py-4">
                     <div>
-                      <FormLabel>Enable secondary listing for {{ chain }}</FormLabel>
-                      <FormDescription> Allow fees on secondary listings for this chain. </FormDescription>
+                      <FormLabel>Enable secondary listing for {{ network }}</FormLabel>
+                      <FormDescription> Allow fees on secondary listings for this network. </FormDescription>
                     </div>
                     <FormControl>
                       <Switch @update:checked="handleChange" :checked="value" />
@@ -213,7 +214,7 @@ watch(
             </div>
           </div>
           <div class="flex justify-end">
-            <Button variant="outline" type="submit" form="chains-parameters-form"> Save </Button>
+            <Button variant="outline" type="submit" form="networks-parameters-form"> Save </Button>
           </div>
         </form>
       </div>

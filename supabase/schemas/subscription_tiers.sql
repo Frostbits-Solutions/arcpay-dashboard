@@ -6,7 +6,7 @@ This table provides a comprehensive overview of permissions for different user r
 | Table                           | anon               | authenticated       | member              | admin               | owner               |
 |---------------------------------|--------------------|---------------------|---------------------|---------------------|---------------------|
 | subscription_tiers              | SELECT (read-only) | SELECT (read-only)  | SELECT (read-only)  | SELECT (read-only)  | SELECT (read-only)  |
-| subscriptions_chains_parameters | SELECT (read-only) | SELECT (read-only)  | SELECT (read-only)  | SELECT (read-only)  | SELECT (read-only)  |
+| subscriptions_networks_parameters | SELECT (read-only) | SELECT (read-only)  | SELECT (read-only)  | SELECT (read-only)  | SELECT (read-only)  |
 
 ## Function Permissions
 | Function                       | anon               | authenticated       | member              | admin               | owner               |
@@ -22,7 +22,7 @@ This table provides a comprehensive overview of permissions for different user r
 */
 
 -------------------- TYPES --------------------
-CREATE TYPE "public"."chain_subscription_parameters" AS (
+CREATE TYPE "public"."network_subscription_parameters" AS (
     allow_secondary_listings boolean,
     allow_custom_currencies boolean,
     flat_fees float,
@@ -65,25 +65,25 @@ GRANT ALL ON SEQUENCE "public"."subscription_tiers_id_seq" TO "service_role";
 CREATE POLICY "Enable read access for all users" ON "public"."subscription_tiers" FOR SELECT USING (true);
 
 
--------------------- SUBSCRIPTION_CHAINS_PARAMETERS --------------------
-CREATE TABLE IF NOT EXISTS "public"."subscriptions_chains_parameters" (
+-------------------- SUBSCRIPTION_NETWORKS_PARAMETERS --------------------
+CREATE TABLE IF NOT EXISTS "public"."subscriptions_networks_parameters" (
     "subscription_id" bigint NOT NULL,
-    "chain_id" "text" NOT NULL,
+    "network_id" "text" NOT NULL,
     "flat_fees" float NOT NULL DEFAULT 10,
     "sales_fees" float NOT NULL DEFAULT 0,
     "secondary_flat_fees" float NOT NULL DEFAULT 20,
     "secondary_sales_fees" float NOT NULL DEFAULT 0,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "subscriptions_chains_parameters_pkey" PRIMARY KEY ("subscription_id", "chain_id"),
-    CONSTRAINT "subscriptions_chains_parameters_subscription_id_fkey" FOREIGN KEY ("subscription_id") REFERENCES "public"."subscription_tiers"("id") ON DELETE CASCADE,
-    CONSTRAINT "subscriptions_chains_parameters_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE CASCADE
+    CONSTRAINT "subscriptions_networks_parameters_pkey" PRIMARY KEY ("subscription_id", "network_id"),
+    CONSTRAINT "subscriptions_networks_parameters_subscription_id_fkey" FOREIGN KEY ("subscription_id") REFERENCES "public"."subscription_tiers"("id") ON DELETE CASCADE,
+    CONSTRAINT "subscriptions_networks_parameters_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE CASCADE
 );
-ALTER TABLE "public"."subscriptions_chains_parameters" OWNER TO "postgres";
+ALTER TABLE "public"."subscriptions_networks_parameters" OWNER TO "postgres";
 
--- RLS for subscriptions_chains_parameters
-ALTER TABLE "public"."subscriptions_chains_parameters" ENABLE ROW LEVEL SECURITY;
-GRANT SELECT ON TABLE "public"."subscriptions_chains_parameters" TO "anon";
-GRANT SELECT ON TABLE "public"."subscriptions_chains_parameters" TO "authenticated";
-GRANT ALL ON TABLE "public"."subscriptions_chains_parameters" TO "service_role";
+-- RLS for subscriptions_networks_parameters
+ALTER TABLE "public"."subscriptions_networks_parameters" ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON TABLE "public"."subscriptions_networks_parameters" TO "anon";
+GRANT SELECT ON TABLE "public"."subscriptions_networks_parameters" TO "authenticated";
+GRANT ALL ON TABLE "public"."subscriptions_networks_parameters" TO "service_role";
 
-CREATE POLICY "Enable read access for all users" ON "public"."subscriptions_chains_parameters" FOR SELECT USING (true);
+CREATE POLICY "Enable read access for all users" ON "public"."subscriptions_networks_parameters" FOR SELECT USING (true);

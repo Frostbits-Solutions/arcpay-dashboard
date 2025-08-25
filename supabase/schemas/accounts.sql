@@ -3,14 +3,14 @@
 
 This table provides a comprehensive overview of permissions for different user roles across all tables in the accounts schema.
 
-| Table                      | anon                   | authenticated             | member                  | admin                         | owner                          |
-|----------------------------|------------------------|---------------------------|-------------------------|-------------------------------|--------------------------------|
-| accounts                   | No access              | No direct access          | SELECT only             | SELECT, UPDATE                | ALL (full CRUD access)         |
-| accounts_addresses         | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_users_association | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_chains_parameters | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_currencies        | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_secrets           | No access              | No direct access          | No access               | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| Table                        | anon                   | authenticated             | member                  | admin                         | owner                          |
+|------------------------------|------------------------|---------------------------|-------------------------|-------------------------------|--------------------------------|
+| accounts                     | No access              | No direct access          | SELECT only             | SELECT, UPDATE                | ALL (full CRUD access)         |
+| accounts_addresses           | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_users_association   | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_networks_parameters | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_currencies          | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_secrets             | No access              | No direct access          | No access               | ALL (full CRUD access)        | ALL (full CRUD access)         |
 
 ## Function Permissions
 | Function                   | anon                   | authenticated           | member                  | admin                   | owner                   |
@@ -89,35 +89,35 @@ ALTER TABLE "public"."accounts_users_association" ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON TABLE "public"."accounts_users_association" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_users_association" TO "service_role";
 
--------------------- ACCOUNTS CHAINS PARAMETERS --------------------
-CREATE TABLE IF NOT EXISTS "public"."accounts_chains_parameters" (
+-------------------- ACCOUNTS NETWORKS PARAMETERS --------------------
+CREATE TABLE IF NOT EXISTS "public"."accounts_networks_parameters" (
     "account_id" "uuid" NOT NULL,
-    "chain_id" text NOT NULL,
+    "network_id" text NOT NULL,
     "enable_secondary" boolean NOT NULL DEFAULT false,
     "secondary_percentage_fee" float NOT NULL DEFAULT 0,
     "secondary_fee_address" text,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "accounts_chains_parameters_pkey" PRIMARY KEY ("account_id", "chain_id"),
-    CONSTRAINT "accounts_chains_parameters_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
-    CONSTRAINT "accounts_chains_parameters_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE CASCADE
+    CONSTRAINT "accounts_networks_parameters_pkey" PRIMARY KEY ("account_id", "network_id"),
+    CONSTRAINT "accounts_networks_parameters_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
+    CONSTRAINT "accounts_networks_parameters_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE CASCADE
 );
-ALTER TABLE "public"."accounts_chains_parameters" OWNER TO "postgres";
+ALTER TABLE "public"."accounts_networks_parameters" OWNER TO "postgres";
 
--- RLS for accounts_chains_parameters
-ALTER TABLE "public"."accounts_chains_parameters" ENABLE ROW LEVEL SECURITY;
-GRANT SELECT ON TABLE "public"."accounts_chains_parameters" TO "anon";
-GRANT ALL ON TABLE "public"."accounts_chains_parameters" TO "authenticated"; 
-GRANT ALL ON TABLE "public"."accounts_chains_parameters" TO "service_role";
+-- RLS for accounts_networks_parameters
+ALTER TABLE "public"."accounts_networks_parameters" ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON TABLE "public"."accounts_networks_parameters" TO "anon";
+GRANT ALL ON TABLE "public"."accounts_networks_parameters" TO "authenticated";
+GRANT ALL ON TABLE "public"."accounts_networks_parameters" TO "service_role";
 
 -------------------- ACCOUNTS CURRENCIES --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts_currencies" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "account_id" "uuid" NOT NULL,
     "currency" bigint NOT NULL,
-    "chain_id" "text" NOT NULL,
-    CONSTRAINT "accounts_currencies_pkey" PRIMARY KEY ("account_id", "currency", "chain_id"),
+    "network_id" "text" NOT NULL,
+    CONSTRAINT "accounts_currencies_pkey" PRIMARY KEY ("account_id", "currency", "network_id"),
     CONSTRAINT "accounts_currencies_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
-    CONSTRAINT "accounts_currencies_currency_fkey" FOREIGN KEY ("currency", "chain_id") REFERENCES "public"."currencies"("id", "chain_id") ON DELETE CASCADE
+    CONSTRAINT "accounts_currencies_currency_fkey" FOREIGN KEY ("currency", "network_id") REFERENCES "public"."currencies"("id", "network_id") ON DELETE CASCADE
 );
 ALTER TABLE "public"."accounts_currencies" OWNER TO "postgres";
 
@@ -212,18 +212,18 @@ CREATE OR REPLACE FUNCTION "private"."get_user_accounts"("user_email" "text") RE
     AS $_$select account_id from public.accounts_users_association where user_email = $1$_$;
 ALTER FUNCTION "private"."get_user_accounts"("user_email" "text") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."get_account_subscription_params"("p_account_id" "uuid", "p_chain_id" "text")
-RETURNS "public"."chain_subscription_parameters"
+CREATE OR REPLACE FUNCTION "public"."get_account_subscription_params"("p_account_id" "uuid", "p_network_id" "text")
+RETURNS "public"."network_subscription_parameters"
 LANGUAGE "sql" STABLE SECURITY DEFINER
 SET search_path = ''
 AS $_$
     SELECT st.allow_secondary_listings, st.allow_custom_currencies, scp.flat_fees, scp.sales_fees, scp.secondary_flat_fees, scp.secondary_sales_fees
     FROM "public"."subscription_tiers" st
     JOIN "public"."accounts" a ON st.id = a.subscription_id
-    JOIN "public"."subscriptions_chains_parameters" scp ON st.id = scp.subscription_id AND scp.chain_id = p_chain_id
+    JOIN "public"."subscriptions_networks_parameters" scp ON st.id = scp.subscription_id AND scp.network_id = p_network_id
     WHERE a.id = p_account_id;
 $_$;
-ALTER FUNCTION "public"."get_account_subscription_params"("uuid", "p_chain_id" "text") OWNER TO "postgres";
+ALTER FUNCTION "public"."get_account_subscription_params"("uuid", "p_network_id" "text") OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "private"."authorize_request"("account_id" "uuid") RETURNS boolean
 LANGUAGE plpgsql SECURITY DEFINER
@@ -323,7 +323,7 @@ GRANT EXECUTE ON FUNCTION "private"."is_user_account_owner"("user_email" "text",
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_admin"("user_email" "text", "account_id" "uuid") TO "service_role";
 GRANT EXECUTE ON FUNCTION "private"."is_user_account_member"("user_email" "text", "account_id" "uuid") TO "service_role";
 GRANT EXECUTE ON FUNCTION "private"."get_user_accounts"("user_email" "text") TO "service_role";
-GRANT EXECUTE ON FUNCTION "public"."get_account_subscription_params"("uuid", "p_chain_id" "text") TO "anon", "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "public"."get_account_subscription_params"("uuid", "p_network_id" "text") TO "anon", "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."authorize_request"("account_id" "uuid") TO "service_role";
 
 -------------------- RLS --------------------
@@ -344,11 +344,11 @@ CREATE POLICY "Account admins can insert account users" ON "public"."accounts_us
 CREATE POLICY "Account admins can update account users" ON "public"."accounts_users_association" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete account users" ON "public"."accounts_users_association" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
--- accounts_chains_parameters
-CREATE POLICY "Public can view chain parameters" ON "public"."accounts_chains_parameters" FOR SELECT USING (true);
-CREATE POLICY "Account admins can insert accounts chain parameters" ON "public"."accounts_chains_parameters" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
-CREATE POLICY "Account admins can update accounts chain parameters" ON "public"."accounts_chains_parameters" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
-CREATE POLICY "Account admins can delete accounts chain parameters" ON "public"."accounts_chains_parameters" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+-- accounts_networks_parameters
+CREATE POLICY "Public can view network parameters" ON "public"."accounts_networks_parameters" FOR SELECT USING (true);
+CREATE POLICY "Account admins can insert accounts network parameters" ON "public"."accounts_networks_parameters" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can update accounts network parameters" ON "public"."accounts_networks_parameters" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can delete accounts network parameters" ON "public"."accounts_networks_parameters" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
 -- accounts_currencies
 CREATE POLICY "Public can view account currencies" ON "public"."accounts_currencies" FOR SELECT USING (true);

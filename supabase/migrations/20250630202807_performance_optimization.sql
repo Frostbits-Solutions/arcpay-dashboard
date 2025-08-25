@@ -20,7 +20,7 @@ drop policy "Owners can update and delete account" on "public"."accounts";
 
 drop policy "Account admins can manage addresses" on "public"."accounts_addresses";
 
-drop policy "Account admins can manage accounts chain parameters" on "public"."accounts_chains_parameters";
+drop policy "Account admins can manage accounts network parameters" on "public"."accounts_networks_parameters";
 
 drop policy "Account admins can manage account currencies" on "public"."accounts_currencies";
 
@@ -82,24 +82,24 @@ to authenticated
 using (private.is_user_account_admin(( SELECT auth.email() AS email), account_id));
 
 
-create policy "Account admins can delete accounts chain parameters"
-on "public"."accounts_chains_parameters"
+create policy "Account admins can delete accounts network parameters"
+on "public"."accounts_networks_parameters"
 as permissive
 for delete
 to authenticated
 using (private.is_user_account_admin(( SELECT auth.email() AS email), account_id));
 
 
-create policy "Account admins can insert accounts chain parameters"
-on "public"."accounts_chains_parameters"
+create policy "Account admins can insert accounts network parameters"
+on "public"."accounts_networks_parameters"
 as permissive
 for insert
 to authenticated
 with check (private.is_user_account_admin(( SELECT auth.email() AS email), account_id));
 
 
-create policy "Account admins can update accounts chain parameters"
-on "public"."accounts_chains_parameters"
+create policy "Account admins can update accounts network parameters"
+on "public"."accounts_networks_parameters"
 as permissive
 for update
 to authenticated

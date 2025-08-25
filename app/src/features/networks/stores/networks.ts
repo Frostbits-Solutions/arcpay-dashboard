@@ -1,53 +1,62 @@
-import { h, ref } from 'vue'
+import { computed, h, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Chain, Currency } from '@/models'
-import { getChains } from '@/services/networks'
-import { toast } from '@/lib/ui/toast'
-import ToastError from '@/lib/ui/toast/ToastError.vue'
+import type { Network, Currency } from '@/models'
+import { getNetworks } from '@/services/networks/networks'
 import { getCurrencies } from '@/services/currencies'
+import { errorHandler } from '@/lib/errorHandler'
+import { services } from '@/services/networks/networks'
+import { walletProviders } from '@/features/networks/walletProviders'
 
 export const useNetworksStore = defineStore('networks', () => {
-  const activeNetwork = ref<string | undefined>()
-  const networks = ref<string[]>([])
+  const networks = ref<Record<string, Network>>({})
+  const activeNetworkId = ref<string | undefined>()
   const activeNetworkCurrencies = ref<Currency[]>([])
 
-  async function setActive(chain_id: string) {
-    await fetchCurrencies()
-    activeNetwork.value = chain_id
-    localStorage.setItem('defaultNetwork', chain_id)
+  const activeNetwork = computed(() => {
+    if (!activeNetworkId.value) return undefined
+    return {
+      ...networks.value[activeNetworkId.value],
+      currencies: activeNetworkCurrencies.value,
+      services: services[activeNetworkId.value],
+      walletProviders: walletProviders[activeNetworkId.value],
+    }
+  })
+
+  const supportedNetworkIds = computed(() => Object.keys(networks.value))
+
+  async function setActive(networkId: string, setDefault?: boolean) {
+    try {
+      if (!networks.value[networkId]) throw new Error(`Network ${networkId} is not supported`)
+      if (!services[networkId]) throw new Error(`Network ${networkId} not supported: Missing services`)
+      if (!walletProviders[networkId]) throw new Error(`Network ${networkId} not supported: Missing wallet providers`)
+      await fetchCurrencies(networkId)
+      activeNetworkId.value = networkId
+      if (setDefault !== false) localStorage.setItem('defaultNetwork', networkId)
+    } catch (e) {
+      errorHandler(e, 'Network error')
+    }
   }
 
-  async function fetchChains() {
-    const { data, error } = await getChains()
+  async function fetchNetworks() {
+    const { data, error } = await getNetworks()
     if (!data || error) {
-      console.error(error)
-      toast({
-        title: 'Error fetching chains',
-        description: error?.message || 'Unexpected error',
-        variant: 'destructive',
-        action: h(ToastError),
-      })
+      errorHandler(error, 'Failed to fetch networks')
     } else {
-      networks.value = data.map((chain: Chain) => chain.id).sort((a, b) => a.localeCompare(b))
+      data.sort((a, b) => a.id.localeCompare(b.id))
+      data.forEach((network: Network) => {
+        networks.value[network.id] = network
+      })
     }
   }
 
-  async function fetchCurrencies() {
-    if (activeNetwork.value) {
-      const { data, error } = await getCurrencies(activeNetwork.value)
-      if (!data || error) {
-        console.error(error)
-        toast({
-          title: 'Unable to fetch currencies data',
-          description: error?.message || 'Unexpected error',
-          variant: 'destructive',
-          action: h(ToastError),
-        })
-      } else {
-        activeNetworkCurrencies.value = data
-      }
+  async function fetchCurrencies(networkId: string) {
+    const { data, error } = await getCurrencies(networkId)
+    if (!data || error) {
+      throw new Error(`Unable to fetch currencies for ${networkId}. ${error?.message || ''}`)
+    } else {
+      activeNetworkCurrencies.value = data
     }
   }
 
-  return { activeNetwork, activeNetworkCurrencies, networks, fetchChains, setActive }
+  return { activeNetwork, networks: supportedNetworkIds, fetchNetworks, setActive }
 })

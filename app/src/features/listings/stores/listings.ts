@@ -18,7 +18,7 @@ export const useListingsStore = defineStore('listings', () => {
   async function fetchListings() {
     if (accounts.active && networks.activeNetwork) {
       loading.value = true
-      const { data, error } = await getListings(accounts.active.id, networks.activeNetwork)
+      const { data, error } = await getListings(accounts.active.id, networks.activeNetwork.id)
       if (!data || error) {
         console.error(error)
         toast({
@@ -35,7 +35,7 @@ export const useListingsStore = defineStore('listings', () => {
   }
 
   watch(
-    () => networks.activeNetwork,
+    () => networks.activeNetwork?.id,
     () => {
       fetchListings()
     }

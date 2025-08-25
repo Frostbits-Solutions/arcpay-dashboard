@@ -9,7 +9,7 @@ const networks = useNetworksStore()
 const props = defineProps<{ row: Row<CompositeListing> }>()
 const listing = computed(() => props.row.original)
 const link = computed(() => {
-  const prefix = networks?.activeNetwork?.split(':')?.[1] === 'testnet' ? 'testnet.' : ''
+  const prefix = networks?.activeNetwork?.netid === 'testnet' ? 'testnet.' : ''
   return `https://${prefix}explorer.perawallet.app/asset/${listing.value.asset_id}/`
 })
 </script>

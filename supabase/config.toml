@@ -39,7 +39,7 @@ max_client_conn = 100
 [db.migrations]
 schema_paths = [
     "./schemas/init.sql",
-    "./schemas/chains.sql",
+    "./schemas/networks.sql",
     "./schemas/currencies.sql",
     "./schemas/subscription_tiers.sql",
     "./schemas/accounts.sql",

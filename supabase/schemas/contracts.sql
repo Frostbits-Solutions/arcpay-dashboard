@@ -42,10 +42,10 @@ ALTER TYPE "public"."contract_tag_enum" OWNER TO "postgres";
 -------------------- CONTRACTS_VERSIONS --------------------
 CREATE TABLE IF NOT EXISTS "public"."contracts_versions" (
     "version" text NOT NULL,
-    "chain_id" text NOT NULL,
+    "network_id" text NOT NULL,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "contracts_versions_pkey" PRIMARY KEY ("version", "chain_id"),
-    CONSTRAINT "contracts_versions_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE RESTRICT
+    CONSTRAINT "contracts_versions_pkey" PRIMARY KEY ("version", "network_id"),
+    CONSTRAINT "contracts_versions_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE RESTRICT
 );
 ALTER TABLE "public"."contracts_versions" OWNER TO "postgres";
 
@@ -60,11 +60,11 @@ CREATE POLICY "Allow public read access to all contracts versions" ON "public"."
 CREATE TABLE IF NOT EXISTS "public"."contracts" (
     "tag" "public"."contract_tag_enum" NOT NULL,
     "version" text NOT NULL,
-    "chain_id" text NOT NULL,
+    "network_id" text NOT NULL,
     "byte_code" text NOT NULL,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "contracts_pkey" PRIMARY KEY ("version", "tag", "chain_id"),
-    CONSTRAINT "contracts_version_fkey" FOREIGN KEY ("version", "chain_id") REFERENCES "public"."contracts_versions"("version", "chain_id") ON DELETE CASCADE
+    CONSTRAINT "contracts_pkey" PRIMARY KEY ("version", "tag", "network_id"),
+    CONSTRAINT "contracts_version_fkey" FOREIGN KEY ("version", "network_id") REFERENCES "public"."contracts_versions"("version", "network_id") ON DELETE CASCADE
 );
 ALTER TABLE "public"."contracts" OWNER TO "postgres";
 

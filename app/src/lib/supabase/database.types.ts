@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       accounts: {
@@ -73,66 +78,24 @@ export type Database = {
           },
         ]
       }
-      accounts_chains_parameters: {
-        Row: {
-          account_id: string
-          chain_id: string
-          created_at: string
-          enable_secondary: boolean
-          secondary_fee_address: string | null
-          secondary_percentage_fee: number
-        }
-        Insert: {
-          account_id: string
-          chain_id: string
-          created_at?: string
-          enable_secondary?: boolean
-          secondary_fee_address?: string | null
-          secondary_percentage_fee?: number
-        }
-        Update: {
-          account_id?: string
-          chain_id?: string
-          created_at?: string
-          enable_secondary?: boolean
-          secondary_fee_address?: string | null
-          secondary_percentage_fee?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "accounts_chains_parameters_account_id_fkey"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "accounts_chains_parameters_chain_id_fkey"
-            columns: ["chain_id"]
-            isOneToOne: false
-            referencedRelation: "chains"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       accounts_currencies: {
         Row: {
           account_id: string
-          chain_id: string
           created_at: string
           currency: number
+          network_id: string
         }
         Insert: {
           account_id: string
-          chain_id: string
           created_at?: string
           currency: number
+          network_id: string
         }
         Update: {
           account_id?: string
-          chain_id?: string
           created_at?: string
           currency?: number
+          network_id?: string
         }
         Relationships: [
           {
@@ -144,10 +107,52 @@ export type Database = {
           },
           {
             foreignKeyName: "accounts_currencies_currency_fkey"
-            columns: ["currency", "chain_id"]
+            columns: ["currency", "network_id"]
             isOneToOne: false
             referencedRelation: "currencies"
-            referencedColumns: ["id", "chain_id"]
+            referencedColumns: ["id", "network_id"]
+          },
+        ]
+      }
+      accounts_networks_parameters: {
+        Row: {
+          account_id: string
+          created_at: string
+          enable_secondary: boolean
+          network_id: string
+          secondary_fee_address: string | null
+          secondary_percentage_fee: number
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          enable_secondary?: boolean
+          network_id: string
+          secondary_fee_address?: string | null
+          secondary_percentage_fee?: number
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          enable_secondary?: boolean
+          network_id?: string
+          secondary_fee_address?: string | null
+          secondary_percentage_fee?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_networks_parameters_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_networks_parameters_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "networks"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -244,128 +249,107 @@ export type Database = {
           },
         ]
       }
-      chains: {
-        Row: {
-          created_at: string
-          fee_proxy_app_id: number | null
-          id: string
-          last_indexed_at: string | null
-        }
-        Insert: {
-          created_at?: string
-          fee_proxy_app_id?: number | null
-          id: string
-          last_indexed_at?: string | null
-        }
-        Update: {
-          created_at?: string
-          fee_proxy_app_id?: number | null
-          id?: string
-          last_indexed_at?: string | null
-        }
-        Relationships: []
-      }
       contracts: {
         Row: {
           byte_code: string
-          chain_id: string
           created_at: string
+          network_id: string
           tag: Database["public"]["Enums"]["contract_tag_enum"]
           version: string
         }
         Insert: {
           byte_code: string
-          chain_id: string
           created_at?: string
+          network_id: string
           tag: Database["public"]["Enums"]["contract_tag_enum"]
           version: string
         }
         Update: {
           byte_code?: string
-          chain_id?: string
           created_at?: string
+          network_id?: string
           tag?: Database["public"]["Enums"]["contract_tag_enum"]
           version?: string
         }
         Relationships: [
           {
             foreignKeyName: "contracts_version_fkey"
-            columns: ["version", "chain_id"]
+            columns: ["version", "network_id"]
             isOneToOne: false
             referencedRelation: "contracts_versions"
-            referencedColumns: ["version", "chain_id"]
+            referencedColumns: ["version", "network_id"]
           },
         ]
       }
       contracts_versions: {
         Row: {
-          chain_id: string
           created_at: string
+          network_id: string
           version: string
         }
         Insert: {
-          chain_id: string
           created_at?: string
+          network_id: string
           version: string
         }
         Update: {
-          chain_id?: string
           created_at?: string
+          network_id?: string
           version?: string
         }
         Relationships: [
           {
-            foreignKeyName: "contracts_versions_chain_id_fkey"
-            columns: ["chain_id"]
+            foreignKeyName: "contracts_versions_network_id_fkey"
+            columns: ["network_id"]
             isOneToOne: false
-            referencedRelation: "chains"
+            referencedRelation: "networks"
             referencedColumns: ["id"]
           },
         ]
       }
       currencies: {
         Row: {
-          chain_id: string
           created_at: string
           decimals: number
           icon: string | null
           id: number
           is_public: boolean
           name: string
+          network_id: string
           ticker: string
           type: Database["public"]["Enums"]["currency_type"]
           updated_at: string | null
         }
         Insert: {
-          chain_id: string
           created_at?: string
           decimals: number
           icon?: string | null
           id: number
           is_public?: boolean
           name: string
+          network_id: string
           ticker: string
           type: Database["public"]["Enums"]["currency_type"]
           updated_at?: string | null
         }
         Update: {
-          chain_id?: string
           created_at?: string
           decimals?: number
           icon?: string | null
           id?: number
           is_public?: boolean
           name?: string
+          network_id?: string
           ticker?: string
           type?: Database["public"]["Enums"]["currency_type"]
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "currencies_chain_id_fkey"
-            columns: ["chain_id"]
+            foreignKeyName: "currencies_network_id_fkey"
+            columns: ["network_id"]
             isOneToOne: false
-            referencedRelation: "chains"
+            referencedRelation: "networks"
             referencedColumns: ["id"]
           },
         ]
@@ -413,7 +397,6 @@ export type Database = {
           asset_qty: number
           asset_thumbnail: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
-          chain_id: string
           contract_version: string
           created_at: string
           creator_address: string
@@ -421,12 +404,11 @@ export type Database = {
           id: string
           metadata: Json
           name: string
+          network_id: string
           status: Database["public"]["Enums"]["listings_statuses"]
           type: Database["public"]["Enums"]["listings_types"]
           updated_at: string | null
-          transactions:
-            | Database["public"]["Tables"]["transactions"]["Row"]
-            | null
+          transactions: unknown | null
         }
         Insert: {
           account_id: string
@@ -435,7 +417,6 @@ export type Database = {
           asset_qty?: number
           asset_thumbnail?: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
-          chain_id: string
           contract_version: string
           created_at?: string
           creator_address: string
@@ -443,6 +424,7 @@ export type Database = {
           id?: string
           metadata?: Json
           name: string
+          network_id: string
           status: Database["public"]["Enums"]["listings_statuses"]
           type: Database["public"]["Enums"]["listings_types"]
           updated_at?: string | null
@@ -454,7 +436,6 @@ export type Database = {
           asset_qty?: number
           asset_thumbnail?: string | null
           asset_type?: Database["public"]["Enums"]["assets_types"]
-          chain_id?: string
           contract_version?: string
           created_at?: string
           creator_address?: string
@@ -462,6 +443,7 @@ export type Database = {
           id?: string
           metadata?: Json
           name?: string
+          network_id?: string
           status?: Database["public"]["Enums"]["listings_statuses"]
           type?: Database["public"]["Enums"]["listings_types"]
           updated_at?: string | null
@@ -475,27 +457,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "listings_chain_id_fkey"
-            columns: ["chain_id"]
-            isOneToOne: false
-            referencedRelation: "chains"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "listings_contract_version_chain_id_fkey"
-            columns: ["contract_version", "chain_id"]
+            foreignKeyName: "listings_contract_version_network_id_fkey"
+            columns: ["contract_version", "network_id"]
             isOneToOne: false
             referencedRelation: "contracts_versions"
-            referencedColumns: ["version", "chain_id"]
+            referencedColumns: ["version", "network_id"]
           },
           {
-            foreignKeyName: "listings_currency_chain_id_fkey"
-            columns: ["currency", "chain_id"]
+            foreignKeyName: "listings_currency_network_id_fkey"
+            columns: ["currency", "network_id"]
             isOneToOne: false
             referencedRelation: "currencies"
-            referencedColumns: ["id", "chain_id"]
+            referencedColumns: ["id", "network_id"]
+          },
+          {
+            foreignKeyName: "listings_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "networks"
+            referencedColumns: ["id"]
           },
         ]
+      }
+      networks: {
+        Row: {
+          chain: string
+          created_at: string
+          fee_proxy_app_id: number | null
+          id: string
+          last_indexed_at: string | null
+          netid: string
+          node_port: number
+          node_token: string | null
+          node_url: string
+        }
+        Insert: {
+          chain: string
+          created_at?: string
+          fee_proxy_app_id?: number | null
+          id: string
+          last_indexed_at?: string | null
+          netid: string
+          node_port: number
+          node_token?: string | null
+          node_url: string
+        }
+        Update: {
+          chain?: string
+          created_at?: string
+          fee_proxy_app_id?: number | null
+          id?: string
+          last_indexed_at?: string | null
+          netid?: string
+          node_port?: number
+          node_token?: string | null
+          node_url?: string
+        }
+        Relationships: []
       }
       sales: {
         Row: {
@@ -553,29 +571,29 @@ export type Database = {
         }
         Relationships: []
       }
-      subscriptions_chains_parameters: {
+      subscriptions_networks_parameters: {
         Row: {
-          chain_id: string
           created_at: string
           flat_fees: number
+          network_id: string
           sales_fees: number
           secondary_flat_fees: number
           secondary_sales_fees: number
           subscription_id: number
         }
         Insert: {
-          chain_id: string
           created_at?: string
           flat_fees?: number
+          network_id: string
           sales_fees?: number
           secondary_flat_fees?: number
           secondary_sales_fees?: number
           subscription_id: number
         }
         Update: {
-          chain_id?: string
           created_at?: string
           flat_fees?: number
+          network_id?: string
           sales_fees?: number
           secondary_flat_fees?: number
           secondary_sales_fees?: number
@@ -583,14 +601,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "subscriptions_chains_parameters_chain_id_fkey"
-            columns: ["chain_id"]
+            foreignKeyName: "subscriptions_networks_parameters_network_id_fkey"
+            columns: ["network_id"]
             isOneToOne: false
-            referencedRelation: "chains"
+            referencedRelation: "networks"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "subscriptions_chains_parameters_subscription_id_fkey"
+            foreignKeyName: "subscriptions_networks_parameters_subscription_id_fkey"
             columns: ["subscription_id"]
             isOneToOne: false
             referencedRelation: "subscription_tiers"
@@ -602,266 +620,86 @@ export type Database = {
         Row: {
           amount: number | null
           app_id: number
-          chain_id: string
           created_at: string
           currency: number
           from_address: string
           id: string
           metadata: Json
+          network_id: string
           type: Database["public"]["Enums"]["transaction_type"]
           listings: Database["public"]["Tables"]["listings"]["Row"] | null
         }
         Insert: {
           amount?: number | null
           app_id: number
-          chain_id: string
           created_at?: string
           currency: number
           from_address: string
           id: string
           metadata?: Json
+          network_id: string
           type: Database["public"]["Enums"]["transaction_type"]
         }
         Update: {
           amount?: number | null
           app_id?: number
-          chain_id?: string
           created_at?: string
           currency?: number
           from_address?: string
           id?: string
           metadata?: Json
+          network_id?: string
           type?: Database["public"]["Enums"]["transaction_type"]
         }
         Relationships: [
           {
-            foreignKeyName: "transactions_chain_id_fkey"
-            columns: ["chain_id"]
-            isOneToOne: false
-            referencedRelation: "chains"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "transactions_currency_fkey"
-            columns: ["currency", "chain_id"]
+            columns: ["currency", "network_id"]
             isOneToOne: false
             referencedRelation: "currencies"
-            referencedColumns: ["id", "chain_id"]
+            referencedColumns: ["id", "network_id"]
+          },
+          {
+            foreignKeyName: "transactions_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "networks"
+            referencedColumns: ["id"]
           },
         ]
       }
-      transactions_2025_07_01: {
+      transactions_2025_08_24: {
         Row: {
           amount: number | null
           app_id: number
-          chain_id: string
           created_at: string
           currency: number
           from_address: string
           id: string
           metadata: Json
+          network_id: string
           type: Database["public"]["Enums"]["transaction_type"]
         }
         Insert: {
           amount?: number | null
           app_id: number
-          chain_id: string
           created_at?: string
           currency: number
           from_address: string
           id: string
           metadata?: Json
+          network_id: string
           type: Database["public"]["Enums"]["transaction_type"]
         }
         Update: {
           amount?: number | null
           app_id?: number
-          chain_id?: string
           created_at?: string
           currency?: number
           from_address?: string
           id?: string
           metadata?: Json
-          type?: Database["public"]["Enums"]["transaction_type"]
-        }
-        Relationships: []
-      }
-      transactions_2025_07_03: {
-        Row: {
-          amount: number | null
-          app_id: number
-          chain_id: string
-          created_at: string
-          currency: number
-          from_address: string
-          id: string
-          metadata: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Insert: {
-          amount?: number | null
-          app_id: number
-          chain_id: string
-          created_at?: string
-          currency: number
-          from_address: string
-          id: string
-          metadata?: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Update: {
-          amount?: number | null
-          app_id?: number
-          chain_id?: string
-          created_at?: string
-          currency?: number
-          from_address?: string
-          id?: string
-          metadata?: Json
-          type?: Database["public"]["Enums"]["transaction_type"]
-        }
-        Relationships: []
-      }
-      transactions_2025_07_04: {
-        Row: {
-          amount: number | null
-          app_id: number
-          chain_id: string
-          created_at: string
-          currency: number
-          from_address: string
-          id: string
-          metadata: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Insert: {
-          amount?: number | null
-          app_id: number
-          chain_id: string
-          created_at?: string
-          currency: number
-          from_address: string
-          id: string
-          metadata?: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Update: {
-          amount?: number | null
-          app_id?: number
-          chain_id?: string
-          created_at?: string
-          currency?: number
-          from_address?: string
-          id?: string
-          metadata?: Json
-          type?: Database["public"]["Enums"]["transaction_type"]
-        }
-        Relationships: []
-      }
-      transactions_2025_07_05: {
-        Row: {
-          amount: number | null
-          app_id: number
-          chain_id: string
-          created_at: string
-          currency: number
-          from_address: string
-          id: string
-          metadata: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Insert: {
-          amount?: number | null
-          app_id: number
-          chain_id: string
-          created_at?: string
-          currency: number
-          from_address: string
-          id: string
-          metadata?: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Update: {
-          amount?: number | null
-          app_id?: number
-          chain_id?: string
-          created_at?: string
-          currency?: number
-          from_address?: string
-          id?: string
-          metadata?: Json
-          type?: Database["public"]["Enums"]["transaction_type"]
-        }
-        Relationships: []
-      }
-      transactions_2025_07_06: {
-        Row: {
-          amount: number | null
-          app_id: number
-          chain_id: string
-          created_at: string
-          currency: number
-          from_address: string
-          id: string
-          metadata: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Insert: {
-          amount?: number | null
-          app_id: number
-          chain_id: string
-          created_at?: string
-          currency: number
-          from_address: string
-          id: string
-          metadata?: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Update: {
-          amount?: number | null
-          app_id?: number
-          chain_id?: string
-          created_at?: string
-          currency?: number
-          from_address?: string
-          id?: string
-          metadata?: Json
-          type?: Database["public"]["Enums"]["transaction_type"]
-        }
-        Relationships: []
-      }
-      transactions_2025_07_07: {
-        Row: {
-          amount: number | null
-          app_id: number
-          chain_id: string
-          created_at: string
-          currency: number
-          from_address: string
-          id: string
-          metadata: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Insert: {
-          amount?: number | null
-          app_id: number
-          chain_id: string
-          created_at?: string
-          currency: number
-          from_address: string
-          id: string
-          metadata?: Json
-          type: Database["public"]["Enums"]["transaction_type"]
-        }
-        Update: {
-          amount?: number | null
-          app_id?: number
-          chain_id?: string
-          created_at?: string
-          currency?: number
-          from_address?: string
-          id?: string
-          metadata?: Json
+          network_id?: string
           type?: Database["public"]["Enums"]["transaction_type"]
         }
         Relationships: []
@@ -876,15 +714,15 @@ export type Database = {
         Returns: string
       }
       get_account_subscription_params: {
-        Args: { p_account_id: string; p_chain_id: string }
-        Returns: Database["public"]["CompositeTypes"]["chain_subscription_parameters"]
+        Args: { p_account_id: string; p_network_id: string }
+        Returns: Database["public"]["CompositeTypes"]["network_subscription_parameters"]
       }
       get_daily_sales_volume_timeseries: {
-        Args: { account_id: string; chain_id: string }
+        Args: { account_id: string; network_id: string }
         Returns: Database["public"]["CompositeTypes"]["transactions_volume"][]
       }
       get_hourly_transactions_timeseries: {
-        Args: { account_id: string; chain_id: string }
+        Args: { account_id: string; network_id: string }
         Returns: Database["public"]["CompositeTypes"]["transactions_count"][]
       }
       get_listing_by_id: {
@@ -900,7 +738,6 @@ export type Database = {
           asset_qty: number
           asset_thumbnail: string | null
           asset_type: Database["public"]["Enums"]["assets_types"]
-          chain_id: string
           contract_version: string
           created_at: string
           creator_address: string
@@ -908,6 +745,7 @@ export type Database = {
           id: string
           metadata: Json
           name: string
+          network_id: string
           status: Database["public"]["Enums"]["listings_statuses"]
           type: Database["public"]["Enums"]["listings_types"]
           updated_at: string | null
@@ -918,12 +756,12 @@ export type Database = {
         Returns: {
           amount: number | null
           app_id: number
-          chain_id: string
           created_at: string
           currency: number
           from_address: string
           id: string
           metadata: Json
+          network_id: string
           type: Database["public"]["Enums"]["transaction_type"]
         }[]
       }
@@ -962,20 +800,12 @@ export type Database = {
         | "cancel"
     }
     CompositeTypes: {
-      chain_subscription_parameters: {
-        allow_secondary_listings: boolean | null
-        allow_custom_currencies: boolean | null
-        flat_fees: number | null
-        sales_fees: number | null
-        secondary_flat_fees: number | null
-        secondary_sales_fees: number | null
-      }
       composite_listing: {
         id: string | null
         created_at: string | null
         updated_at: string | null
         status: Database["public"]["Enums"]["listings_statuses"] | null
-        chain_id: string | null
+        network_id: string | null
         contract_version: string | null
         creator_address: string | null
         name: string | null
@@ -1000,6 +830,14 @@ export type Database = {
         dutch_max_price: number | null
         dutch_duration: number | null
       }
+      network_subscription_parameters: {
+        allow_secondary_listings: boolean | null
+        allow_custom_currencies: boolean | null
+        flat_fees: number | null
+        sales_fees: number | null
+        secondary_flat_fees: number | null
+        secondary_sales_fees: number | null
+      }
       transactions_count: {
         time: string | null
         count: number | null
@@ -1014,21 +852,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -1046,14 +888,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -1069,14 +913,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -1092,14 +938,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -1107,14 +955,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

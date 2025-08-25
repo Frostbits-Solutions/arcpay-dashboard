@@ -128,9 +128,9 @@ create table "public"."accounts_addresses" (
 
 alter table "public"."accounts_addresses" enable row level security;
 
-create table "public"."accounts_chains_parameters" (
+create table "public"."accounts_networks_parameters" (
     "account_id" uuid not null,
-    "chain_id" text not null,
+    "network_id" text not null,
     "enable_secondary" boolean not null default false,
     "secondary_percentage_fee" double precision not null default 0,
     "secondary_fee_address" text,
@@ -138,13 +138,13 @@ create table "public"."accounts_chains_parameters" (
 );
 
 
-alter table "public"."accounts_chains_parameters" enable row level security;
+alter table "public"."accounts_networks_parameters" enable row level security;
 
 create table "public"."accounts_currencies" (
     "created_at" timestamp with time zone not null default now(),
     "account_id" uuid not null,
     "currency" bigint not null,
-    "chain_id" text not null
+    "network_id" text not null
 );
 
 
@@ -182,20 +182,25 @@ create table "public"."auctions" (
 
 alter table "public"."auctions" enable row level security;
 
-create table "public"."chains" (
+create table "public"."networks" (
     "id" text not null,
+    "chain" text NOT NULL,
+    "netid" text NOT NULL,
+    "node_url" text NOT NULL,
+    "node_port" integer NOT NULL,
+    "node_token" text,
     "created_at" timestamp without time zone not null default now(),
     "last_indexed_at" timestamp without time zone,
     "fee_proxy_app_id" bigint
 );
 
 
-alter table "public"."chains" enable row level security;
+alter table "public"."networks" enable row level security;
 
 create table "public"."contracts" (
     "tag" contract_tag_enum not null,
     "version" text not null,
-    "chain_id" text not null,
+    "network_id" text not null,
     "byte_code" text not null,
     "created_at" timestamp without time zone not null default now()
 );
@@ -205,7 +210,7 @@ alter table "public"."contracts" enable row level security;
 
 create table "public"."contracts_versions" (
     "version" text not null,
-    "chain_id" text not null,
+    "network_id" text not null,
     "created_at" timestamp without time zone not null default now()
 );
 
@@ -214,7 +219,7 @@ alter table "public"."contracts_versions" enable row level security;
 
 create table "public"."currencies" (
     "id" bigint not null,
-    "chain_id" text not null,
+    "network_id" text not null,
     "created_at" timestamp with time zone not null default now(),
     "updated_at" timestamp with time zone,
     "name" text not null,
@@ -256,7 +261,7 @@ create table "public"."listings" (
     "asset_type" assets_types not null,
     "asset_qty" double precision not null default '1'::double precision,
     "metadata" jsonb not null default '{}'::jsonb,
-    "chain_id" text not null,
+    "network_id" text not null,
     "contract_version" text not null
 );
 
@@ -285,9 +290,9 @@ create table "public"."subscription_tiers" (
 
 alter table "public"."subscription_tiers" enable row level security;
 
-create table "public"."subscriptions_chains_parameters" (
+create table "public"."subscriptions_networks_parameters" (
     "subscription_id" bigint not null,
-    "chain_id" text not null,
+    "network_id" text not null,
     "flat_fees" double precision not null default 10,
     "sales_fees" double precision not null default 0,
     "secondary_flat_fees" double precision not null default 20,
@@ -296,13 +301,13 @@ create table "public"."subscriptions_chains_parameters" (
 );
 
 
-alter table "public"."subscriptions_chains_parameters" enable row level security;
+alter table "public"."subscriptions_networks_parameters" enable row level security;
 
 create table "public"."transactions" (
     "id" text not null,
     "created_at" timestamp with time zone not null default now(),
     "from_address" text not null,
-    "chain_id" text not null,
+    "network_id" text not null,
     "app_id" bigint not null,
     "type" transaction_type not null,
     "amount" double precision,
@@ -315,9 +320,9 @@ alter table "public"."transactions" enable row level security;
 
 CREATE UNIQUE INDEX accounts_addresses_pkey ON public.accounts_addresses USING btree (address, account_id);
 
-CREATE UNIQUE INDEX accounts_chains_parameters_pkey ON public.accounts_chains_parameters USING btree (account_id, chain_id);
+CREATE UNIQUE INDEX accounts_networks_parameters_pkey ON public.accounts_networks_parameters USING btree (account_id, network_id);
 
-CREATE UNIQUE INDEX accounts_currencies_pkey ON public.accounts_currencies USING btree (account_id, currency, chain_id);
+CREATE UNIQUE INDEX accounts_currencies_pkey ON public.accounts_currencies USING btree (account_id, currency, network_id);
 
 CREATE UNIQUE INDEX accounts_name_key ON public.accounts USING btree (name);
 
@@ -329,17 +334,17 @@ CREATE UNIQUE INDEX accounts_users_association_pkey ON public.accounts_users_ass
 
 CREATE UNIQUE INDEX auctions_pkey ON public.auctions USING btree (listing_id);
 
-CREATE UNIQUE INDEX chains_pkey ON public.chains USING btree (id);
+CREATE UNIQUE INDEX networks_pkey ON public.networks USING btree (id);
 
-CREATE UNIQUE INDEX contracts_pkey ON public.contracts USING btree (version, tag, chain_id);
+CREATE UNIQUE INDEX contracts_pkey ON public.contracts USING btree (version, tag, network_id);
 
-CREATE UNIQUE INDEX contracts_versions_pkey ON public.contracts_versions USING btree (version, chain_id);
+CREATE UNIQUE INDEX contracts_versions_pkey ON public.contracts_versions USING btree (version, network_id);
 
-CREATE UNIQUE INDEX currencies_pkey ON public.currencies USING btree (id, chain_id);
+CREATE UNIQUE INDEX currencies_pkey ON public.currencies USING btree (id, network_id);
 
 CREATE UNIQUE INDEX dutch_auctions_pkey ON public.dutch_auctions USING btree (listing_id);
 
-CREATE INDEX idx_listings ON public.listings USING btree (account_id, status, chain_id, currency, type, asset_type, asset_id, creator_address);
+CREATE INDEX idx_listings ON public.listings USING btree (account_id, status, network_id, currency, type, asset_type, asset_id, creator_address);
 
 CREATE UNIQUE INDEX listings_pkey ON public.listings USING btree (id);
 
@@ -347,13 +352,13 @@ CREATE UNIQUE INDEX sales_pkey ON public.sales USING btree (listing_id);
 
 CREATE UNIQUE INDEX subscription_tiers_pkey ON public.subscription_tiers USING btree (id);
 
-CREATE UNIQUE INDEX subscriptions_chains_parameters_pkey ON public.subscriptions_chains_parameters USING btree (subscription_id, chain_id);
+CREATE UNIQUE INDEX subscriptions_networks_parameters_pkey ON public.subscriptions_networks_parameters USING btree (subscription_id, network_id);
 
 alter table "public"."accounts" add constraint "accounts_pkey" PRIMARY KEY using index "accounts_pkey";
 
 alter table "public"."accounts_addresses" add constraint "accounts_addresses_pkey" PRIMARY KEY using index "accounts_addresses_pkey";
 
-alter table "public"."accounts_chains_parameters" add constraint "accounts_chains_parameters_pkey" PRIMARY KEY using index "accounts_chains_parameters_pkey";
+alter table "public"."accounts_networks_parameters" add constraint "accounts_networks_parameters_pkey" PRIMARY KEY using index "accounts_networks_parameters_pkey";
 
 alter table "public"."accounts_currencies" add constraint "accounts_currencies_pkey" PRIMARY KEY using index "accounts_currencies_pkey";
 
@@ -363,7 +368,7 @@ alter table "public"."accounts_users_association" add constraint "accounts_users
 
 alter table "public"."auctions" add constraint "auctions_pkey" PRIMARY KEY using index "auctions_pkey";
 
-alter table "public"."chains" add constraint "chains_pkey" PRIMARY KEY using index "chains_pkey";
+alter table "public"."networks" add constraint "networks_pkey" PRIMARY KEY using index "networks_pkey";
 
 alter table "public"."contracts" add constraint "contracts_pkey" PRIMARY KEY using index "contracts_pkey";
 
@@ -379,9 +384,9 @@ alter table "public"."sales" add constraint "sales_pkey" PRIMARY KEY using index
 
 alter table "public"."subscription_tiers" add constraint "subscription_tiers_pkey" PRIMARY KEY using index "subscription_tiers_pkey";
 
-alter table "public"."subscriptions_chains_parameters" add constraint "subscriptions_chains_parameters_pkey" PRIMARY KEY using index "subscriptions_chains_parameters_pkey";
+alter table "public"."subscriptions_networks_parameters" add constraint "subscriptions_networks_parameters_pkey" PRIMARY KEY using index "subscriptions_networks_parameters_pkey";
 
-alter table "public"."transactions" add constraint "transactions_pkey" PRIMARY KEY ("id", "chain_id","app_id", "from_address", "created_at");
+alter table "public"."transactions" add constraint "transactions_pkey" PRIMARY KEY ("id", "network_id","app_id", "from_address", "created_at");
 
 alter table "public"."accounts" add constraint "accounts_name_key" UNIQUE using index "accounts_name_key";
 
@@ -393,19 +398,19 @@ alter table "public"."accounts_addresses" add constraint "accounts_addresses_acc
 
 alter table "public"."accounts_addresses" validate constraint "accounts_addresses_account_id_fkey";
 
-alter table "public"."accounts_chains_parameters" add constraint "accounts_chains_parameters_account_id_fkey" FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE not valid;
+alter table "public"."accounts_networks_parameters" add constraint "accounts_networks_parameters_account_id_fkey" FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE not valid;
 
-alter table "public"."accounts_chains_parameters" validate constraint "accounts_chains_parameters_account_id_fkey";
+alter table "public"."accounts_networks_parameters" validate constraint "accounts_networks_parameters_account_id_fkey";
 
-alter table "public"."accounts_chains_parameters" add constraint "accounts_chains_parameters_chain_id_fkey" FOREIGN KEY (chain_id) REFERENCES chains(id) ON DELETE CASCADE not valid;
+alter table "public"."accounts_networks_parameters" add constraint "accounts_networks_parameters_network_id_fkey" FOREIGN KEY (network_id) REFERENCES networks(id) ON DELETE CASCADE not valid;
 
-alter table "public"."accounts_chains_parameters" validate constraint "accounts_chains_parameters_chain_id_fkey";
+alter table "public"."accounts_networks_parameters" validate constraint "accounts_networks_parameters_network_id_fkey";
 
 alter table "public"."accounts_currencies" add constraint "accounts_currencies_account_id_fkey" FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE not valid;
 
 alter table "public"."accounts_currencies" validate constraint "accounts_currencies_account_id_fkey";
 
-alter table "public"."accounts_currencies" add constraint "accounts_currencies_currency_fkey" FOREIGN KEY (currency, chain_id) REFERENCES currencies(id, chain_id) ON DELETE CASCADE not valid;
+alter table "public"."accounts_currencies" add constraint "accounts_currencies_currency_fkey" FOREIGN KEY (currency, network_id) REFERENCES currencies(id, network_id) ON DELETE CASCADE not valid;
 
 alter table "public"."accounts_currencies" validate constraint "accounts_currencies_currency_fkey";
 
@@ -421,17 +426,17 @@ alter table "public"."auctions" add constraint "auctions_listing_id_fkey" FOREIG
 
 alter table "public"."auctions" validate constraint "auctions_listing_id_fkey";
 
-alter table "public"."contracts" add constraint "contracts_version_fkey" FOREIGN KEY (version, chain_id) REFERENCES contracts_versions(version, chain_id) ON DELETE CASCADE not valid;
+alter table "public"."contracts" add constraint "contracts_version_fkey" FOREIGN KEY (version, network_id) REFERENCES contracts_versions(version, network_id) ON DELETE CASCADE not valid;
 
 alter table "public"."contracts" validate constraint "contracts_version_fkey";
 
-alter table "public"."contracts_versions" add constraint "contracts_versions_chain_id_fkey" FOREIGN KEY (chain_id) REFERENCES chains(id) ON DELETE RESTRICT not valid;
+alter table "public"."contracts_versions" add constraint "contracts_versions_network_id_fkey" FOREIGN KEY (network_id) REFERENCES networks(id) ON DELETE RESTRICT not valid;
 
-alter table "public"."contracts_versions" validate constraint "contracts_versions_chain_id_fkey";
+alter table "public"."contracts_versions" validate constraint "contracts_versions_network_id_fkey";
 
-alter table "public"."currencies" add constraint "currencies_chain_id_fkey" FOREIGN KEY (chain_id) REFERENCES chains(id) ON DELETE CASCADE not valid;
+alter table "public"."currencies" add constraint "currencies_network_id_fkey" FOREIGN KEY (network_id) REFERENCES networks(id) ON DELETE CASCADE not valid;
 
-alter table "public"."currencies" validate constraint "currencies_chain_id_fkey";
+alter table "public"."currencies" validate constraint "currencies_network_id_fkey";
 
 alter table "public"."dutch_auctions" add constraint "dutch_auctions_listing_id_fkey" FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE not valid;
 
@@ -441,39 +446,39 @@ alter table "public"."listings" add constraint "listings_account_id_fkey" FOREIG
 
 alter table "public"."listings" validate constraint "listings_account_id_fkey";
 
-alter table "public"."listings" add constraint "listings_chain_id_fkey" FOREIGN KEY (chain_id) REFERENCES chains(id) not valid;
+alter table "public"."listings" add constraint "listings_network_id_fkey" FOREIGN KEY (network_id) REFERENCES networks(id) not valid;
 
-alter table "public"."listings" validate constraint "listings_chain_id_fkey";
+alter table "public"."listings" validate constraint "listings_network_id_fkey";
 
-alter table "public"."listings" add constraint "listings_contract_version_chain_id_fkey" FOREIGN KEY (contract_version, chain_id) REFERENCES contracts_versions(version, chain_id) ON DELETE RESTRICT not valid;
+alter table "public"."listings" add constraint "listings_contract_version_network_id_fkey" FOREIGN KEY (contract_version, network_id) REFERENCES contracts_versions(version, network_id) ON DELETE RESTRICT not valid;
 
-alter table "public"."listings" validate constraint "listings_contract_version_chain_id_fkey";
+alter table "public"."listings" validate constraint "listings_contract_version_network_id_fkey";
 
-alter table "public"."listings" add constraint "listings_currency_chain_id_fkey" FOREIGN KEY (currency, chain_id) REFERENCES currencies(id, chain_id) ON DELETE CASCADE not valid;
+alter table "public"."listings" add constraint "listings_currency_network_id_fkey" FOREIGN KEY (currency, network_id) REFERENCES currencies(id, network_id) ON DELETE CASCADE not valid;
 
-alter table "public"."listings" validate constraint "listings_currency_chain_id_fkey";
+alter table "public"."listings" validate constraint "listings_currency_network_id_fkey";
 
 alter table "public"."sales" add constraint "sales_listing_id_fkey" FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE not valid;
 
 alter table "public"."sales" validate constraint "sales_listing_id_fkey";
 
-alter table "public"."subscriptions_chains_parameters" add constraint "subscriptions_chains_parameters_chain_id_fkey" FOREIGN KEY (chain_id) REFERENCES chains(id) ON DELETE CASCADE not valid;
+alter table "public"."subscriptions_networks_parameters" add constraint "subscriptions_networks_parameters_network_id_fkey" FOREIGN KEY (network_id) REFERENCES networks(id) ON DELETE CASCADE not valid;
 
-alter table "public"."subscriptions_chains_parameters" validate constraint "subscriptions_chains_parameters_chain_id_fkey";
+alter table "public"."subscriptions_networks_parameters" validate constraint "subscriptions_networks_parameters_network_id_fkey";
 
-alter table "public"."subscriptions_chains_parameters" add constraint "subscriptions_chains_parameters_subscription_id_fkey" FOREIGN KEY (subscription_id) REFERENCES subscription_tiers(id) ON DELETE CASCADE not valid;
+alter table "public"."subscriptions_networks_parameters" add constraint "subscriptions_networks_parameters_subscription_id_fkey" FOREIGN KEY (subscription_id) REFERENCES subscription_tiers(id) ON DELETE CASCADE not valid;
 
-alter table "public"."subscriptions_chains_parameters" validate constraint "subscriptions_chains_parameters_subscription_id_fkey";
+alter table "public"."subscriptions_networks_parameters" validate constraint "subscriptions_networks_parameters_subscription_id_fkey";
 
-alter table "public"."transactions" add constraint "transactions_chain_id_fkey" FOREIGN KEY (chain_id) REFERENCES chains(id) ON DELETE CASCADE;
+alter table "public"."transactions" add constraint "transactions_network_id_fkey" FOREIGN KEY (network_id) REFERENCES networks(id) ON DELETE CASCADE;
 
-alter table "public"."transactions" add constraint "transactions_currency_fkey" FOREIGN KEY (currency, chain_id) REFERENCES currencies(id, chain_id) ON DELETE CASCADE;
+alter table "public"."transactions" add constraint "transactions_currency_fkey" FOREIGN KEY (currency, network_id) REFERENCES currencies(id, network_id) ON DELETE CASCADE;
 
 set check_function_bodies = off;
 
-create type "public"."chain_subscription_parameters" as ("allow_secondary_listings" boolean, "allow_custom_currencies" boolean, "flat_fees" double precision, "sales_fees" double precision, "secondary_flat_fees" double precision, "secondary_sales_fees" double precision);
+create type "public"."network_subscription_parameters" as ("allow_secondary_listings" boolean, "allow_custom_currencies" boolean, "flat_fees" double precision, "sales_fees" double precision, "secondary_flat_fees" double precision, "secondary_sales_fees" double precision);
 
-create type "public"."composite_listing" as ("id" uuid, "created_at" timestamp without time zone, "updated_at" timestamp without time zone, "status" listings_statuses, "chain_id" text, "contract_version" text, "creator_address" text, "name" text, "type" listings_types, "app_id" bigint, "currency" bigint, "currency_name" text, "currency_ticker" text, "currency_icon" text, "currency_type" currency_type, "currency_decimals" bigint, "asset_id" text, "asset_thumbnail" text, "asset_type" assets_types, "asset_qty" double precision, "metadata" jsonb, "sale_price" double precision, "auction_start_price" double precision, "auction_increment" double precision, "auction_duration" integer, "dutch_min_price" double precision, "dutch_max_price" double precision, "dutch_duration" integer);
+create type "public"."composite_listing" as ("id" uuid, "created_at" timestamp without time zone, "updated_at" timestamp without time zone, "status" listings_statuses, "network_id" text, "contract_version" text, "creator_address" text, "name" text, "type" listings_types, "app_id" bigint, "currency" bigint, "currency_name" text, "currency_ticker" text, "currency_icon" text, "currency_type" currency_type, "currency_decimals" bigint, "asset_id" text, "asset_thumbnail" text, "asset_type" assets_types, "asset_qty" double precision, "metadata" jsonb, "sale_price" double precision, "auction_start_price" double precision, "auction_increment" double precision, "auction_duration" integer, "dutch_min_price" double precision, "dutch_max_price" double precision, "dutch_duration" integer);
 
 create type "public"."transactions_count" as ("time" timestamp without time zone, "count" bigint);
 
@@ -501,8 +506,8 @@ END;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.get_account_subscription_params(p_account_id uuid, p_chain_id text)
- RETURNS chain_subscription_parameters
+CREATE OR REPLACE FUNCTION public.get_account_subscription_params(p_account_id uuid, p_network_id text)
+ RETURNS network_subscription_parameters
  LANGUAGE sql
  STABLE SECURITY DEFINER
  SET search_path TO ''
@@ -510,12 +515,12 @@ AS $function$
     SELECT st.allow_secondary_listings, st.allow_custom_currencies, scp.flat_fees, scp.sales_fees, scp.secondary_flat_fees, scp.secondary_sales_fees
     FROM "public"."subscription_tiers" st
     JOIN "public"."accounts" a ON st.id = a.subscription_id
-    JOIN "public"."subscriptions_chains_parameters" scp ON st.id = scp.subscription_id AND scp.chain_id = p_chain_id
+    JOIN "public"."subscriptions_networks_parameters" scp ON st.id = scp.subscription_id AND scp.network_id = p_network_id
     WHERE a.id = p_account_id;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.get_daily_sales_volume_timeseries(account_id uuid, chain_id text)
+CREATE OR REPLACE FUNCTION public.get_daily_sales_volume_timeseries(account_id uuid, network_id text)
  RETURNS SETOF transactions_volume
  LANGUAGE sql
  STABLE
@@ -527,15 +532,15 @@ AS $function$
     c.id as currency_id,
     c.ticker as currency_ticker
     from "public"."transactions" t
-    left join "public"."currencies" c on t.currency = c.id and t."chain_id" = c."chain_id"
+    left join "public"."currencies" c on t.currency = c.id and t."network_id" = c."network_id"
     left join "public"."listings" l on t.app_id = l.app_id
-    where l.account_id = $1 and t.created_at > NOW() - interval '30 days' and t.type = 'buy' and t."chain_id" = $2
+    where l.account_id = $1 and t.created_at > NOW() - interval '30 days' and t.type = 'buy' and t."network_id" = $2
     group by time, c.id, c.decimals, c.ticker
     order by time asc
     $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.get_hourly_transactions_timeseries(account_id uuid, chain_id text)
+CREATE OR REPLACE FUNCTION public.get_hourly_transactions_timeseries(account_id uuid, network_id text)
  RETURNS SETOF transactions_count
  LANGUAGE sql
  STABLE
@@ -546,7 +551,7 @@ AS $function$
     count(t.id) AS count
     from "public"."transactions" t
     left join "public"."listings" l on t.app_id = l.app_id
-    where l.account_id = $1 and t.created_at > NOW() - interval '168 hours' and t."chain_id" = $2
+    where l.account_id = $1 and t.created_at > NOW() - interval '168 hours' and t."network_id" = $2
     group by time
     order by time asc
     $function$
@@ -562,7 +567,7 @@ AS $function$select
         l.created_at,
         l.updated_at,
         l.status,
-        l.chain_id,
+        l.network_id,
         l.contract_version,
         l.creator_address,
         l.name,
@@ -590,7 +595,7 @@ AS $function$select
         left join public.auctions a on a.listing_id = get_listing_by_id.listing_id
         left join public.dutch_auctions d on d.listing_id = get_listing_by_id.listing_id
         left join public.sales s on s.listing_id = get_listing_by_id.listing_id
-        left join public.currencies c on (c.id = l.currency and c.chain_id = l.chain_id)
+        left join public.currencies c on (c.id = l.currency and c.network_id = l.network_id)
     where l.id = get_listing_by_id.listing_id$function$
 ;
 
@@ -714,47 +719,47 @@ grant truncate on table "public"."accounts_addresses" to "service_role";
 
 grant update on table "public"."accounts_addresses" to "service_role";
 
-grant delete on table "public"."accounts_chains_parameters" to "anon";
+grant delete on table "public"."accounts_networks_parameters" to "anon";
 
-grant insert on table "public"."accounts_chains_parameters" to "anon";
+grant insert on table "public"."accounts_networks_parameters" to "anon";
 
-grant references on table "public"."accounts_chains_parameters" to "anon";
+grant references on table "public"."accounts_networks_parameters" to "anon";
 
-grant select on table "public"."accounts_chains_parameters" to "anon";
+grant select on table "public"."accounts_networks_parameters" to "anon";
 
-grant trigger on table "public"."accounts_chains_parameters" to "anon";
+grant trigger on table "public"."accounts_networks_parameters" to "anon";
 
-grant truncate on table "public"."accounts_chains_parameters" to "anon";
+grant truncate on table "public"."accounts_networks_parameters" to "anon";
 
-grant update on table "public"."accounts_chains_parameters" to "anon";
+grant update on table "public"."accounts_networks_parameters" to "anon";
 
-grant delete on table "public"."accounts_chains_parameters" to "authenticated";
+grant delete on table "public"."accounts_networks_parameters" to "authenticated";
 
-grant insert on table "public"."accounts_chains_parameters" to "authenticated";
+grant insert on table "public"."accounts_networks_parameters" to "authenticated";
 
-grant references on table "public"."accounts_chains_parameters" to "authenticated";
+grant references on table "public"."accounts_networks_parameters" to "authenticated";
 
-grant select on table "public"."accounts_chains_parameters" to "authenticated";
+grant select on table "public"."accounts_networks_parameters" to "authenticated";
 
-grant trigger on table "public"."accounts_chains_parameters" to "authenticated";
+grant trigger on table "public"."accounts_networks_parameters" to "authenticated";
 
-grant truncate on table "public"."accounts_chains_parameters" to "authenticated";
+grant truncate on table "public"."accounts_networks_parameters" to "authenticated";
 
-grant update on table "public"."accounts_chains_parameters" to "authenticated";
+grant update on table "public"."accounts_networks_parameters" to "authenticated";
 
-grant delete on table "public"."accounts_chains_parameters" to "service_role";
+grant delete on table "public"."accounts_networks_parameters" to "service_role";
 
-grant insert on table "public"."accounts_chains_parameters" to "service_role";
+grant insert on table "public"."accounts_networks_parameters" to "service_role";
 
-grant references on table "public"."accounts_chains_parameters" to "service_role";
+grant references on table "public"."accounts_networks_parameters" to "service_role";
 
-grant select on table "public"."accounts_chains_parameters" to "service_role";
+grant select on table "public"."accounts_networks_parameters" to "service_role";
 
-grant trigger on table "public"."accounts_chains_parameters" to "service_role";
+grant trigger on table "public"."accounts_networks_parameters" to "service_role";
 
-grant truncate on table "public"."accounts_chains_parameters" to "service_role";
+grant truncate on table "public"."accounts_networks_parameters" to "service_role";
 
-grant update on table "public"."accounts_chains_parameters" to "service_role";
+grant update on table "public"."accounts_networks_parameters" to "service_role";
 
 grant delete on table "public"."accounts_currencies" to "anon";
 
@@ -924,47 +929,47 @@ grant truncate on table "public"."auctions" to "service_role";
 
 grant update on table "public"."auctions" to "service_role";
 
-grant delete on table "public"."chains" to "anon";
+grant delete on table "public"."networks" to "anon";
 
-grant insert on table "public"."chains" to "anon";
+grant insert on table "public"."networks" to "anon";
 
-grant references on table "public"."chains" to "anon";
+grant references on table "public"."networks" to "anon";
 
-grant select on table "public"."chains" to "anon";
+grant select on table "public"."networks" to "anon";
 
-grant trigger on table "public"."chains" to "anon";
+grant trigger on table "public"."networks" to "anon";
 
-grant truncate on table "public"."chains" to "anon";
+grant truncate on table "public"."networks" to "anon";
 
-grant update on table "public"."chains" to "anon";
+grant update on table "public"."networks" to "anon";
 
-grant delete on table "public"."chains" to "authenticated";
+grant delete on table "public"."networks" to "authenticated";
 
-grant insert on table "public"."chains" to "authenticated";
+grant insert on table "public"."networks" to "authenticated";
 
-grant references on table "public"."chains" to "authenticated";
+grant references on table "public"."networks" to "authenticated";
 
-grant select on table "public"."chains" to "authenticated";
+grant select on table "public"."networks" to "authenticated";
 
-grant trigger on table "public"."chains" to "authenticated";
+grant trigger on table "public"."networks" to "authenticated";
 
-grant truncate on table "public"."chains" to "authenticated";
+grant truncate on table "public"."networks" to "authenticated";
 
-grant update on table "public"."chains" to "authenticated";
+grant update on table "public"."networks" to "authenticated";
 
-grant delete on table "public"."chains" to "service_role";
+grant delete on table "public"."networks" to "service_role";
 
-grant insert on table "public"."chains" to "service_role";
+grant insert on table "public"."networks" to "service_role";
 
-grant references on table "public"."chains" to "service_role";
+grant references on table "public"."networks" to "service_role";
 
-grant select on table "public"."chains" to "service_role";
+grant select on table "public"."networks" to "service_role";
 
-grant trigger on table "public"."chains" to "service_role";
+grant trigger on table "public"."networks" to "service_role";
 
-grant truncate on table "public"."chains" to "service_role";
+grant truncate on table "public"."networks" to "service_role";
 
-grant update on table "public"."chains" to "service_role";
+grant update on table "public"."networks" to "service_role";
 
 grant delete on table "public"."contracts" to "anon";
 
@@ -1260,47 +1265,47 @@ grant truncate on table "public"."subscription_tiers" to "service_role";
 
 grant update on table "public"."subscription_tiers" to "service_role";
 
-grant delete on table "public"."subscriptions_chains_parameters" to "anon";
+grant delete on table "public"."subscriptions_networks_parameters" to "anon";
 
-grant insert on table "public"."subscriptions_chains_parameters" to "anon";
+grant insert on table "public"."subscriptions_networks_parameters" to "anon";
 
-grant references on table "public"."subscriptions_chains_parameters" to "anon";
+grant references on table "public"."subscriptions_networks_parameters" to "anon";
 
-grant select on table "public"."subscriptions_chains_parameters" to "anon";
+grant select on table "public"."subscriptions_networks_parameters" to "anon";
 
-grant trigger on table "public"."subscriptions_chains_parameters" to "anon";
+grant trigger on table "public"."subscriptions_networks_parameters" to "anon";
 
-grant truncate on table "public"."subscriptions_chains_parameters" to "anon";
+grant truncate on table "public"."subscriptions_networks_parameters" to "anon";
 
-grant update on table "public"."subscriptions_chains_parameters" to "anon";
+grant update on table "public"."subscriptions_networks_parameters" to "anon";
 
-grant delete on table "public"."subscriptions_chains_parameters" to "authenticated";
+grant delete on table "public"."subscriptions_networks_parameters" to "authenticated";
 
-grant insert on table "public"."subscriptions_chains_parameters" to "authenticated";
+grant insert on table "public"."subscriptions_networks_parameters" to "authenticated";
 
-grant references on table "public"."subscriptions_chains_parameters" to "authenticated";
+grant references on table "public"."subscriptions_networks_parameters" to "authenticated";
 
-grant select on table "public"."subscriptions_chains_parameters" to "authenticated";
+grant select on table "public"."subscriptions_networks_parameters" to "authenticated";
 
-grant trigger on table "public"."subscriptions_chains_parameters" to "authenticated";
+grant trigger on table "public"."subscriptions_networks_parameters" to "authenticated";
 
-grant truncate on table "public"."subscriptions_chains_parameters" to "authenticated";
+grant truncate on table "public"."subscriptions_networks_parameters" to "authenticated";
 
-grant update on table "public"."subscriptions_chains_parameters" to "authenticated";
+grant update on table "public"."subscriptions_networks_parameters" to "authenticated";
 
-grant delete on table "public"."subscriptions_chains_parameters" to "service_role";
+grant delete on table "public"."subscriptions_networks_parameters" to "service_role";
 
-grant insert on table "public"."subscriptions_chains_parameters" to "service_role";
+grant insert on table "public"."subscriptions_networks_parameters" to "service_role";
 
-grant references on table "public"."subscriptions_chains_parameters" to "service_role";
+grant references on table "public"."subscriptions_networks_parameters" to "service_role";
 
-grant select on table "public"."subscriptions_chains_parameters" to "service_role";
+grant select on table "public"."subscriptions_networks_parameters" to "service_role";
 
-grant trigger on table "public"."subscriptions_chains_parameters" to "service_role";
+grant trigger on table "public"."subscriptions_networks_parameters" to "service_role";
 
-grant truncate on table "public"."subscriptions_chains_parameters" to "service_role";
+grant truncate on table "public"."subscriptions_networks_parameters" to "service_role";
 
-grant update on table "public"."subscriptions_chains_parameters" to "service_role";
+grant update on table "public"."subscriptions_networks_parameters" to "service_role";
 
 grant delete on table "public"."transactions" to "anon";
 
@@ -1376,16 +1381,16 @@ to authenticated
 using (private.is_user_account_member(auth.email(), account_id));
 
 
-create policy "Account admins can manage accounts chain parameters"
-on "public"."accounts_chains_parameters"
+create policy "Account admins can manage accounts network parameters"
+on "public"."accounts_networks_parameters"
 as permissive
 for all
 to authenticated
 using (private.is_user_account_admin(auth.email(), account_id));
 
 
-create policy "Public can view chain parameters"
-on "public"."accounts_chains_parameters"
+create policy "Public can view network parameters"
+on "public"."accounts_networks_parameters"
 as permissive
 for select
 to public
@@ -1459,7 +1464,7 @@ using ((EXISTS ( SELECT 1
 
 
 create policy "Enable read access for all users"
-on "public"."chains"
+on "public"."networks"
 as permissive
 for select
 to public
@@ -1575,7 +1580,7 @@ using (true);
 
 
 create policy "Enable read access for all users"
-on "public"."subscriptions_chains_parameters"
+on "public"."subscriptions_networks_parameters"
 as permissive
 for select
 to public

@@ -56,15 +56,15 @@ CREATE TABLE IF NOT EXISTS "public"."transactions" (
     "id" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "from_address" "text" NOT NULL,
-    "chain_id" "text" NOT NULL,
+    "network_id" "text" NOT NULL,
     "app_id" bigint NOT NULL,
     "type" "public"."transaction_type" NOT NULL,
     "amount" double precision,
     "currency" bigint NOT NULL,
     "metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
-    CONSTRAINT "transactions_pkey" PRIMARY KEY ("id", "chain_id", "app_id", "from_address", "created_at"),
-    CONSTRAINT "transactions_currency_fkey" FOREIGN KEY ("currency", "chain_id") REFERENCES "public"."currencies"("id", "chain_id") ON DELETE CASCADE,
-    CONSTRAINT "transactions_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE CASCADE
+    CONSTRAINT "transactions_pkey" PRIMARY KEY ("id", "network_id", "app_id", "from_address", "created_at"),
+    CONSTRAINT "transactions_currency_fkey" FOREIGN KEY ("currency", "network_id") REFERENCES "public"."currencies"("id", "network_id") ON DELETE CASCADE,
+    CONSTRAINT "transactions_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE CASCADE
 ) PARTITION BY RANGE (created_at);
 ALTER TABLE "public"."transactions" OWNER TO "postgres";
 
@@ -92,7 +92,7 @@ CREATE OR REPLACE FUNCTION "public"."listings"("public"."transactions") RETURNS 
 ALTER FUNCTION "public"."listings"("public"."transactions") OWNER TO "postgres";
 GRANT EXECUTE ON FUNCTION "public"."listings"("public"."transactions") TO "anon", "authenticated", "service_role";
 
-CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") RETURNS SETOF "public"."transactions_count"
+CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "network_id" "text") RETURNS SETOF "public"."transactions_count"
     LANGUAGE "sql" STABLE
     set search_path = ''
     AS $_$
@@ -101,14 +101,14 @@ CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("accoun
     count(t.id) AS count
     from "public"."transactions" t
     left join "public"."listings" l on t.app_id = l.app_id
-    where l.account_id = $1 and t.created_at > NOW() - interval '168 hours' and t."chain_id" = $2
+    where l.account_id = $1 and t.created_at > NOW() - interval '168 hours' and t."network_id" = $2
     group by time
     order by time asc
     $_$;
 
-ALTER FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") OWNER TO "postgres";
+ALTER FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "network_id" "text") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") RETURNS SETOF "public"."transactions_volume"
+CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "network_id" "text") RETURNS SETOF "public"."transactions_volume"
     LANGUAGE "sql" STABLE
     set search_path = ''
     AS $_$
@@ -118,14 +118,14 @@ CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account
     c.id as currency_id,
     c.ticker as currency_ticker
     from "public"."transactions" t
-    left join "public"."currencies" c on t.currency = c.id and t."chain_id" = c."chain_id"
+    left join "public"."currencies" c on t.currency = c.id and t."network_id" = c."network_id"
     left join "public"."listings" l on t.app_id = l.app_id
-    where l.account_id = $1 and t.created_at > NOW() - interval '30 days' and t.type = 'buy' and t."chain_id" = $2
+    where l.account_id = $1 and t.created_at > NOW() - interval '30 days' and t.type = 'buy' and t."network_id" = $2
     group by time, c.id, c.decimals, c.ticker
     order by time asc
     $_$;
 
-ALTER FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") OWNER TO "postgres";
+ALTER FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "network_id" "text") OWNER TO "postgres";
 
 -- Create a function to automatically create new daily partitions
 CREATE OR REPLACE FUNCTION "private"."create_daily_transactions_partition"()
@@ -162,6 +162,6 @@ $$;
 
 -- GRANT PERMISSION ON FUNCTIONS
 GRANT EXECUTE ON FUNCTION "public"."transactions"("public"."listings") TO "anon", "authenticated", "service_role";
-GRANT EXECUTE ON FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "chain_id" "text") TO "authenticated", "service_role";
-GRANT EXECUTE ON FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "chain_id" "text") TO "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "network_id" "text") TO "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "network_id" "text") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."create_daily_transactions_partition"() TO "service_role";

@@ -12,7 +12,7 @@ const networks = useNetworksStore()
 const { toast } = useToast()
 
 const link = computed(() => {
-  return `${window.origin}${import.meta.env.BASE_URL}${networks?.activeNetwork}/listing/${props.id}/`
+  return `${window.origin}${import.meta.env.BASE_URL}${networks?.activeNetwork?.id}/listing/${props.id}/`
 })
 
 const { copy, copied, isSupported } = useClipboard({ source: link.value })

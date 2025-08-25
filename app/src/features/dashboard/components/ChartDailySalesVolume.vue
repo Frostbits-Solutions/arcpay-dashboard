@@ -8,8 +8,8 @@ import { useTransactionsStore } from '@/features/transactions/stores/transaction
 const networks = useNetworksStore()
 const transactions = useTransactionsStore()
 const timeseries = computed(() => transactions.dailySalesVolumeTimeseries)
-const chainCurrency = computed(() => networks.activeNetwork?.split(':')[0] || 'algo')
-const volume = computed(() => transactions.totalSalesVolumes[chainCurrency.value] || 0)
+const networkCurrency = computed(() => networks.activeNetwork?.chain || 'algo')
+const volume = computed(() => transactions.totalSalesVolumes[networkCurrency.value] || 0)
 const categories = computed(() => transactions.top5CurrenciesByVolume)
 </script>
 
@@ -19,7 +19,7 @@ const categories = computed(() => transactions.top5CurrenciesByVolume)
       <div>
         <h5 class="flex items-baseline gap-1 text-3xl font-bold leading-none text-foreground">
           <count-up :decimalPlaces="0" :duration="1" :end-val="volume"></count-up>
-          <span class="text-lg uppercase text-muted-foreground">{{ chainCurrency }}</span>
+          <span class="text-lg uppercase text-muted-foreground">{{ networkCurrency }}</span>
         </h5>
         <p class="text-base font-normal text-muted-foreground">Monthly volume</p>
       </div>

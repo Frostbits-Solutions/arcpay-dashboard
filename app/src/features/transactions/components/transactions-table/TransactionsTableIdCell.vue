@@ -9,7 +9,8 @@ const props = defineProps<{ row: Row<Transaction> }>()
 const id = computed(() => props.row.original.id)
 const networks = useNetworksStore()
 const link = computed(() => {
-  const prefix = networks?.activeNetwork?.split(':')?.[1] === 'testnet' ? 'testnet.' : ''
+  const prefix = networks?.activeNetwork?.netid === 'testnet' ? 'testnet.' : ''
+  // TODO - Use getExplorerLink function instead
   return `https://${prefix}explorer.perawallet.app/tx-group/${id.value}/`
 })
 </script>

@@ -30,7 +30,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
   async function fetchTransactions() {
     if (accounts.active && networks.activeNetwork) {
-      const { data, error } = await getTransactionsListings(accounts.active.id, networks.activeNetwork)
+      const { data, error } = await getTransactionsListings(accounts.active.id, networks.activeNetwork?.id)
       if (!data || error) {
         console.error(error)
         toast({
@@ -48,7 +48,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   async function fetchHourlyTransactionsCount() {
     if (accounts.active && networks.activeNetwork) {
       const tm = []
-      const { data, error } = await getHourlyTransactionsCount(accounts.active.id, networks.activeNetwork)
+      const { data, error } = await getHourlyTransactionsCount(accounts.active.id, networks.activeNetwork?.id)
       if (!data || error) {
         console.error(error)
         toast({
@@ -74,7 +74,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   async function fetchDailySalesVolume() {
     if (accounts.active && networks.activeNetwork) {
       const tm = []
-      const { data, error } = await getDailySalesVolume(accounts.active.id, networks.activeNetwork)
+      const { data, error } = await getDailySalesVolume(accounts.active.id, networks.activeNetwork?.id)
       if (!data || error) {
         console.error(error)
         toast({
@@ -129,7 +129,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   async function subscribe() {
     if (accounts.active && networks.activeNetwork) {
       console.log('subribing to transactions')
-      const { data, error } = await getAccountActiveListingsAppids(accounts.active.id, networks.activeNetwork)
+      const { data, error } = await getAccountActiveListingsAppids(accounts.active.id, networks.activeNetwork?.id)
       if (data && data.length) {
         const appIds = data.map((item: { app_id: number }) => item.app_id)
         realtimeChannel.value = subscribeToTransactions(supabase, appIds, () => {
@@ -146,7 +146,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   }
 
   watch(
-    () => networks.activeNetwork,
+    () => networks.activeNetwork?.id,
     () => {
       fetchAll(true)
     }

@@ -39,6 +39,7 @@
     "flowbite": "^2.5.1",
     "lucide-vue-next": "^0.445.0",
     "mersenne-twister": "^1.1.0",
+    "multiformats": "^13.4.0",
     "open-props": "^1.7.6",
     "pinia": "^2.2.2",
     "radix-vue": "^1.9.6",

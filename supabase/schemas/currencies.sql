@@ -27,7 +27,7 @@ ALTER TYPE "public"."currency_type" OWNER TO "postgres";
 -------------------- CURRENCIES --------------------
 CREATE TABLE IF NOT EXISTS "public"."currencies" (
     "id" bigint NOT NULL,
-    "chain_id" "text" NOT NULL,
+    "network_id" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone,
     "name" "text" NOT NULL,
@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS "public"."currencies" (
     "type" "public"."currency_type" NOT NULL,
     "decimals" bigint NOT NULL,
     "is_public" boolean DEFAULT true NOT NULL,
-    CONSTRAINT "currencies_pkey" PRIMARY KEY ("id", "chain_id"),
-    CONSTRAINT "currencies_chain_id_fkey" FOREIGN KEY ("chain_id") REFERENCES "public"."chains"("id") ON DELETE CASCADE
+    CONSTRAINT "currencies_pkey" PRIMARY KEY ("id", "network_id"),
+    CONSTRAINT "currencies_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE CASCADE
 );
 ALTER TABLE "public"."currencies" OWNER TO "postgres";
 

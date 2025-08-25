@@ -1,11 +1,11 @@
 import { h, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { getAccount, getAccountAddresses, getAccountSecrets, getAccountChainsParameters, getAccountSubscription, getAccountUsers, getAllAccounts } from '@/services/accounts'
+import { getAccount, getAccountAddresses, getAccountSecrets, getAccountNetworksParameters, getAccountSubscription, getAccountUsers, getAllAccounts } from '@/services/accounts'
 import { useSessionStore } from '@/features/auth/stores/session'
 import type { Tables } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
-import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountChainParameter, AccountSecret, AccountUser, SubscriptionTier } from '@/models'
+import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountNetworkParameter, AccountSecret, AccountUser, SubscriptionTier } from '@/models'
 
 interface AccountSettings {
   settings?: Account | null
@@ -15,7 +15,7 @@ interface AccountSettings {
   users?: Omit<AccountUser, 'account_id'>[]
   secrets?: AccountSecret[]
   addresses?: AccountAddress[]
-  chainsParameters?: AccountChainParameter[]
+  networksParameters?: AccountNetworkParameter[]
   currencies?: AccountCurrency[]
 }
 
@@ -65,7 +65,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         fetchAccountAddresses(account.id),
         fetchAccountSubscription(account.id),
         fetchAccountSecrets(account.id),
-        fetchAccountChainsParameters(account.id),
+        fetchAccountNetworksParameters(account.id),
       ]).then(() => {
         loading.value = false
       })
@@ -149,18 +149,18 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
-  async function fetchAccountChainsParameters(accountId: string) {
-    const { data: chainsParameters, error } = await getAccountChainsParameters(accountId)
+  async function fetchAccountNetworksParameters(accountId: string) {
+    const { data: networksParameters, error } = await getAccountNetworksParameters(accountId)
     if (error) {
       console.error(error)
       toast({
-        title: 'Error fetching account chains paramaters',
+        title: 'Error fetching account networks paramaters',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
         action: h(ToastError),
       })
     } else {
-      activeSettings.value.chainsParameters = chainsParameters ?? []
+      activeSettings.value.networksParameters = networksParameters ?? []
     }
   }
 
@@ -173,7 +173,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     fetchAccountSettings,
     fetchAccountUsers,
     fetchAccountAddresses,
-    fetchSubscriptionChainsParameters: fetchAccountChainsParameters,
+    fetchSubscriptionNetworksParameters: fetchAccountNetworksParameters,
     fetchAccountSecrets,
     selectAccount,
   }

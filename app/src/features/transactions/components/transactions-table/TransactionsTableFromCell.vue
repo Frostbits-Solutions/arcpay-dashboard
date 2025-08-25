@@ -10,7 +10,7 @@ const props = defineProps<{ row: Row<Transaction> }>()
 const networks = useNetworksStore()
 const from = computed(() => props.row.original.from_address)
 const link = computed(() => {
-  const prefix = networks?.activeNetwork?.split(':')?.[1] === 'testnet' ? 'testnet.' : ''
+  const prefix = networks?.activeNetwork?.netid === 'testnet' ? 'testnet.' : ''
   return `https://${prefix}explorer.perawallet.app/address/${from.value}/`
 })
 </script>
