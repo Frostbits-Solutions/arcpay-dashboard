@@ -1,6 +1,6 @@
 import { h, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { getAccount, getAccountAddresses, getAccountSecrets, getAccountNetworksParameters, getAccountCurrencies,getAccountSubscription, getAccountUsers, getAllAccounts } from '@/services/accounts'
+import { getAccount, getAccountAddresses, getAccountSecrets, getAccountNetworksParameters, getAccountCurrencies, getAccountSubscription, getAccountUsers, getAllAccounts } from '@/services/accounts'
 import { useSessionStore } from '@/features/auth/stores/session'
 import type { Tables } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
@@ -173,13 +173,25 @@ export const useAccountsStore = defineStore('accounts', () => {
         title: 'Error fetching account users',
         description: error?.message || 'Unexpected error',
         variant: 'destructive',
-        action: h(ToastError)
+        action: h(ToastError),
       })
     } else {
       activeSettings.value.currencies = currencies
     }
   }
 
-
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionNetworksParameters, fetchAccountSecrets, selectAccount, fetchAccountCurrencies }
+  return {
+    all,
+    active,
+    activeSettings,
+    loading,
+    fetchAll,
+    fetchAccountSettings,
+    fetchAccountUsers,
+    fetchAccountAddresses,
+    fetchSubscriptionNetworksParameters: fetchAccountNetworksParameters,
+    fetchAccountSecrets,
+    selectAccount,
+    fetchAccountCurrencies,
+  }
 })

@@ -5,9 +5,8 @@ import OrganizationSettingsListingsSecondary from './OrganizationSettingsListing
 import { computed, ref } from 'vue'
 
 const networks = useNetworksStore()
-const chains = computed(() => networks.networks)
-const activeChainTab = ref(0)
-const activeChain = computed(() => chains.value[activeChainTab.value])
+const activeNetworkTab = ref(0)
+const activeNetwork = computed(() => networks.networks[activeNetworkTab.value])
 </script>
 
 <template>
@@ -16,17 +15,17 @@ const activeChain = computed(() => chains.value[activeChainTab.value])
     <p class="text-sm text-muted-foreground">Enable third party listings and add custom currencies to your account.</p>
     <div class="mt-4 flex border-b border-border">
       <button
-        v-for="(chain, index) in chains"
-        :key="chain"
-        @click="activeChainTab = index"
-        :class="['px-4 py-2 text-sm', activeChainTab === index ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground']"
+        v-for="(network, index) in networks.networks"
+        :key="network"
+        @click="activeNetworkTab = index"
+        :class="['px-4 py-2 text-sm', activeNetworkTab === index ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground']"
       >
-        {{ chain }}
+        {{ network }}
       </button>
     </div>
     <div class="relative">
-      <OrganizationSettingsListingsSecondary class="mb-4" :active-chain="activeChain" />
-      <OrganizationSettingsCurrencies :active-chain="activeChain" />
+      <OrganizationSettingsListingsSecondary class="mb-4" :active-network="activeNetwork" />
+      <OrganizationSettingsCurrencies :active-network="activeNetwork" />
     </div>
   </div>
 </template>

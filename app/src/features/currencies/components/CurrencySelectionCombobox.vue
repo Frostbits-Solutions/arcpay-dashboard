@@ -9,12 +9,12 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover'
 import { Skeleton } from '@/lib/ui/skeleton'
 import { type Database } from '@/lib/supabase/database.types'
-import { useCurrenciesStore } from '@/features/currencies/stores/currencies'
+import { useNetworksStore } from '@/features/networks/stores/networks'
 
 type Currency = Database['public']['Tables']['currencies']['Row']
 
 const props = defineProps({
-  activeChain: {
+  activeNetwork: {
     type: String,
     required: true,
   },
@@ -28,24 +28,14 @@ const emit = defineEmits<{
   (e: 'select', currency: Currency): void
 }>()
 
-const currencyStore = useCurrenciesStore()
-const currencies = computed(() => currencyStore.list.filter((c) => !props.excludeCurrencyIds.includes(c.id)))
+const networks = useNetworksStore()
+const currencies = computed(() => networks.activeNetwork?.currencies.filter((c) => !props.excludeCurrencyIds.includes(c.id)))
 const selectedCurrency = computed(() => {
-  return currencies.value.find((currency) => currency.ticker === value.value)
+  return currencies.value?.find((currency) => currency.ticker === value.value)
 })
 const open = ref(false)
 const value = ref<string | undefined>(undefined)
 const loading = ref(true)
-
-watch(
-  () => props,
-  () => {
-    loading.value = true
-    currencyStore.fetchCurrencies(props.activeChain)
-    loading.value = false
-  },
-  { immediate: true, deep: true }
-)
 </script>
 
 <template>
@@ -74,14 +64,14 @@ watch(
         <CommandList>
           <CommandGroup class="w-[327px]">
             <CommandItem
-              v-for="currency in currencies.filter((c: Currency) => !c.is_public)"
+              v-for="currency in currencies?.filter((c: Currency) => !c.is_public)"
               :key="currency.id"
               :value="currency.ticker"
               @select="
                 (e: CustomEvent) => {
                   if (typeof e.detail.value === 'string') {
                     value = e.detail.value
-                    const selected = currencies.find((c) => c.ticker === value)
+                    const selected = currencies?.find((c) => c.ticker === value)
                     if (selected) {
                       emit('select', selected)
                     }

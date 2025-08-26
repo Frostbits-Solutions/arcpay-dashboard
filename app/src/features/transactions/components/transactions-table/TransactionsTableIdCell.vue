@@ -10,7 +10,7 @@ const id = computed(() => props.row.original.id)
 const networks = useNetworksStore()
 const link = computed(() => {
   const prefix = networks?.activeNetwork?.netid === 'testnet' ? 'testnet.' : ''
-  // TODO - Use getExplorerLink function instead
+  // TODO (GH-31) - Use getExplorerLink function instead
   return `https://${prefix}explorer.perawallet.app/tx-group/${id.value}/`
 })
 </script>

@@ -17,7 +17,7 @@ import type { AccountNetworkParameter } from '@/models'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 
 const props = defineProps({
-  activeChain: {
+  activeNetwork: {
     type: String,
     required: true,
   },
@@ -42,7 +42,7 @@ const formSchema = toTypedSchema(
   z.object({
     enable_secondary: z.boolean().optional(),
     secondary_percentage_fee: z.number().min(0, 'Percentage must be at least 0.00%').max(50, 'Percentage must be at most 50.00%'),
-    // TODO - Update the regex to match algo addresses
+    // TODO (GH-30) - Update the regex to match algo addresses
     secondary_fee_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid network address'), // Regex for Ethereum-like addresses
   })
 )
@@ -52,7 +52,7 @@ const form = useForm({
 })
 
 function resetForm() {
-  const selectedNetwork = props.activeChain
+  const selectedNetwork = props.activeNetwork
   if (!selectedNetwork || !accounts.active || !accounts.activeSettings.networksParameters) return
 
   // Find the network parameter for the selected network
@@ -84,7 +84,7 @@ const onNetworkParamFormSubmit = form.handleSubmit(async (values) => {
   if (!hasProSubscription.value || !accounts.active?.id || !accounts.activeSettings.networksParameters) return
 
   const accountId = activeNetworkParameter.value.account_id
-  const networkId = props.activeChain
+  const networkId = props.activeNetwork
 
   // Check if network parameter already exists
   const existingNetworkParameter = accounts.activeSettings.networksParameters.find((c) => c.network_id === networkId)
@@ -160,8 +160,8 @@ watch(
               <FormItem>
                 <div class="flex items-center justify-between px-4 py-4">
                   <div>
-                    <FormLabel>Enable secondary listing for {{ props.activeChain }}</FormLabel>
-                    <FormDescription> Allow fees on secondary listings for this chain. </FormDescription>
+                    <FormLabel>Enable secondary listing for {{ props.activeNetwork }}</FormLabel>
+                    <FormDescription> Allow fees on secondary listings for this network. </FormDescription>
                   </div>
                   <FormControl>
                     <Switch @update:checked="handleChange" :checked="value" />

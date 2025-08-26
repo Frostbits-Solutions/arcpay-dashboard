@@ -7,8 +7,7 @@ import { Button } from '@/lib/ui/button'
 import { Badge } from '@/lib/ui/badge'
 import CurrencySelectionCombobox from '@/features/currencies/components/CurrencySelectionCombobox.vue'
 import { type Database } from '@/lib/supabase/database.types'
-import { useCurrenciesStore } from '@/features/currencies/stores/currencies'
-import { addAccountCurrency, removeAccountCurrency } from '../services/accounts'
+import { addAccountCurrency, removeAccountCurrency } from '@/services/accounts'
 import { toast } from '@/lib/ui/toast'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
@@ -16,7 +15,7 @@ import ToastError from '@/lib/ui/toast/ToastError.vue'
 type Currency = Database['public']['Tables']['currencies']['Row']
 
 const props = defineProps({
-  activeChain: {
+  activeNetwork: {
     type: String,
     required: true,
   },
@@ -24,30 +23,29 @@ const props = defineProps({
 
 const accounts = useAccountsStore()
 const networks = useNetworksStore()
-const currencyStore = useCurrenciesStore()
 const currencySelected = ref<Currency | null>(null)
 const hasProSubscription = computed(() => accounts.activeSettings.subscription_tiers?.allow_custom_currencies ?? false)
 
 const listedPublicCurrencies = computed(() => {
-  return currencyStore.list.filter((currency: Currency) => {
-    return props.activeChain === currency.chain_id && currency.is_public
+  return networks.activeNetwork?.currencies.filter((currency: Currency) => {
+    return props.activeNetwork === currency.network_id && currency.is_public
   })
 })
 
 const listedPrivateCurrencies = computed(() => {
-  return currencyStore.list.filter((currency: Currency) => {
-    return props.activeChain === currency.chain_id && !currency.is_public && accounts.activeSettings.currencies?.some((c) => c.currency === currency.id)
+  return networks.activeNetwork?.currencies.filter((currency: Currency) => {
+    return props.activeNetwork === currency.network_id && !currency.is_public && accounts.activeSettings.currencies?.some((c) => c.currency === currency.id)
   })
 })
 
 const listedPrivateCurrenciesIds = computed(() => {
-  return listedPrivateCurrencies.value.map((currency: Currency) => currency.id)
+  return listedPrivateCurrencies.value?.map((currency: Currency) => currency.id)
 })
 
 function AddCurrencyToUser() {
   if (!accounts.active || !currencySelected.value) return
 
-  addAccountCurrency(accounts.active.id, currencySelected.value.id, props.activeChain)
+  addAccountCurrency(accounts.active.id, currencySelected.value.id, props.activeNetwork)
     .then(() => {
       resetCurrencySettings()
       // Show success toast
@@ -71,7 +69,7 @@ function removeCurrencyToUser(currencyId: number) {
   console.log('Removing currency with ID:', currencyId)
   if (!accounts.active) return
 
-  removeAccountCurrency(accounts.active.id, currencyId, props.activeChain)
+  removeAccountCurrency(accounts.active.id, currencyId, props.activeNetwork)
     .then(() => {
       resetCurrencySettings()
       // Show success toast
@@ -100,7 +98,6 @@ function resetCurrencySettings() {
   if (!accounts.active) return
 
   accounts.fetchAccountCurrencies(accounts.active.id)
-  currencyStore.fetchCurrencies(props.activeChain)
   currencySelected.value = null
   canImport.value = false
 }
@@ -122,11 +119,11 @@ watch(
         Add custom currencies
         <Badge variant="gradient">PRO</Badge>
       </h4>
-      <p class="mb-4 text-sm text-muted-foreground">List of all supported chains for your organization. You can add currencies for each chain.</p>
+      <p class="mb-4 text-sm text-muted-foreground">List of all supported networks for your organization. You can add currencies for each network.</p>
       <div class="mb-4 flex items-center justify-between">
         <label class="text-sm font-medium text-muted-foreground">Select a currency to import:</label>
         <div class="flex items-center gap-2">
-          <CurrencySelectionCombobox :active-chain="props.activeChain" :exclude-currency-ids="listedPrivateCurrenciesIds" @select="handleCurrencySelect" />
+          <CurrencySelectionCombobox :active-network="props.activeNetwork" :exclude-currency-ids="listedPrivateCurrenciesIds" @select="handleCurrencySelect" />
           <Button variant="outline" :disabled="!canImport" @click="AddCurrencyToUser">Import</Button>
         </div>
       </div>
@@ -140,7 +137,7 @@ watch(
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(currency) in listedPublicCurrencies" :key="currency.id">
+            <tr v-for="currency in listedPublicCurrencies" :key="currency.id">
               <td class="px-6 py-4"><img :src="currency.icon ?? ''" alt="Icone" width="24" height="24" /></td>
               <td class="px-6 py-4">{{ currency.name }}</td>
               <td class="px-6 py-4">{{ currency.ticker }}</td>
@@ -150,7 +147,7 @@ watch(
                 </div>
               </td>
             </tr>
-            <tr v-for="(currency) in listedPrivateCurrencies" :key="currency.id">
+            <tr v-for="currency in listedPrivateCurrencies" :key="currency.id">
               <td class="px-6 py-4"><img :src="currency.icon ?? ''" alt="Icone" width="24" height="24" /></td>
               <td class="px-6 py-4">{{ currency.name }}</td>
               <td class="px-6 py-4">{{ currency.ticker }}</td>
