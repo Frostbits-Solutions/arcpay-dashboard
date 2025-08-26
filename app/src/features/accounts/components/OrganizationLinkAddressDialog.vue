@@ -11,7 +11,6 @@ import { useToast } from '@/lib/ui/toast'
 import { h, ref } from 'vue'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/lib/ui/select'
 
 const accounts = useAccountsStore()
 const { toast } = useToast()

@@ -207,8 +207,8 @@ export async function addAccountCurrency(account_id: string, currency: number, n
   return { data, error }
 }
 
-export async function removeAccountCurrency(account_id: string, currency: number, network_id: string) {
-  const { data, error } = await supabase.from('accounts_currencies').delete().eq('account_id', account_id).eq('currency', currency).eq('network_id', network_id)
+export async function removeAccountCurrency(account_id: string, currencyId: number, network_id: string) {
+  const { data, error } = await supabase.from('accounts_currencies').delete().eq('account_id', account_id).eq('currency', currencyId).eq('network_id', network_id)
   return { data, error }
 }
 

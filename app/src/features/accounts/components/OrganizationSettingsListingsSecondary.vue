@@ -16,6 +16,12 @@ import * as z from 'zod'
 import type { AccountNetworkParameter } from '@/models'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 
+const props = defineProps({
+  activeChain: {
+    type: String,
+    required: true,
+  },
+})
 const accounts = useAccountsStore()
 const network = useNetworksStore()
 
@@ -46,7 +52,7 @@ const form = useForm({
 })
 
 function resetForm() {
-  const selectedNetwork = networks.value[activeNetworkTab.value]
+  const selectedNetwork = props.activeChain
   if (!selectedNetwork || !accounts.active || !accounts.activeSettings.networksParameters) return
 
   // Find the network parameter for the selected network
@@ -78,7 +84,7 @@ const onNetworkParamFormSubmit = form.handleSubmit(async (values) => {
   if (!hasProSubscription.value || !accounts.active?.id || !accounts.activeSettings.networksParameters) return
 
   const accountId = activeNetworkParameter.value.account_id
-  const networkId = networks.value[activeNetworkTab.value]
+  const networkId = props.activeChain
 
   // Check if network parameter already exists
   const existingNetworkParameter = accounts.activeSettings.networksParameters.find((c) => c.network_id === networkId)
@@ -120,11 +126,11 @@ watch(
 )
 
 watch(
-  activeNetworkTab,
+  props,
   () => {
     resetForm()
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 </script>
 
@@ -134,7 +140,7 @@ watch(
       <div class="flex items-center justify-between">
         <div>
           <h4 class="text-md font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
-          <p class="text-sm text-muted-foreground">
+          <p class="mt-4 text-sm text-muted-foreground">
             Allow third party listings to be created by addresses that are not linked to your organization. Your organization collects fees on each third party listing sold.<br />
             Upgrade to PRO to enable third party listings and collect fees on each sale.
           </p>
@@ -143,75 +149,61 @@ watch(
     </div>
     <div v-else class="mt-6">
       <div class="rounded-lg border border-border bg-muted/50 p-4">
-        <h4 class="text-md font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
+        <h4 class="text-md mb-2 font-normal">Third party listings <Badge variant="gradient">PRO</Badge></h4>
         <p class="text-sm text-muted-foreground">
           Allow third party listings to be created by addresses that are not linked to your organization. Your organization collects fees on each third party listing sold.
         </p>
-      </div>
-      <div class="mt-2 rounded-lg border border-border p-4">
-        <div class="flex border-b border-border">
-          <button
-            v-for="(network, index) in networks"
-            :key="network"
-            @click="activeNetworkTab = index"
-            :class="['border-b-2 px-4 py-2 text-sm', activeNetworkTab === index ? 'border-primary text-primary' : 'border-transparent text-muted-foreground']"
-          >
-            {{ network }}
-          </button>
-        </div>
         <form id="networks-parameters-form" class="mt-6 space-y-6" @submit="onNetworkParamFormSubmit">
           <div>
-            <div v-for="(network, index) in networks" :key="network" v-show="activeNetworkTab === index" class="mt-4">
-              <!-- Enable Secondary Listing -->
-              <FormField v-slot="{ value, handleChange }" name="enable_secondary">
-                <FormItem>
-                  <div class="flex items-center justify-between px-4 py-4">
-                    <div>
-                      <FormLabel>Enable secondary listing for {{ network }}</FormLabel>
-                      <FormDescription> Allow fees on secondary listings for this network. </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch @update:checked="handleChange" :checked="value" />
-                    </FormControl>
+            <!-- Enable Secondary Listing -->
+            <FormField v-slot="{ value, handleChange }" name="enable_secondary">
+              <FormItem>
+                <div class="flex items-center justify-between px-4 py-4">
+                  <div>
+                    <FormLabel>Enable secondary listing for {{ props.activeChain }}</FormLabel>
+                    <FormDescription> Allow fees on secondary listings for this chain. </FormDescription>
                   </div>
-                </FormItem>
-              </FormField>
+                  <FormControl>
+                    <Switch @update:checked="handleChange" :checked="value" />
+                  </FormControl>
+                </div>
+              </FormItem>
+            </FormField>
 
-              <!-- Secondary Fee Address -->
-              <FormField v-slot="{ componentField, errors }" name="secondary_fee_address">
-                <FormItem>
-                  <div class="flex items-center justify-between px-4 py-4">
-                    <div>
-                      <FormLabel>Secondary fee address</FormLabel>
-                      <FormDescription> Address that will receive the fees from secondary listings. </FormDescription>
-                      <FormMessage v-if="errors" class="mt-2 text-xs">{{ errors }}</FormMessage>
-                    </div>
-                    <FormControl>
-                      <Input type="text" v-bind="componentField" placeholder="0x..." class="w-1/2 truncate" />
-                    </FormControl>
+            <!-- Secondary Fee Address -->
+            <FormField v-slot="{ componentField, errors }" name="secondary_fee_address">
+              <FormItem>
+                <div class="flex items-center justify-between px-4 py-4">
+                  <div>
+                    <FormLabel>Secondary fee address</FormLabel>
+                    <FormDescription> Address that will receive the fees from secondary listings. </FormDescription>
+                    <FormMessage v-if="errors" class="mt-2 text-xs">{{ errors }}</FormMessage>
                   </div>
-                </FormItem>
-              </FormField>
+                  <FormControl>
+                    <Input type="text" v-bind="componentField" placeholder="0x..." class="w-1/2 truncate" />
+                  </FormControl>
+                </div>
+              </FormItem>
+            </FormField>
 
-              <!-- Fee Percentage -->
-              <FormField v-slot="{ componentField, errors }" name="secondary_percentage_fee">
-                <FormItem>
-                  <div class="flex items-center justify-between px-4 py-4">
-                    <div>
-                      <FormLabel>Fee Percentage</FormLabel>
-                      <FormDescription> Enter the percentage fee (0.00% to 50.00%). </FormDescription>
-                      <FormMessage v-if="errors" class="mt-2 text-xs">{{ errors }}</FormMessage>
-                    </div>
-                    <FormControl>
-                      <div class="flex items-center">
-                        <Input v-bind="componentField" type="number" step="0.01" min="0" max="50" class="w-1/8" />
-                        <span class="ml-2 text-muted-foreground">%</span>
-                      </div>
-                    </FormControl>
+            <!-- Fee Percentage -->
+            <FormField v-slot="{ componentField, errors }" name="secondary_percentage_fee">
+              <FormItem>
+                <div class="flex items-center justify-between px-4 py-4">
+                  <div>
+                    <FormLabel>Fee Percentage</FormLabel>
+                    <FormDescription> Enter the percentage fee (0.00% to 50.00%). </FormDescription>
+                    <FormMessage v-if="errors" class="mt-2 text-xs">{{ errors }}</FormMessage>
                   </div>
-                </FormItem>
-              </FormField>
-            </div>
+                  <FormControl>
+                    <div class="flex items-center">
+                      <Input v-bind="componentField" type="number" step="0.01" min="0" max="50" class="w-1/8" />
+                      <span class="ml-2 text-muted-foreground">%</span>
+                    </div>
+                  </FormControl>
+                </div>
+              </FormItem>
+            </FormField>
           </div>
           <div class="flex justify-end">
             <Button variant="outline" type="submit" form="networks-parameters-form"> Save </Button>
