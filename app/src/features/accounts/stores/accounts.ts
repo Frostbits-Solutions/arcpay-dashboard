@@ -7,6 +7,7 @@ import {
   getAccountChainsParameters, getAccountSubscription,
   getAccountUsers,
   getAllAccounts,
+  getAccountCurrencies,
 } from '@/features/accounts/services/accounts'
 import { useSessionStore } from '@/features/auth/stores/session'
 import type { Tables } from '@/lib/supabase/database.types'
@@ -69,6 +70,7 @@ export const useAccountsStore = defineStore('accounts', () => {
       Promise.allSettled([
         fetchAccountSettings(account.id),
         fetchAccountUsers(account.id),
+        fetchAccountCurrencies(account.id),
         fetchAccountAddresses(account.id),
         fetchAccountSubscription(account.id),
         fetchAccountSecrets(account.id),
@@ -171,6 +173,21 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
   }
 
+  async function fetchAccountCurrencies(accountId: string) {
+    const { data: currencies, error } = await getAccountCurrencies(accountId)
+    if (!currencies || error) {
+      console.error(error)
+      toast({
+        title: 'Error fetching account users',
+        description: error?.message || 'Unexpected error',
+        variant: 'destructive',
+        action: h(ToastError)
+      })
+    } else {
+      activeSettings.value.currencies = currencies
+    }
+  }
+
   
-  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, fetchAccountSecrets, selectAccount }
+  return { all, active, activeSettings, loading, fetchAll, fetchAccountSettings, fetchAccountUsers, fetchAccountAddresses, fetchSubscriptionChainsParameters: fetchAccountChainsParameters, fetchAccountSecrets, selectAccount, fetchAccountCurrencies }
 })

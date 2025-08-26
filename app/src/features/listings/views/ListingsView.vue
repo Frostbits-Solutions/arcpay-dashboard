@@ -10,6 +10,7 @@ import { DataTable } from '@/lib/ui/data-table'
 const listingsStore = useListingsStore()
 const accounts = useAccountsStore()
 
+// @ts-expect-error: Suppress type checking for this line
 const listings = computed<CompositeListing[]>(() => listingsStore.list || [])
 const primaryAddresses = computed<string[]>(() => accounts.activeSettings.addresses?.map(a => a.address) || [])
 

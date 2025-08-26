@@ -14,9 +14,10 @@ export const useCurrenciesStore = defineStore('currencies', () => {
   const list = ref<Currency[]>([])
   const networks = useNetworksStore()
 
-  async function fetchCurrencies() {
-    if (networks.activeNetwork) {
-      const {data, error} = await getCurrencies(networks.activeNetwork)
+  async function fetchCurrencies(network: string | null = null) {
+    const selectedNetwork = network ?? networks.activeNetwork
+    if (selectedNetwork) {
+      const {data, error} = await getCurrencies(selectedNetwork)
       if (!data || error) {
         console.error(error)
         toast({

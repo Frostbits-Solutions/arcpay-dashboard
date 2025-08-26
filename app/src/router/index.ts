@@ -60,7 +60,7 @@ const router = createRouter({
               path: 'listings',
               name: 'organization-organization-listings',
               component: OrganizationSettingsListings,
-            }
+            },
           ]
         }
       ]
