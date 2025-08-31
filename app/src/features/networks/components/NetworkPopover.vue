@@ -3,19 +3,22 @@ import { Button } from '@/lib/ui/button'
 import { ChevronDown, Check, GlobeLock } from 'lucide-vue-next'
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover'
 import { useNetworksStore } from '@/features/networks/stores/networks'
+import { computed } from 'vue'
+import { Skeleton } from '@/lib/ui/skeleton'
 
 const networks = useNetworksStore()
-const supportedNetworks = ['algo:mainnet', 'algo:testnet', 'voi:mainnet']
+const supportedNetworks = computed(() => networks.networks)
 </script>
 
 <template>
   <Popover>
     <PopoverTrigger>
-      <Button variant="outline">
+      <Button variant="outline" v-if="supportedNetworks.length && networks.activeNetwork">
         <GlobeLock class="mr-1 h-4 w-4" />
         {{ networks.activeNetwork?.id }}
         <ChevronDown class="ml-4 h-4 w-4" />
       </Button>
+      <Skeleton v-else class="h-8 w-40" />
     </PopoverTrigger>
     <PopoverContent side="bottom" align="start" class="p-1">
       <ul class="pb-1 text-foreground">
