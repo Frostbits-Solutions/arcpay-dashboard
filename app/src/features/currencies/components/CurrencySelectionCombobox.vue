@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { CaretSortIcon, CheckIcon } from '@radix-icons/vue'
 import defaultCurrencyIcon from '@/assets/currency.svg'
 
@@ -9,12 +9,13 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/ui/popover'
 import { Skeleton } from '@/lib/ui/skeleton'
 import { type Database } from '@/lib/supabase/database.types'
-import { useNetworksStore } from '@/features/networks/stores/networks'
+import { getCurrencies } from '@/services/currencies'
+import { errorHandler } from '@/lib/errorHandler'
 
 type Currency = Database['public']['Tables']['currencies']['Row']
 
 const props = defineProps({
-  activeNetwork: {
+  network: {
     type: String,
     required: true,
   },
@@ -28,14 +29,29 @@ const emit = defineEmits<{
   (e: 'select', currency: Currency): void
 }>()
 
-const networks = useNetworksStore()
-const currencies = computed(() => networks.activeNetwork?.currencies.filter((c) => !props.excludeCurrencyIds.includes(c.id)))
 const selectedCurrency = computed(() => {
   return currencies.value?.find((currency) => currency.ticker === value.value)
 })
 const open = ref(false)
 const value = ref<string | undefined>(undefined)
 const loading = ref(true)
+const currencies = ref<Currency[]>([])
+
+watch(
+  () => [props.network, props.excludeCurrencyIds],
+  async () => {
+    loading.value = true
+    value.value = undefined
+    const { data, error } = await getCurrencies(props.network)
+    if (!data || error) {
+      errorHandler(error, `Unable to fetch currencies for ${props.network}.`)
+    } else {
+      currencies.value = data.filter((c) => !props.excludeCurrencyIds.includes(c.id))
+    }
+    loading.value = false
+  },
+  { immediate: true }
+)
 </script>
 
 <template>

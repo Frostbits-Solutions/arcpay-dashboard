@@ -1,31 +1,31 @@
 <script setup lang="ts">
 import { useNetworksStore } from '@/features/networks/stores/networks'
-import OrganizationSettingsCurrencies from './OrganizationSettingsCurrencies.vue'
+import OrganizationSettingsListingsCurrencies from './OrganizationSettingsListingsCurrencies.vue'
 import OrganizationSettingsListingsSecondary from './OrganizationSettingsListingsSecondary.vue'
 import { computed, ref } from 'vue'
 
 const networks = useNetworksStore()
-const activeNetworkTab = ref(0)
-const activeNetwork = computed(() => networks.networks[activeNetworkTab.value])
+const selectedNetworkTab = ref(0)
+const selectedNetwork = computed(() => networks.networks[selectedNetworkTab.value])
 </script>
 
 <template>
   <div>
     <h2 class="text-2xl font-bold dark:text-white">Listings</h2>
     <p class="text-sm text-muted-foreground">Enable third party listings and add custom currencies to your account.</p>
-    <div class="mt-4 flex border-b border-border">
+    <div class="mt-10 flex rounded-lg border border-border px-4">
       <button
         v-for="(network, index) in networks.networks"
         :key="network"
-        @click="activeNetworkTab = index"
-        :class="['px-4 py-2 text-sm', activeNetworkTab === index ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground']"
+        @click="selectedNetworkTab = index"
+        :class="['mx-4 border-b-2 py-4 text-sm', selectedNetworkTab === index ? 'border-b-primary text-primary' : 'border-b-transparent text-muted-foreground']"
       >
         {{ network }}
       </button>
     </div>
     <div class="relative">
-      <OrganizationSettingsListingsSecondary class="mb-4" :active-network="activeNetwork" />
-      <OrganizationSettingsCurrencies :active-network="activeNetwork" />
+      <OrganizationSettingsListingsSecondary class="mb-4" :selected-network="selectedNetwork" />
+      <OrganizationSettingsListingsCurrencies :selected-network="selectedNetwork" />
     </div>
   </div>
 </template>

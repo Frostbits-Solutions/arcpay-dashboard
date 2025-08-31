@@ -86,18 +86,16 @@ async function onDelete(values: any) {
       </router-link>
     </li>
   </ul>
-  <div :class="['mb-2 mt-10 rounded-lg p-2 p-[1px]', isPro ? 'bg-gradient' : 'bg-border']">
-    <div class="flex items-center justify-between rounded-lg bg-background p-4">
-      <div>
-        <h4 class="text-md font-normal">Subscription</h4>
-        <p class="text-sm text-muted-foreground">
-          This organization is currently on the
-          <span :class="['font-bold uppercase', isPro ? 'bg-gradient bg-clip-text text-transparent' : 'text-primary']">{{ accounts.activeSettings.subscription_tiers?.name }}</span> plan.<br />
-        </p>
-      </div>
-      <Button variant="gradient" class="mt-2" v-if="isPro">Manage</Button>
-      <Button variant="gradient" class="mt-2" v-else>Upgrade to Pro</Button>
+  <div class="mb-2 mt-10 flex items-center justify-between rounded-lg border border-border bg-background p-4">
+    <div>
+      <h4 class="text-md font-normal">Subscription</h4>
+      <p class="text-sm text-muted-foreground">
+        This organization is currently on the
+        <span :class="['font-bold uppercase', isPro ? 'bg-gradient bg-clip-text text-transparent' : 'text-primary']">{{ accounts.activeSettings.subscription_tiers?.name }}</span> plan.<br />
+      </p>
     </div>
+    <Button variant="gradient" class="mt-2" v-if="isPro">Manage</Button>
+    <Button variant="gradient" class="mt-2" v-else>Upgrade to Pro</Button>
   </div>
   <div class="rounded-lg border border-border p-4">
     <Form id="general-form" :validation-schema="formSchema" @submit="onSubmit" class="space-y-6">
