@@ -66,7 +66,7 @@ async function onDeleteJwtSecret(secret: string) {
     <Switch @update:checked="toggleAuthorization" :checked="accounts.activeSettings.settings?.authorize_requests" />
   </div>
   <div v-if="accounts.activeSettings.settings?.authorize_requests" class="relative mt-2 rounded-lg border border-border p-4" v-motion-fade>
-    <div class="flex items-center justify-between gap-10 pb-4">
+    <div class="flex items-center justify-between gap-10">
       <div>
         <h4 class="text-md mb-1 font-normal">JWT Secrets</h4>
         <p class="text-sm text-muted-foreground">
@@ -84,52 +84,52 @@ async function onDeleteJwtSecret(secret: string) {
         <Button variant="outline">Generate new secret</Button>
       </OrganizationGenerateSecretDialog>
     </div>
-    <div class="overflow-hidden rounded-lg border border-border">
-      <table class="w-full text-left text-sm text-muted-foreground rtl:text-right">
-        <thead class="bg-muted/50 text-xs uppercase text-muted-foreground/50">
-          <tr>
-            <th scope="col" class="px-6 py-3">Secret</th>
-            <th scope="col" class="px-6 py-3">Name</th>
-            <th scope="col" class="w-16"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-if="!accounts.loading">
-            <tr v-for="secret in accounts.activeSettings.secrets" :key="secret.secret" class="border-b border-border last:border-b-0">
-              <td class="truncate px-6 py-4">
-                <Clipboard :secret="true" :source="secret.secret" class="text-xs" />
-              </td>
-              <td class="truncate px-6 py-4">
-                {{ secret.name }}
-              </td>
+  </div>
+  <div v-if="accounts.activeSettings.settings?.authorize_requests" class="mt-2 overflow-hidden rounded-lg border border-border" v-motion-fade>
+    <table class="w-full text-left text-sm text-muted-foreground rtl:text-right">
+      <thead class="bg-muted/50 text-xs uppercase text-muted-foreground/50">
+        <tr>
+          <th scope="col" class="px-6 py-3">Secret</th>
+          <th scope="col" class="px-6 py-3">Name</th>
+          <th scope="col" class="w-16"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-if="!accounts.loading">
+          <tr v-for="secret in accounts.activeSettings.secrets" :key="secret.secret" class="border-b border-border last:border-b-0">
+            <td class="truncate px-6 py-4">
+              <Clipboard :secret="true" :source="secret.secret" class="text-xs" />
+            </td>
+            <td class="truncate px-6 py-4">
+              {{ secret.name }}
+            </td>
 
-              <td class="px-6 py-4">
-                <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDeleteJwtSecret(secret.secret)">
-                  <Trash2 class="size-4 text-destructive" />
-                </Button>
-              </td>
-            </tr>
-            <tr v-if="!accounts.activeSettings.secrets?.length">
-              <td colspan="4" class="px-6 py-4 text-center text-sm text-muted-foreground">No secret</td>
-            </tr>
-          </template>
-          <tr v-else>
             <td class="px-6 py-4">
-              <Skeleton class="h-4 w-48" />
-            </td>
-            <td class="px-6 py-4">
-              <Skeleton class="h-4 w-48" />
-            </td>
-            <td class="px-6 py-4">
-              <Skeleton class="h-4 w-28" />
-            </td>
-            <td class="px-6 py-4">
-              <Skeleton class="h-5 w-8" />
+              <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDeleteJwtSecret(secret.secret)">
+                <Trash2 class="size-4 text-destructive" />
+              </Button>
             </td>
           </tr>
-        </tbody>
-      </table>
-    </div>
+          <tr v-if="!accounts.activeSettings.secrets?.length">
+            <td colspan="4" class="px-6 py-4 text-center text-sm text-muted-foreground">No secret</td>
+          </tr>
+        </template>
+        <tr v-else>
+          <td class="px-6 py-4">
+            <Skeleton class="h-4 w-48" />
+          </td>
+          <td class="px-6 py-4">
+            <Skeleton class="h-4 w-48" />
+          </td>
+          <td class="px-6 py-4">
+            <Skeleton class="h-4 w-28" />
+          </td>
+          <td class="px-6 py-4">
+            <Skeleton class="h-5 w-8" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
