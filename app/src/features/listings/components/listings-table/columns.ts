@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { CompositeListing } from '@/models'
+import type { CompositeListing } from '@/lib/supabase/models'
 import ListingsTableStatusCell from '@/features/listings/components/listings-table/ListingsTableStatusCell.vue'
 import ListingsTableAssetCell from '@/features/listings/components/listings-table/ListingsTableAssetCell.vue'
 import ListingsTableTypeCell from '@/features/listings/components/listings-table/ListingsTableTypeCell.vue'
@@ -13,42 +13,42 @@ export const columns: ColumnDef<CompositeListing>[] = [
     accessorKey: 'status',
     header: () => h('div', { class: 'text-left' }, 'Status'),
     cell: ({ row }) => {
-      return h(ListingsTableStatusCell, {row})
+      return h(ListingsTableStatusCell, { row })
     },
   },
   {
     accessorKey: 'id',
     header: () => h('div', { class: 'text-left' }, 'Id'),
     cell: ({ row }) => {
-      return h(ListingsTableIdCell, {row})
+      return h(ListingsTableIdCell, { row })
     },
   },
   {
     accessorKey: 'type',
     header: () => h('div', { class: 'text-left' }, 'Type'),
     cell: ({ row }) => {
-      return h(ListingsTableTypeCell, {row})
+      return h(ListingsTableTypeCell, { row })
     },
   },
   {
     accessorKey: 'asset_id',
     header: () => h('div', { class: 'text-left' }, 'Asset'),
     cell: ({ row }) => {
-      return h(ListingsTableAssetCell, {row})
+      return h(ListingsTableAssetCell, { row })
     },
   },
   {
     accessorKey: 'seller_address',
     header: () => h('div', { class: 'text-left' }, 'Seller'),
     cell: ({ row }) => {
-      return h(ListingsTableSellerCell, {row})
+      return h(ListingsTableSellerCell, { row })
     },
   },
   {
     accessorKey: 'actions',
     header: () => h('div', { class: 'text-left' }, ''),
     cell: ({ row }) => {
-      return h(ListingsTableActionCell, {row})
+      return h(ListingsTableActionCell, { row })
     },
-  }
+  },
 ]

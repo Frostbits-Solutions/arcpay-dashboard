@@ -5,7 +5,7 @@ import { useSessionStore } from '@/features/auth/stores/session'
 import type { Tables } from '@/lib/supabase/database.types'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
-import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountNetworkParameter, AccountSecret, AccountUser, SubscriptionTier } from '@/models'
+import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountNetworkParameter, AccountSecret, AccountUser, SubscriptionTier } from '@/lib/supabase/models'
 
 interface AccountSettings {
   settings?: Account | null

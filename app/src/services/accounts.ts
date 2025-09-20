@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
 import type { PostgrestError } from '@supabase/supabase-js'
-import type { AccountMembership, MembershipRole } from '@/models'
+import type { AccountMembership, MembershipRole } from '@/lib/supabase/models'
 
 export async function createAccount(name: string) {
   const { data, error } = await supabase.rpc('create_account', { account_name: name })

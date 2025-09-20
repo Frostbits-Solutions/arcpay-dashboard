@@ -11,6 +11,7 @@ import { Skeleton } from '@/lib/ui/skeleton'
 import { type Database } from '@/lib/supabase/database.types'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
+import { supabase } from '@/lib/supabase/supabaseClient'
 
 type Currency = Database['public']['Tables']['currencies']['Row']
 
@@ -42,7 +43,7 @@ watch(
   async () => {
     loading.value = true
     value.value = undefined
-    const { data, error } = await getCurrencies(props.network)
+    const { data, error } = await getCurrencies(supabase, props.network)
     if (!data || error) {
       errorHandler(error, `Unable to fetch currencies for ${props.network}.`)
     } else {

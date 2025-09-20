@@ -5,7 +5,6 @@ import { Trash2 } from 'lucide-vue-next'
 import { Button } from '@/lib/ui/button'
 import { Badge } from '@/lib/ui/badge'
 import CurrencySelectionCombobox from '@/features/currencies/components/CurrencySelectionCombobox.vue'
-import { type Database } from '@/lib/supabase/database.types'
 import { addAccountCurrency, removeAccountCurrency } from '@/services/accounts'
 import { toast } from '@/lib/ui/toast'
 import ToastCheck from '@/lib/ui/toast/ToastCheck.vue'
@@ -13,8 +12,8 @@ import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
 import DefautCurrencyIcon from '@/assets/currency.svg'
-
-type Currency = Database['public']['Tables']['currencies']['Row']
+import { supabase } from '@/lib/supabase/supabaseClient'
+import { type Currency } from '@/lib/supabase/models'
 
 const props = defineProps({
   selectedNetwork: {
@@ -46,7 +45,7 @@ const listedPrivateCurrenciesIds = computed(() => {
 })
 
 async function fetchCurrencies() {
-  const { data, error } = await getCurrencies(props.selectedNetwork)
+  const { data, error } = await getCurrencies(supabase, props.selectedNetwork)
   if (!data || error) {
     errorHandler(error, `Unable to fetch currencies for ${props.selectedNetwork}.`)
   } else {

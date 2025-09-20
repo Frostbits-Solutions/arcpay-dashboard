@@ -5,7 +5,8 @@ import { useToast } from '@/lib/ui/toast'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import { getListings } from '@/services/listings'
-import type { CompositeListing } from '@/models'
+import type { CompositeListing } from '@/lib/supabase/models'
+import { supabase } from '@/lib/supabase/supabaseClient'
 
 const { toast } = useToast()
 
@@ -18,7 +19,7 @@ export const useListingsStore = defineStore('listings', () => {
   async function fetchListings() {
     if (accounts.active && networks.activeNetwork) {
       loading.value = true
-      const { data, error } = await getListings(accounts.active.id, networks.activeNetwork.id)
+      const { data, error } = await getListings(supabase, accounts.active.id, networks.activeNetwork.id)
       if (!data || error) {
         console.error(error)
         toast({

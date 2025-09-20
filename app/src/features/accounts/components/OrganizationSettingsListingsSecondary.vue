@@ -13,7 +13,7 @@ import { Input } from '@/lib/ui/input'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
-import type { AccountNetworkParameter } from '@/models'
+import type { AccountNetworkParameter } from '@/lib/supabase/models'
 
 const accounts = useAccountsStore()
 const { toast } = useToast()

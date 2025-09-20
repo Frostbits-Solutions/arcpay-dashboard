@@ -7,6 +7,7 @@ export type AccountCurrency = Database['public']['Tables']['accounts_currencies'
 export type AccountMembership = { id: string; name: string; role: MembershipRole }
 export type AccountSecret = Database['public']['Tables']['accounts_secrets']['Row']
 export type AccountUser = Database['public']['Tables']['accounts_users_association']['Row']
+export type AssetType = Database['public']['Enums']['assets_types']
 export type Auction = Database['public']['Tables']['auctions']['Row']
 export type Network = Database['public']['Tables']['networks']['Row']
 export type Contract = Database['public']['Tables']['contracts']['Row']

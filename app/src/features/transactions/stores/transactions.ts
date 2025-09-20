@@ -1,13 +1,13 @@
 import { h, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import dayjs from 'dayjs'
-import { getDailySalesVolume, getHourlyTransactionsCount, getTransactionsListings, subscribeToTransactions } from '@/services/transaction'
+import { getDailySalesVolume, getHourlyTransactionsCount, getTransactionsListings } from '@/services/transaction'
 import ToastError from '@/lib/ui/toast/ToastError.vue'
 import { useToast } from '@/lib/ui/toast'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import utc from 'dayjs/plugin/utc'
-import type { Transaction } from '@/models'
+import type { Transaction } from '@/lib/supabase/models'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { getAccountActiveListingsAppids } from '@/services/accounts'
 import { supabase } from '@/lib/supabase/supabaseClient'
@@ -126,25 +126,6 @@ export const useTransactionsStore = defineStore('transactions', () => {
     loading.value = false
   }
 
-  async function subscribe() {
-    if (accounts.active && networks.activeNetwork) {
-      console.log('subribing to transactions')
-      const { data, error } = await getAccountActiveListingsAppids(accounts.active.id, networks.activeNetwork?.id)
-      if (data && data.length) {
-        const appIds = data.map((item: { app_id: number }) => item.app_id)
-        realtimeChannel.value = subscribeToTransactions(supabase, appIds, () => {
-          fetchAll(false)
-        })
-      }
-    }
-  }
-
-  async function unsubscribe() {
-    if (realtimeChannel.value) {
-      await realtimeChannel.value.unsubscribe()
-    }
-  }
-
   watch(
     () => networks.activeNetwork?.id,
     () => {
@@ -158,5 +139,5 @@ export const useTransactionsStore = defineStore('transactions', () => {
     }
   )
 
-  return { loading, list, totalSalesVolumes, top5CurrenciesByVolume, hourlyTransactionsTimeseries, dailySalesVolumeTimeseries, fetchAll, subscribe, unsubscribe }
+  return { loading, list, totalSalesVolumes, top5CurrenciesByVolume, hourlyTransactionsTimeseries, dailySalesVolumeTimeseries, fetchAll }
 })

@@ -1,11 +1,12 @@
 import { computed, h, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Network, Currency } from '@/models'
+import type { Network, Currency } from '@/lib/supabase/models'
 import { getNetworks } from '@/services/networks/networks'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
 import { services } from '@/services/networks/networks'
 import { walletProviders } from '@/features/networks/walletProviders'
+import { supabase } from '@/lib/supabase/supabaseClient'
 
 export const useNetworksStore = defineStore('networks', () => {
   const networks = ref<Record<string, Network>>({})
@@ -50,7 +51,7 @@ export const useNetworksStore = defineStore('networks', () => {
   }
 
   async function fetchCurrencies(networkId: string) {
-    const { data, error } = await getCurrencies(networkId)
+    const { data, error } = await getCurrencies(supabase, networkId)
     if (!data || error) {
       throw new Error(`Unable to fetch currencies for ${networkId}. ${error?.message || ''}`)
     } else {

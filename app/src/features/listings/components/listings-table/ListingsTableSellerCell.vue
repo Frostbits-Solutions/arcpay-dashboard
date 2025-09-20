@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { CompositeListing } from '@/models'
+import type { CompositeListing } from '@/lib/supabase/models'
 import { computed } from 'vue'
 import Jazzicon from '@/lib/ui/jazzicon/Jazzicon.vue'
 import { ArrowUpRight } from 'lucide-vue-next'

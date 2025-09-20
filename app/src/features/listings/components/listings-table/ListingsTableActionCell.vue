@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { CompositeListing } from '@/models'
+import type { CompositeListing } from '@/lib/supabase/models'
 import { computed } from 'vue'
 import ListingsShareButton from '@/features/listings/components/listings-table/ListingsShareButton.vue'
 import ListingsSettingsPopover from '@/features/listings/components/listings-table/ListingsActionPopover.vue'
 
-const props = defineProps<{row: Row<CompositeListing>}>()
+const props = defineProps<{ row: Row<CompositeListing> }>()
 const id = computed(() => props.row.original.id)
 </script>
 
 <template>
-  <ListingsShareButton :id="id"/>
-  <ListingsSettingsPopover :id="id"/>
+  <ListingsShareButton :id="id" />
+  <ListingsSettingsPopover :id="id" />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

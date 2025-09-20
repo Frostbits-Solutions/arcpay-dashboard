@@ -1,8 +1,22 @@
 import { supabase } from '@/lib/supabase/supabaseClient'
-import { type RealtimePostgresInsertPayload, SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseClient } from '@supabase/supabase-js'
+import type { Transaction } from '@/lib/supabase/models'
 
-export async function getTransactions(app_ids: string[], network: string) {
-  const { data, error } = await supabase.from('transactions').select('*').eq('network_id', network).in('app_id', app_ids)
+export async function getTransactions(client: SupabaseClient, network: string, app_ids: string[]) {
+  const { data, error } = await client.from('transactions').select('*').eq('network_id', network).in('app_id', app_ids).returns<Transaction[]>()
+  return { data, error }
+}
+
+export async function getLastBidTx(supabase: SupabaseClient, network: string, app_id: number) {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('network_id', network)
+    .eq('app_id', app_id)
+    .eq('type', 'bid')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .returns<Transaction[]>()
   return { data, error }
 }
 
@@ -11,25 +25,6 @@ export async function getTransactionsListings(account_id: string, network: strin
   return { data, error }
 }
 
-export function subscribeToTransactions(supabase: SupabaseClient, app_ids: number[], callback: (payload: RealtimePostgresInsertPayload<{ [p: string]: any }>) => void) {
-  const room = supabase.channel(`changes`)
-  room
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions', filter: `app_id=in.(${app_ids.join(',')})` }, (payload) => {
-      console.log('update', payload)
-      callback(payload)
-    })
-    .subscribe(async (status) => {
-      if (status !== 'SUBSCRIBED') {
-        console.log(status)
-        return
-      }
-      await room.track({
-        online_at: new Date().toISOString(),
-      })
-      console.log('subscribed')
-    })
-  return room
-}
 export async function getHourlyTransactionsCount(account_id: string, network: string) {
   const { data, error } = await supabase.rpc('get_hourly_transactions_timeseries', { account_id, network_id: network })
   return { data, error }
