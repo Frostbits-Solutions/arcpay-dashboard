@@ -6,10 +6,18 @@ import ChartDailySalesVolume from '@/features/dashboard/components/ChartDailySal
 import { useTransactionsStore } from '@/features/transactions/stores/transactions'
 import { DataTable } from '@/lib/ui/data-table'
 import { columns } from '@/features/transactions/components/transactions-table/columns'
+import { Button } from '@/lib/ui/button'
+import { RefreshCw } from 'lucide-vue-next'
 
 const networks = useNetworksStore()
 const transactions = useTransactionsStore()
 const pollingInterval = ref<NodeJS.Timeout>()
+const lastUpdated = ref<string>()
+
+async function fetchTransactions() {
+  await transactions.fetchAll(true)
+  lastUpdated.value = new Date().toLocaleString()
+}
 
 onMounted(async () => {
   const defaultNet = localStorage.getItem('defaultNetwork')
@@ -19,9 +27,6 @@ onMounted(async () => {
   } else {
     networks.setActive('algo:mainnet')
   }
-  pollingInterval.value = setInterval(() => {
-    transactions.fetchAll(false)
-  }, 60000)
 })
 
 onBeforeUnmount(() => {
@@ -37,15 +42,17 @@ onBeforeUnmount(() => {
         <ChartDailySalesVolume />
         <ChartHourlyTransactions />
       </div>
-      <h2 class="mb-4 mt-16 flex justify-between text-lg font-semibold text-foreground">
-        Latests transactions
-        <span class="inline-flex items-center rounded-[10px] bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-          <span class="relative me-2 h-2 w-2 rounded-full bg-green-500">
-            <span class="absolute h-2 w-2 animate-ping rounded-full bg-green-500"></span>
-          </span>
-          Real time
-        </span>
-      </h2>
+      <div class="mb-4 mt-16 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-foreground">Latest transactions</h2>
+        <div class="flex items-center gap-2">
+          <span v-if="lastUpdated" class="text-xs text-muted-foreground" :key="lastUpdated" v-motion-slide-right>Last updated {{ lastUpdated }}</span>
+          <Button size="sm" class="group" @click="fetchTransactions">
+            <RefreshCw class="mr-1 h-4 w-4 group-hover:animate-spin" />
+            Refresh
+          </Button>
+        </div>
+      </div>
+
       <DataTable :columns="columns" :data="transactions.list" />
     </div>
   </main>
