@@ -228,11 +228,6 @@ export async function getAccountJwtSecrets(account_id: string) {
   return { data, error }
 }
 
-/**
- * Delete a JWT secret for an account.
- * @param account_id - The ID of the account.
- * @param secret_id - The secret to delete.
- */
 export async function deleteAccountJwtSecret(account_id: string, secret: string) {
   const { data, error } = await supabase.from('accounts_secrets').delete().eq('account_id', account_id).eq('secret', secret)
   return { data, error }

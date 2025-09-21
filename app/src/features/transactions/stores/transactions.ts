@@ -9,8 +9,6 @@ import { useNetworksStore } from '@/features/networks/stores/networks'
 import utc from 'dayjs/plugin/utc'
 import type { Transaction } from '@/lib/supabase/models'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { getAccountActiveListingsAppids } from '@/services/accounts'
-import { supabase } from '@/lib/supabase/supabaseClient'
 
 type HourlyTransactionsTimeseries = { time: string; transactions: number }[]
 type DailySalesVolumeTimeseries = Record<string, string | number>[]
@@ -26,7 +24,6 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const top5CurrenciesByVolume = ref<string[]>([])
   const hourlyTransactionsTimeseries = ref<HourlyTransactionsTimeseries>([])
   const dailySalesVolumeTimeseries = ref<DailySalesVolumeTimeseries>([])
-  const realtimeChannel = ref<RealtimeChannel | undefined>()
 
   async function fetchTransactions() {
     if (accounts.active && networks.activeNetwork) {

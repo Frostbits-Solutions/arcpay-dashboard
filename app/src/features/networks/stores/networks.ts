@@ -1,4 +1,4 @@
-import { computed, h, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Network, Currency } from '@/lib/supabase/models'
 import { getNetworks } from '@/services/networks'

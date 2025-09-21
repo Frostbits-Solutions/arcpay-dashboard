@@ -12,7 +12,7 @@ const listing = computed(() => props.row.original.listings)
 </script>
 
 <template>
-  <Button variant="ghost" class="relative justify-start gap-1 pr-8" @click="console.log('ARCPAY DSK Buy')">
+  <Button variant="ghost" class="relative justify-start gap-1 pr-8" @click="console.log('ARCPAY SDK Buy')">
     <span class="max-w-48 truncate text-muted-foreground">{{ listing?.name }}</span>
     <span class="text-xs text-muted-foreground opacity-50">({{ listing?.app_id }})</span>
     <ArrowUpRight class="absolute right-2 top-2 h-4 w-4 text-muted-foreground/20" />
