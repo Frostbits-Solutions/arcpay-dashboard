@@ -62,12 +62,16 @@ async function getCreatedAppId(algodClient: algosdk.Algodv2, txId: string, netwo
   return await getTxExponentialBackOff()
 }
 
-function getExplorerLink(assetId: string, network: string) {
-  const params = assetId.split('/')
-  if (params[1]) {
-    if (network === 'voi:mainnet') return `https://nftnavigator.xyz/collection/${params[0]}/token/${params[1]}`
-    else return `https://nftnavigator.xyz/collection/${params[0]}/token/${params[1]}`
-  } else return '#'
+function getExplorerLink(network: string, objectId: string) {
+  let path = ''
+  if (objectId.match(/^\d+$/)) path = 'asset'
+  else if (objectId.match(/^[A-Z2-7]{58}$/)) path = 'account'
+  else if (objectId.match(/^[a-zA-Z0-9+=]+$/)) path = 'group'
+  else if (objectId.match(/^\d+\/\d+$/)) {
+    const params = objectId.split('/')
+    return `https://nftnavigator.xyz/collection/${params[0]}/token/${params[1]}`
+  } else throw new Error('Invalid objectId')
+  return `https://explorer.voi.network/explorer/${path}/${objectId}/`
 }
 
 export default {

@@ -119,9 +119,15 @@ async function getCreatedAppId(algodClient: algosdk.Algodv2, txId: string, netwo
   return await getTxExponentialBackOff()
 }
 
-function getExplorerLink(assetId: string, network: string) {
-  if (network === 'algo:mainnet') return `https://explorer.perawallet.app/asset/${assetId}/`
-  else return `https://testnet.explorer.perawallet.app/asset/${assetId}/`
+function getExplorerLink(network: string, objectId: string) {
+  let prefix = ''
+  let path = ''
+  if (network === 'algo:testnet') prefix = 'testnet.'
+  if (objectId.match(/^\d+$/)) path = 'asset'
+  else if (objectId.match(/^[A-Z2-7]{58}$/)) path = 'address'
+  else if (objectId.match(/^[a-zA-Z0-9+=]+$/)) path = 'tx-group'
+  else throw new Error('Invalid objectId')
+  return `https://${prefix}explorer.perawallet.app/${path}/${objectId}/`
 }
 
 export default {
