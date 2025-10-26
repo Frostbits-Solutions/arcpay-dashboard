@@ -1,0 +1,1 @@
+export { default as Jazzicon } from './Jazzicon.vue'

@@ -1,6 +1,6 @@
 <img width="1259" alt="dashboard" src="https://github.com/user-attachments/assets/87b4f6fa-d754-4d8c-9ad8-3462735a81ba">
 
-# ArcPay Dashboard
+# ArcPay
 Welcome to the ArcPay Dashboard! This application serves as a user-friendly interface for managing transactions and account settings.
 
 ## Features

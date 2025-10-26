@@ -1,0 +1,94 @@
+<script setup lang="ts">
+import { useAccountsStore } from '@/features/accounts/stores/accounts'
+import { Button } from '@repo/ui/button'
+import { Clipboard } from '@repo/ui/clipboard'
+import { Trash2 } from 'lucide-vue-next'
+import { Skeleton } from '@repo/ui/skeleton'
+import { removeAccountAddress } from '@/services/accounts'
+import { h } from 'vue'
+import { ToastCheck } from '@repo/ui/toast'
+import { useToast } from '@repo/ui/toast'
+import OrganizationLinkAddressDialog from '@/features/accounts/components/OrganizationLinkAddressDialog.vue'
+import { errorHandler } from '@/lib/errorHandler'
+
+const accounts = useAccountsStore()
+const { toast } = useToast()
+
+async function onDeleteAccountAddress(address: string) {
+  if (accounts.active?.id) {
+    const { data, error } = await removeAccountAddress(accounts.active.id, address)
+    if (error) {
+      errorHandler(error, 'Error removing address')
+    } else {
+      await accounts.fetchAccountAddresses(accounts.active.id)
+      toast({
+        title: `Address removed`,
+        action: h(ToastCheck),
+      })
+    }
+  }
+}
+</script>
+
+<template>
+  <div class="relative mt-10">
+    <div class="flex items-center justify-between pb-4">
+      <div>
+        <h4 class="text-md font-normal">Organization addresses</h4>
+        <p class="text-sm text-muted-foreground">
+          Link accounts to your organization to new create listings. Listing created by addresses that are not linked to your organization are considered third party listings.
+        </p>
+      </div>
+      <OrganizationLinkAddressDialog>
+        <Button variant="outline">Link address</Button>
+      </OrganizationLinkAddressDialog>
+    </div>
+    <div class="overflow-hidden rounded-lg border border-border">
+      <table class="w-full text-left text-sm text-muted-foreground rtl:text-right">
+        <thead class="border-b text-xs text-muted-foreground/50">
+          <tr>
+            <th scope="col" class="w-[512px] px-6 py-3">Address</th>
+            <th scope="col" class="px-6 py-3">Name</th>
+            <th scope="col" class="w-16 px-6 py-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-if="!accounts.loading">
+            <tr v-for="address in accounts.activeSettings.addresses" :key="address.address" class="border-b border-border last:border-b-0">
+              <td class="px-6 py-4">
+                <Clipboard :source="address.address" class="text-xs" />
+              </td>
+              <td class="truncate px-6 py-4">
+                {{ address.name }}
+              </td>
+              <td class="px-6 py-4">
+                <Button variant="ghost" size="icon" class="size-7 rounded-sm" @click="onDeleteAccountAddress(address.address)">
+                  <Trash2 class="size-4 text-destructive" />
+                </Button>
+              </td>
+            </tr>
+            <tr v-if="!accounts.activeSettings.addresses?.length">
+              <td colspan="4" class="px-6 py-4 text-center text-sm text-muted-foreground">No addresses linked</td>
+            </tr>
+          </template>
+          <tr v-else>
+            <td class="px-6 py-4">
+              <Skeleton class="h-4 w-48" />
+            </td>
+            <td class="px-6 py-4">
+              <Skeleton class="h-4 w-48" />
+            </td>
+            <td class="px-6 py-4">
+              <Skeleton class="h-4 w-28" />
+            </td>
+            <td class="px-6 py-4">
+              <Skeleton class="h-5 w-8" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<style scoped></style>
