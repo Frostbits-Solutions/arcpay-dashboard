@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     "./config/postcss": "./postcss.config.js",
-    "./config/tailwind": "./tailwind.config.ts",
+    "./config/tailwind": "./tailwind.config.js",
     "./assets/*": "./src/assets/*",
     "./badge": "./src/badge/index.ts",
     "./button": "./src/button/index.ts",
