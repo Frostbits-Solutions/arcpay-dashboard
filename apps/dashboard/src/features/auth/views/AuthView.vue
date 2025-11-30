@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { supabase } from '@/lib/supabase/supabaseClient'
+import { supabase } from '@repo/supabase/client'
 import { useRouter } from 'vue-router'
 import { Spinner } from '@repo/ui/spinner'
 import { Input } from '@repo/ui/input'

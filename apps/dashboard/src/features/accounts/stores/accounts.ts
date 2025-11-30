@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { getAccount, getAccountAddresses, getAccountSecrets, getAccountNetworksParameters, getAccountCurrencies, getAccountSubscription, getAccountUsers, getAllAccounts } from '@/services/accounts'
 import { useSessionStore } from '@/features/auth/stores/session'
 import { useToast } from '@repo/ui/toast'
-import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountNetworkParameter, AccountSecret, AccountUser, SubscriptionTier } from '@/lib/supabase/models'
+import type { Account, AccountAddress, AccountCurrency, AccountMembership, AccountNetworkParameter, AccountSecret, AccountUser, SubscriptionTier } from '@repo/supabase/models'
 import { errorHandler } from '@/lib/errorHandler'
 
 interface AccountSettings {

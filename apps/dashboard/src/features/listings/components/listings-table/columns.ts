@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { CompositeListing } from '@/lib/supabase/models'
+import type { CompositeListing } from '@repo/supabase/models'
 import ListingsTableStatusCell from '@/features/listings/components/listings-table/ListingsTableStatusCell.vue'
 import ListingsTableAssetCell from '@/features/listings/components/listings-table/ListingsTableAssetCell.vue'
 import ListingsTableTypeCell from '@/features/listings/components/listings-table/ListingsTableTypeCell.vue'

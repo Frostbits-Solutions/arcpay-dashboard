@@ -2,7 +2,7 @@ import algosdk from 'algosdk'
 import type { AssetMetadata } from '@/types'
 import voi from '@/services/networks/voi'
 import algo from '@/services/networks/algo'
-import { supabase } from '@/lib/supabase/supabaseClient'
+import { supabase } from '@repo/supabase/client'
 
 export interface NetworkServices {
   getAddressAssets: (algodClient: algosdk.Algodv2, address: string, page?: number, size?: number) => Promise<AssetMetadata[]>

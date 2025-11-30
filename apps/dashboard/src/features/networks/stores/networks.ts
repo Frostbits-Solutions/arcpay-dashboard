@@ -1,12 +1,12 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Network, Currency } from '@/lib/supabase/models'
+import type { Network, Currency } from '@repo/supabase/models'
 import { getNetworks } from '@/services/networks'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
 import { services } from '@/services/networks'
 import { walletProviders } from '@/features/networks/walletProviders'
-import { supabase } from '@/lib/supabase/supabaseClient'
+import { supabase } from '@repo/supabase/client'
 import { type SupportedWallet, type NetworkId, WalletManager } from '@txnlab/use-wallet'
 
 export const useNetworksStore = defineStore('networks', () => {

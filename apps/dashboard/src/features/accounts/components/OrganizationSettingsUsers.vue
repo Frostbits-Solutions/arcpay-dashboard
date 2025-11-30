@@ -9,15 +9,15 @@ import { ToastCheck } from '@repo/ui/toast'
 import { removeAccountUser } from '@/services/accounts'
 import { useToast } from '@repo/ui/toast'
 import OrganizationAddUsersDialog from '@/features/accounts/components/OrganizationAddUsersDialog.vue'
-import type { Tables } from '@/lib/supabase/database.types'
 import { errorHandler } from '@/lib/errorHandler'
+import type { AccountUser } from '@repo/supabase/models'
 
 const { toast } = useToast()
 const accounts = useAccountsStore()
 const searchTerm = ref<string>('')
 
 const filteredUsers = computed(() => {
-  type User = Omit<Tables<'accounts_users_association'>, 'account_id'>
+  type User = Omit<AccountUser, 'account_id'>
   const roleValue = { owner: 1, admin: 2, member: 3 }
   return accounts.activeSettings?.users?.filter((user) => user.user_email.includes(searchTerm.value)).sort((a: User, b: User) => roleValue[a.role] - roleValue[b.role]) || []
 })

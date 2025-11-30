@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { Transaction } from '@/lib/supabase/models'
+import type { Transaction } from '@repo/supabase/models'
 import TransactionsTableAmountCell from '@/features/transactions/components/transactions-table/TransactionsTableAmountCell.vue'
 import TransactionsTableTypeCell from '@/features/transactions/components/transactions-table/TransactionsTableTypeCell.vue'
 import TransactionsTableIdCell from '@/features/transactions/components/transactions-table/TransactionsTableIdCell.vue'

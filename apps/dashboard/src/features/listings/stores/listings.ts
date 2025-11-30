@@ -3,8 +3,8 @@ import { defineStore } from 'pinia'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import { getListings } from '@/services/listings'
-import type { CompositeListing } from '@/lib/supabase/models'
-import { supabase } from '@/lib/supabase/supabaseClient'
+import type { CompositeListing } from '@repo/supabase/models'
+import { supabase } from '@repo/supabase/client'
 import { errorHandler } from '@/lib/errorHandler'
 
 export const useListingsStore = defineStore('listings', () => {

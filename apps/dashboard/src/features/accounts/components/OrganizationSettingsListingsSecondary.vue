@@ -12,7 +12,7 @@ import { Input } from '@repo/ui/input'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
-import type { AccountNetworkParameter } from '@/lib/supabase/models'
+import type { AccountNetworkParameter } from '@repo/supabase/models'
 import { errorHandler } from '@/lib/errorHandler'
 
 const accounts = useAccountsStore()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { supabase } from '@/lib/supabase/supabaseClient'
+import { supabase } from '@repo/supabase/client'
 import router from '@/features/app/router'
 import { Button } from '@repo/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@repo/ui/tooltip'

@@ -5,7 +5,7 @@ import { getDailySalesVolume, getHourlyTransactionsCount, getTransactionsListing
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import utc from 'dayjs/plugin/utc'
-import type { Transaction } from '@/lib/supabase/models'
+import type { Transaction } from '@repo/supabase/models'
 import { errorHandler } from '@/lib/errorHandler'
 
 type HourlyTransactionsTimeseries = { time: string; transactions: number }[]

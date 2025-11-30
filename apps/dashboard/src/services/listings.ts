@@ -1,20 +1,18 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { AssetType, Auction, DutchAuction, Listing, Sale } from '@/lib/supabase/models'
-import type { Database } from '@/lib/supabase/database.types'
+import type { AssetType, Auction, CompositeListing, DutchAuction, Listing, Sale, SupaPromise } from '@repo/supabase/models'
 
-export async function getListings(client: SupabaseClient, account_id: string, network: string) {
+export async function getListings(client: SupabaseClient, account_id: string, network: string): SupaPromise<Listing[]> {
   const { data, error } = await client
     .from('listings')
     .select('*, auctions( * ), sales( * ), dutch_auctions( * )')
     .eq('account_id', account_id)
     .eq('network_id', network)
     .order('created_at', { ascending: false })
-    .returns<Listing[]>()
   return { data, error }
 }
 
-export async function getListingById(client: SupabaseClient, listing_id: string) {
-  const { data, error } = await client.rpc('get_listing_by_id', { listing_id }).returns<Database['public']['Functions']['get_listing_by_id']['Returns']>()
+export async function getListingById(client: SupabaseClient, listing_id: string): SupaPromise<CompositeListing> {
+  const { data, error } = await client.rpc('get_listing_by_id', { listing_id })
   return { data, error }
 }
 
@@ -35,7 +33,7 @@ export async function createAuction(
   duration: Auction['duration'],
   start_price: Auction['start_price'],
   increment: Auction['increment']
-) {
+): SupaPromise<Auction[]> {
   const { data: listingData, error: listingError } = await client
     .from('listings')
     .insert({
@@ -55,10 +53,8 @@ export async function createAuction(
       contract_version,
     })
     .select()
-    .returns<Listing[]>()
-
   const listingId = listingData?.[0].id
-  if (listingError || !listingId) return { data: null, listingError }
+  if (listingError || !listingId) return { data: null, error: listingError }
 
   const { data, error } = await client
     .from('auctions')
@@ -69,7 +65,6 @@ export async function createAuction(
       duration,
     })
     .select()
-    .returns<Auction[]>()
   return { data, error }
 }
 
@@ -90,7 +85,7 @@ export async function createDutchAuction(
   duration: DutchAuction['duration'],
   min_price: DutchAuction['min_price'],
   max_price: DutchAuction['max_price']
-) {
+): SupaPromise<DutchAuction[]> {
   const { data: listingData, error: listingError } = await client
     .from('listings')
     .insert({
@@ -110,10 +105,9 @@ export async function createDutchAuction(
       contract_version,
     })
     .select()
-    .returns<Listing[]>()
 
   const listingId = listingData?.[0].id
-  if (listingError || !listingId) return { data: null, listingError }
+  if (listingError || !listingId) return { data: null, error: listingError }
 
   const { data, error } = await client
     .from('dutch_auctions')
@@ -124,7 +118,6 @@ export async function createDutchAuction(
       duration,
     })
     .select()
-    .returns<DutchAuction[]>()
   return { data, error }
 }
 
@@ -142,8 +135,8 @@ export async function createSale(
   metadata: Listing['metadata'],
   network_id: Listing['network_id'],
   contract_version: Listing['contract_version'],
-  price: Database['public']['Tables']['sales']['Row']['price']
-) {
+  price: Sale['price']
+): SupaPromise<Sale[]> {
   const { data: listingData, error: listingError } = await client
     .from('listings')
     .insert({
@@ -163,10 +156,9 @@ export async function createSale(
       contract_version,
     })
     .select()
-    .returns<Listing[]>()
 
   const listingId = listingData?.[0].id
-  if (listingError || !listingId) return { data: null, listingError }
+  if (listingError || !listingId) return { data: null, error: listingError }
 
   const { data, error } = await client
     .from('sales')
@@ -175,6 +167,5 @@ export async function createSale(
       price,
     })
     .select()
-    .returns<Sale[]>()
   return { data, error }
 }

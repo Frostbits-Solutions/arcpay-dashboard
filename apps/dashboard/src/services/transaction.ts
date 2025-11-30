@@ -1,6 +1,6 @@
-import { supabase } from '@/lib/supabase/supabaseClient'
+import { supabase } from '@repo/supabase/client'
 import { SupabaseClient } from '@supabase/supabase-js'
-import type { Transaction } from '@/lib/supabase/models'
+import type { Transaction } from '@repo/supabase/models'
 
 export async function getTransactions(client: SupabaseClient, network: string, app_ids: string[]) {
   const { data, error } = await client.from('transactions').select('*').eq('network_id', network).in('app_id', app_ids).returns<Transaction[]>()

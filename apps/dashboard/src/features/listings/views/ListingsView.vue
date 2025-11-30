@@ -2,7 +2,7 @@
 import { onMounted, computed } from 'vue'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useListingsStore } from '@/features/listings/stores/listings'
-import type { CompositeListing } from '@/lib/supabase/models'
+import type { CompositeListing } from '@repo/supabase/models'
 import { columns } from '@/features/listings/components/listings-table/columns'
 import { DataTable } from '@repo/ui/data-table'
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { Transaction } from '@/lib/supabase/models'
+import type { Transaction } from '@repo/supabase/models'
 import { computed } from 'vue'
 import { ArrowUpRight } from 'lucide-vue-next'
 import { useNetworksStore } from '@/features/networks/stores/networks'

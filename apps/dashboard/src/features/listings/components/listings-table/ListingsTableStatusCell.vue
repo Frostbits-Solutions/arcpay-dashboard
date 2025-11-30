@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { CompositeListing } from '@/lib/supabase/models'
+import type { CompositeListing } from '@repo/supabase/models'
 import { computed } from 'vue'
 import { Badge } from '@repo/ui/badge'
 

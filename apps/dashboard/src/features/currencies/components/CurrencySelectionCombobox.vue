@@ -8,12 +8,10 @@ import { Button } from '@repo/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@repo/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/popover'
 import { Skeleton } from '@repo/ui/skeleton'
-import { type Database } from '@/lib/supabase/database.types'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
-import { supabase } from '@/lib/supabase/supabaseClient'
-
-type Currency = Database['public']['Tables']['currencies']['Row']
+import { supabase } from '@repo/supabase/client'
+import type { Currency } from '@repo/supabase/models'
 
 const props = defineProps({
   network: {
