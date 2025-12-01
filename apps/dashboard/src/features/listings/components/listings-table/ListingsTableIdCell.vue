@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { ListingDetail } from '@repo/supabase/models'
+import type { Listing } from '@repo/supabase/models'
 import { computed } from 'vue'
 import { ArrowUpRight } from 'lucide-vue-next'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import { Button } from '@repo/ui/button'
 
-const props = defineProps<{ row: Row<ListingDetail> }>()
+const props = defineProps<{ row: Row<Listing> }>()
 const id = computed(() => props.row.original.id)
 const networks = useNetworksStore()
 </script>

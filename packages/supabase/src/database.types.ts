@@ -214,41 +214,6 @@ export type Database = {
           },
         ];
       };
-      auctions: {
-        Row: {
-          created_at: string;
-          duration: number;
-          increment: number;
-          listing_id: string;
-          start_price: number;
-          updated_at: string | null;
-        };
-        Insert: {
-          created_at?: string;
-          duration: number;
-          increment: number;
-          listing_id: string;
-          start_price: number;
-          updated_at?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          duration?: number;
-          increment?: number;
-          listing_id?: string;
-          start_price?: number;
-          updated_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "auctions_listing_id_fkey";
-            columns: ["listing_id"];
-            isOneToOne: true;
-            referencedRelation: "listings";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       contracts: {
         Row: {
           byte_code: string;
@@ -350,41 +315,6 @@ export type Database = {
             columns: ["network_id"];
             isOneToOne: false;
             referencedRelation: "networks";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      dutch_auctions: {
-        Row: {
-          created_at: string;
-          duration: number;
-          listing_id: string;
-          max_price: number | null;
-          min_price: number;
-          updated_at: string | null;
-        };
-        Insert: {
-          created_at?: string;
-          duration: number;
-          listing_id: string;
-          max_price?: number | null;
-          min_price: number;
-          updated_at?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          duration?: number;
-          listing_id?: string;
-          max_price?: number | null;
-          min_price?: number;
-          updated_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "dutch_auctions_listing_id_fkey";
-            columns: ["listing_id"];
-            isOneToOne: true;
-            referencedRelation: "listings";
             referencedColumns: ["id"];
           },
         ];
@@ -514,35 +444,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      sales: {
-        Row: {
-          created_at: string;
-          listing_id: string;
-          price: number;
-          updated_at: string | null;
-        };
-        Insert: {
-          created_at?: string;
-          listing_id: string;
-          price: number;
-          updated_at?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          listing_id?: string;
-          price?: number;
-          updated_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "sales_listing_id_fkey";
-            columns: ["listing_id"];
-            isOneToOne: true;
-            referencedRelation: "listings";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       subscription_tiers: {
         Row: {
           allow_custom_currencies: boolean;
@@ -626,7 +527,25 @@ export type Database = {
           metadata: Json;
           network_id: string;
           type: Database["public"]["Enums"]["transaction_type"];
-          listings: Database["public"]["Tables"]["listings"]["Row"] | null;
+          listings: {
+            account_id: string;
+            app_id: number;
+            asset_id: number;
+            asset_qty: number;
+            asset_thumbnail: string | null;
+            asset_type: Database["public"]["Enums"]["assets_types"];
+            contract_version: string;
+            created_at: string;
+            creator_address: string;
+            currency: number;
+            id: string;
+            metadata: Json;
+            name: string;
+            network_id: string;
+            status: Database["public"]["Enums"]["listings_statuses"];
+            type: Database["public"]["Enums"]["listings_types"];
+            updated_at: string | null;
+          } | null;
         };
         Insert: {
           amount?: number | null;
@@ -667,69 +586,54 @@ export type Database = {
           },
         ];
       };
-      transactions_2025_08_24: {
-        Row: {
-          amount: number | null;
-          app_id: number;
-          created_at: string;
-          currency: number;
-          from_address: string;
-          id: string;
-          metadata: Json;
-          network_id: string;
-          type: Database["public"]["Enums"]["transaction_type"];
-        };
-        Insert: {
-          amount?: number | null;
-          app_id: number;
-          created_at?: string;
-          currency: number;
-          from_address: string;
-          id: string;
-          metadata?: Json;
-          network_id: string;
-          type: Database["public"]["Enums"]["transaction_type"];
-        };
-        Update: {
-          amount?: number | null;
-          app_id?: number;
-          created_at?: string;
-          currency?: number;
-          from_address?: string;
-          id?: string;
-          metadata?: Json;
-          network_id?: string;
-          type?: Database["public"]["Enums"]["transaction_type"];
-        };
-        Relationships: [];
-      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      create_account: {
-        Args: { account_name: string };
-        Returns: string;
-      };
+      create_account: { Args: { account_name: string }; Returns: string };
       get_account_subscription_params: {
         Args: { p_account_id: string; p_network_id: string };
         Returns: Database["public"]["CompositeTypes"]["network_subscription_parameters"];
+        SetofOptions: {
+          from: "*";
+          to: "network_subscription_parameters";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       get_daily_sales_volume_timeseries: {
         Args: { account_id: string; network_id: string };
         Returns: Database["public"]["CompositeTypes"]["transactions_volume"][];
+        SetofOptions: {
+          from: "*";
+          to: "transactions_volume";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
       };
       get_hourly_transactions_timeseries: {
         Args: { account_id: string; network_id: string };
         Returns: Database["public"]["CompositeTypes"]["transactions_count"][];
+        SetofOptions: {
+          from: "*";
+          to: "transactions_count";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
       };
       get_listing_by_id: {
         Args: { listing_id: string };
         Returns: Database["public"]["CompositeTypes"]["composite_listing"];
+        SetofOptions: {
+          from: "*";
+          to: "composite_listing";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       listings: {
-        Args: { "": unknown };
+        Args: { "": Database["public"]["Tables"]["transactions"]["Row"] };
         Returns: {
           account_id: string;
           app_id: number;
@@ -749,6 +653,12 @@ export type Database = {
           type: Database["public"]["Enums"]["listings_types"];
           updated_at: string | null;
         }[];
+        SetofOptions: {
+          from: "transactions";
+          to: "listings";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
       };
       transactions: {
         Args: { "": Database["public"]["Tables"]["listings"]["Row"] };
@@ -763,6 +673,12 @@ export type Database = {
           network_id: string;
           type: Database["public"]["Enums"]["transaction_type"];
         }[];
+        SetofOptions: {
+          from: "listings";
+          to: "transactions";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
       };
     };
     Enums: {
@@ -821,13 +737,6 @@ export type Database = {
         asset_type: Database["public"]["Enums"]["assets_types"] | null;
         asset_qty: number | null;
         metadata: Json | null;
-        sale_price: number | null;
-        auction_start_price: number | null;
-        auction_increment: number | null;
-        auction_duration: number | null;
-        dutch_min_price: number | null;
-        dutch_max_price: number | null;
-        dutch_duration: number | null;
       };
       network_subscription_parameters: {
         allow_secondary_listings: boolean | null;

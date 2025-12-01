@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     "./client": "./src/client.ts",
-    "./models": "./src/models.ts"
+    "./models": "./src/models.ts",
+    "./types": "./src/database.types.ts"
   },
   "scripts": {
     "type-check": "vue-tsc --build --force",

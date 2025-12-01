@@ -2,14 +2,14 @@
 import { onMounted, computed } from 'vue'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useListingsStore } from '@/features/listings/stores/listings'
-import type { ListingDetail } from '@repo/supabase/models'
+import type { Listing } from '@repo/supabase/models'
 import { columns } from '@/features/listings/components/listings-table/columns'
 import { DataTable } from '@repo/ui/data-table'
 
 const listingsStore = useListingsStore()
 const accounts = useAccountsStore()
 
-const listings = computed<ListingDetail[]>(() => listingsStore.list || [])
+const listings = computed<Listing[]>(() => listingsStore.list || [])
 const primaryAddresses = computed<string[]>(() => accounts.activeSettings.addresses?.map((a) => a.address) || [])
 
 const primaryListings = computed(() => listings.value.filter((listing) => primaryAddresses.value.includes(listing.creator_address)))

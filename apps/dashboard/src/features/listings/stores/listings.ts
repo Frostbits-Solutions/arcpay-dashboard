@@ -3,14 +3,14 @@ import { defineStore } from 'pinia'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import { getListings } from '@/services/listings'
-import type { ListingDetail } from '@repo/supabase/models'
+import type { Listing } from '@repo/supabase/models'
 import { errorHandler } from '@/lib/errorHandler'
 
 export const useListingsStore = defineStore('listings', () => {
   const accounts = useAccountsStore()
   const networks = useNetworksStore()
   const loading = ref(false)
-  const list = ref<ListingDetail[]>([])
+  const list = ref<Listing[]>([])
 
   async function fetchListings() {
     if (accounts.active && networks.activeNetwork) {
@@ -19,7 +19,7 @@ export const useListingsStore = defineStore('listings', () => {
       if (!data || error) {
         errorHandler(error, 'Error fetching listings')
       } else {
-        list.value = data as ListingDetail[]
+        list.value = data
       }
       loading.value = false
     }

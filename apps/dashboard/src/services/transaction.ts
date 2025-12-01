@@ -1,8 +1,14 @@
 import { supabase } from '@repo/supabase/client'
-import type { SupaPromise, TransactionListing, TransactionsCount, TransactionsVolumne } from '@repo/supabase/models'
+import type { SupaPromise, TransactionListing, TransactionsCount, TransactionsVolumne, Listing } from '@repo/supabase/models'
 
 export async function getTransactionsListings(account_id: string, network: string): SupaPromise<TransactionListing[]> {
-  const { data, error } = await supabase.from('transactions').select('*, listings!inner( * )').eq('listings.account_id', account_id).eq('network_id', network).order('created_at', { ascending: false })
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*, listings!inner( * )')
+    .eq('listings.account_id', account_id)
+    .eq('network_id', network)
+    .order('created_at', { ascending: false })
+    .overrideTypes<Array<{ listings: Listing }>>()
   return { data, error }
 }
 

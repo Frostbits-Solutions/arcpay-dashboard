@@ -6,9 +6,6 @@ This table provides a comprehensive overview of permissions for different user r
 | Table           | anon                   | authenticated           | member                  | admin                   | owner                   |
 |-----------------|------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
 | listings        | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
-| auctions        | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
-| dutch_auctions  | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
-| sales           | SELECT, INSERT         | SELECT, INSERT          | ALL (full CRUD access)  | ALL (full CRUD access)  | ALL (full CRUD access)  |
 
 ## Function Permissions
 | Function                   | anon                   | authenticated           | member                  | admin                   | owner                   |
@@ -70,14 +67,7 @@ CREATE TYPE "public"."composite_listing" AS (
 	"asset_thumbnail" "text",
 	"asset_type" "public"."assets_types",
 	"asset_qty" double precision,
-	"metadata" "jsonb",
-	"sale_price" double precision,
-	"auction_start_price" double precision,
-	"auction_increment" double precision,
-	"auction_duration" integer,
-	"dutch_min_price" double precision,
-	"dutch_max_price" double precision,
-	"dutch_duration" integer
+	"metadata" "jsonb"
 );
 
 ALTER TYPE "public"."composite_listing" OWNER TO "postgres";
@@ -151,84 +141,6 @@ CREATE OR REPLACE FUNCTION "private"."authorize_listing_request"("listing_id" "u
 $$;
 ALTER FUNCTION "private"."authorize_listing_request"("listing_id" "uuid") OWNER TO "postgres";
 GRANT EXECUTE ON FUNCTION "private"."authorize_listing_request"("uuid") TO "service_role";
--------------------- AUCTIONS --------------------
-CREATE TABLE IF NOT EXISTS "public"."auctions" (
-    "listing_id" "uuid" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone,
-    "start_price" double precision NOT NULL,
-    "increment" double precision NOT NULL,
-    "duration" integer NOT NULL,
-    CONSTRAINT "auctions_pkey" PRIMARY KEY ("listing_id"),
-    CONSTRAINT "auctions_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE
-);
-
-ALTER TABLE "public"."auctions" OWNER TO "postgres";
-
--- RLS for auctions
-ALTER TABLE "public"."auctions" ENABLE ROW LEVEL SECURITY;
-GRANT ALL ON TABLE "public"."auctions" TO "anon";
-GRANT ALL ON TABLE "public"."auctions" TO "authenticated";
-GRANT ALL ON TABLE "public"."auctions" TO "service_role";
-
-CREATE POLICY "Enable read access for all users" ON "public"."auctions" FOR SELECT USING ("private"."authorize_listing_request"("listing_id"));
-CREATE POLICY "Enable insert for all users" ON "public"."auctions" FOR INSERT WITH CHECK ("private"."authorize_listing_request"("listing_id"));
-CREATE POLICY "Members can update auctions" ON "public"."auctions" FOR UPDATE TO "authenticated"
-    USING ("private"."can_user_manage_listing"("listing_id"));
-CREATE POLICY "Members can delete auctions" ON "public"."auctions" FOR DELETE TO "authenticated"
-    USING ("private"."can_user_manage_listing"("listing_id"));
-
--------------------- DUTCH_AUCTION --------------------
-CREATE TABLE IF NOT EXISTS "public"."dutch_auctions" (
-    "listing_id" "uuid" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone,
-    "min_price" double precision NOT NULL,
-    "max_price" double precision,
-    "duration" integer NOT NULL,
-    CONSTRAINT "dutch_auctions_pkey" PRIMARY KEY ("listing_id"),
-    CONSTRAINT "dutch_auctions_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE
-);
-
-ALTER TABLE "public"."dutch_auctions" OWNER TO "postgres";
-
--- RLS for dutch auctions
-ALTER TABLE "public"."dutch_auctions" ENABLE ROW LEVEL SECURITY;
-GRANT ALL ON TABLE "public"."dutch_auctions" TO "anon";
-GRANT ALL ON TABLE "public"."dutch_auctions" TO "authenticated";
-GRANT ALL ON TABLE "public"."dutch_auctions" TO "service_role";
-
-CREATE POLICY "Enable read access for all users" ON "public"."dutch_auctions" FOR SELECT USING ("private"."authorize_listing_request"("listing_id"));
-CREATE POLICY "Enable insert for all users" ON "public"."dutch_auctions" FOR INSERT WITH CHECK ("private"."authorize_listing_request"("listing_id"));
-CREATE POLICY "Members can update dutch auctions" ON "public"."dutch_auctions" FOR UPDATE TO "authenticated"
-    USING ("private"."can_user_manage_listing"("listing_id"));
-CREATE POLICY "Members can delete dutch auctions" ON "public"."dutch_auctions" FOR DELETE TO "authenticated"
-    USING ("private"."can_user_manage_listing"("listing_id"));
-
--------------------- SALES --------------------
-CREATE TABLE IF NOT EXISTS "public"."sales" (
-    "listing_id" "uuid" NOT NULL,
-    "created_at" timestamp without time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp without time zone,
-    "price" numeric NOT NULL,
-    CONSTRAINT "sales_pkey" PRIMARY KEY ("listing_id"),
-    CONSTRAINT "sales_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."listings"("id") ON DELETE CASCADE
-);
-ALTER TABLE "public"."sales" OWNER TO "postgres";
-
--- RLS for sales
-ALTER TABLE "public"."sales" ENABLE ROW LEVEL SECURITY;
-GRANT ALL ON TABLE "public"."sales" TO "anon";
-GRANT ALL ON TABLE "public"."sales" TO "authenticated";
-GRANT ALL ON TABLE "public"."sales" TO "service_role";
-
-CREATE POLICY "Enable read access for all users" ON "public"."sales" FOR SELECT USING ("private"."authorize_listing_request"("listing_id"));
-CREATE POLICY "Enable insert for all users" ON "public"."sales" FOR INSERT WITH CHECK ("private"."authorize_listing_request"("listing_id"));
-CREATE POLICY "Members can update sales" ON "public"."sales" FOR UPDATE TO "authenticated"
-    USING ("private"."can_user_manage_listing"("listing_id"));
-CREATE POLICY "Members can delete sales" ON "public"."sales" FOR DELETE TO "authenticated"
-    USING ("private"."can_user_manage_listing"("listing_id"));
-
 
 -------------------- FUNCTIONS --------------------
 CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RETURNS "public"."composite_listing"
@@ -255,18 +167,8 @@ CREATE OR REPLACE FUNCTION "public"."get_listing_by_id"("listing_id" "uuid") RET
         l.asset_thumbnail,
         l.asset_type,
         l.asset_qty,
-        l.metadata,
-        s.price as "sale_price",
-        a.start_price as "auction_start_price",
-        a.increment as "auction_increment",
-        a.duration as "auction_duration",
-        d.min_price as "dutch_min_price",
-        d.max_price as "dutch_max_price",
-        d.duration as "dutch_duration"
+        l.metadata
     from public.listings l
-        left join public.auctions a on a.listing_id = get_listing_by_id.listing_id
-        left join public.dutch_auctions d on d.listing_id = get_listing_by_id.listing_id
-        left join public.sales s on s.listing_id = get_listing_by_id.listing_id
         left join public.currencies c on (c.id = l.currency and c.network_id = l.network_id)
     where l.id = get_listing_by_id.listing_id$$;
 
