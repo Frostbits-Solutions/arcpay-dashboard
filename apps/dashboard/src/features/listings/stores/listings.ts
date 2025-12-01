@@ -3,24 +3,23 @@ import { defineStore } from 'pinia'
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import { getListings } from '@/services/listings'
-import type { CompositeListing } from '@repo/supabase/models'
-import { supabase } from '@repo/supabase/client'
+import type { ListingDetail } from '@repo/supabase/models'
 import { errorHandler } from '@/lib/errorHandler'
 
 export const useListingsStore = defineStore('listings', () => {
   const accounts = useAccountsStore()
   const networks = useNetworksStore()
   const loading = ref(false)
-  const list = ref<CompositeListing[]>([])
+  const list = ref<ListingDetail[]>([])
 
   async function fetchListings() {
     if (accounts.active && networks.activeNetwork) {
       loading.value = true
-      const { data, error } = await getListings(supabase, accounts.active.id, networks.activeNetwork.id)
+      const { data, error } = await getListings(accounts.active.id, networks.activeNetwork.id)
       if (!data || error) {
         errorHandler(error, 'Error fetching listings')
       } else {
-        list.value = data as CompositeListing[]
+        list.value = data as ListingDetail[]
       }
       loading.value = false
     }

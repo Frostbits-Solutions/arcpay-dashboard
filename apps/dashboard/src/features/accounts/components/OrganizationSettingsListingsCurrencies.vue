@@ -11,7 +11,6 @@ import { ToastCheck } from '@repo/ui/toast'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
 import DefautCurrencyIcon from '@repo/ui/assets/currency.svg'
-import { supabase } from '@repo/supabase/client'
 import { type Currency } from '@repo/supabase/models'
 
 const props = defineProps({
@@ -44,7 +43,7 @@ const listedPrivateCurrenciesIds = computed(() => {
 })
 
 async function fetchCurrencies() {
-  const { data, error } = await getCurrencies(supabase, props.selectedNetwork)
+  const { data, error } = await getCurrencies(props.selectedNetwork)
   if (!data || error) {
     errorHandler(error, `Unable to fetch currencies for ${props.selectedNetwork}.`)
   } else {

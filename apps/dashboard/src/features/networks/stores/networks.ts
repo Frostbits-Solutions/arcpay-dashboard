@@ -4,8 +4,6 @@ import type { Network, Currency } from '@repo/supabase/models'
 import { getNetworks } from '@/services/networks'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
-import { services } from '@/services/networks'
-import { supabase } from '@repo/supabase/client'
 
 export const useNetworksStore = defineStore('networks', () => {
   const networks = ref<Record<string, Network>>({})
@@ -17,7 +15,6 @@ export const useNetworksStore = defineStore('networks', () => {
     return {
       ...networks.value[activeNetworkId.value],
       currencies: activeNetworkCurrencies.value,
-      services: services[activeNetworkId.value],
     }
   })
 
@@ -25,7 +22,6 @@ export const useNetworksStore = defineStore('networks', () => {
   async function setActive(networkId: string, setDefault?: boolean) {
     try {
       if (!networks.value[networkId]) throw new Error(`Network ${networkId} is not supported`)
-      if (!services[networkId]) throw new Error(`Network ${networkId} not supported: Missing services`)
       await fetchCurrencies(networkId)
       activeNetworkId.value = networkId
       if (setDefault !== false) localStorage.setItem('defaultNetwork', networkId)
@@ -47,7 +43,7 @@ export const useNetworksStore = defineStore('networks', () => {
   }
 
   async function fetchCurrencies(networkId: string) {
-    const { data, error } = await getCurrencies(supabase, networkId)
+    const { data, error } = await getCurrencies(networkId)
     if (!data || error) {
       throw new Error(`Unable to fetch currencies for ${networkId}. ${error?.message || ''}`)
     } else {

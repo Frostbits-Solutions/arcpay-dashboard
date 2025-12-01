@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import type { CompositeListing } from '@repo/supabase/models'
+import type { ListingDetail } from '@repo/supabase/models'
 import ListingsTableStatusCell from '@/features/listings/components/listings-table/ListingsTableStatusCell.vue'
 import ListingsTableAssetCell from '@/features/listings/components/listings-table/ListingsTableAssetCell.vue'
 import ListingsTableTypeCell from '@/features/listings/components/listings-table/ListingsTableTypeCell.vue'
@@ -8,7 +8,7 @@ import ListingsTableSellerCell from '@/features/listings/components/listings-tab
 import ListingsTableIdCell from '@/features/listings/components/listings-table/ListingsTableIdCell.vue'
 import ListingsTableActionCell from '@/features/listings/components/listings-table/ListingsTableActionCell.vue'
 
-export const columns: ColumnDef<CompositeListing>[] = [
+export const columns: ColumnDef<ListingDetail>[] = [
   {
     accessorKey: 'status',
     header: () => h('div', { class: 'text-left' }, 'Status'),

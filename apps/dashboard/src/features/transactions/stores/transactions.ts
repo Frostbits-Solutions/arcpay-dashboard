@@ -5,7 +5,7 @@ import { getDailySalesVolume, getHourlyTransactionsCount, getTransactionsListing
 import { useAccountsStore } from '@/features/accounts/stores/accounts'
 import { useNetworksStore } from '@/features/networks/stores/networks'
 import utc from 'dayjs/plugin/utc'
-import type { Transaction } from '@repo/supabase/models'
+import type { TransactionListing } from '@repo/supabase/models'
 import { errorHandler } from '@/lib/errorHandler'
 
 type HourlyTransactionsTimeseries = { time: string; transactions: number }[]
@@ -15,7 +15,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const accounts = useAccountsStore()
   const networks = useNetworksStore()
   const loading = ref(false)
-  const list = ref<Transaction[]>([])
+  const list = ref<TransactionListing[]>([])
   const totalSalesVolumes = ref<Record<string, number>>({})
   const top5CurrenciesByVolume = ref<string[]>([])
   const hourlyTransactionsTimeseries = ref<HourlyTransactionsTimeseries>([])

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { CompositeListing } from '@repo/supabase/models'
+import type { ListingDetail } from '@repo/supabase/models'
 import { computed } from 'vue'
 import { Badge } from '@repo/ui/badge'
 
-const props = defineProps<{ row: Row<CompositeListing> }>()
-const status = computed(() => props.row.original.status)
+const props = defineProps<{ row: Row<ListingDetail> }>()
+const status = computed(() => props.row.original.status || 'pending')
 </script>
 
 <template>

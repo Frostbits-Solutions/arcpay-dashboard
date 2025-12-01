@@ -1,0 +1,31 @@
+{
+  "name": "@repo/networks",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./client": "./src/client.ts",
+    "./models": "./src/models.ts"
+  },
+  "scripts": {
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "algosdk": "^2.7.0",
+    "axios": "^1.7.9",
+    "multiformats": "^13.3.1",
+    "@ipld/dag-pb": "^4.1.3"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.10.4",
+    "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^22.6.1",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.3.3",
+    "typescript": "~5.6.2",
+    "vue-tsc": "^2.1.6"
+  }
+}

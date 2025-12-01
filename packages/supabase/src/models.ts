@@ -38,5 +38,17 @@ export type SubscriptionTier =
 export type SubscriptionNetworkParameters =
   Database["public"]["Tables"]["subscriptions_networks_parameters"]["Row"];
 export type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
+export type TransactionListing = Transaction & {
+  listings: Listing;
+};
+export type TransactionsCount =
+  Database["public"]["CompositeTypes"]["transactions_count"];
+export type TransactionsVolumne =
+  Database["public"]["CompositeTypes"]["transactions_volume"];
 export type CompositeListing =
   Database["public"]["CompositeTypes"]["composite_listing"];
+export type ListingDetail = Listing & {
+  auctions: Auction | null;
+  sales: Sale | null;
+  dutch_auctions: DutchAuction | null;
+};

@@ -1,12 +1,7 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Currency } from '@repo/supabase/models'
+import type { Currency, SupaPromise } from '@repo/supabase/models'
+import { supabase } from '@repo/supabase/client'
 
-export async function getCurrencies(client: SupabaseClient, network: string) {
-  const { data, error } = await client.from('currencies').select('*').eq('network_id', network).returns<Currency[]>()
-  return { data, error }
-}
-
-export async function getCurrency(client: SupabaseClient, network: string, id: string) {
-  const { data, error } = await client.from('currencies').select('*').eq('network_id', network).eq('id', id).returns<Currency[]>()
+export async function getCurrencies(network: string): SupaPromise<Currency[]> {
+  const { data, error } = await supabase.from('currencies').select('*').eq('network_id', network)
   return { data, error }
 }

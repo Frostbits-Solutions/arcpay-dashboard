@@ -10,7 +10,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/popover'
 import { Skeleton } from '@repo/ui/skeleton'
 import { getCurrencies } from '@/services/currencies'
 import { errorHandler } from '@/lib/errorHandler'
-import { supabase } from '@repo/supabase/client'
 import type { Currency } from '@repo/supabase/models'
 
 const props = defineProps({
@@ -41,7 +40,7 @@ watch(
   async () => {
     loading.value = true
     value.value = undefined
-    const { data, error } = await getCurrencies(supabase, props.network)
+    const { data, error } = await getCurrencies(props.network)
     if (!data || error) {
       errorHandler(error, `Unable to fetch currencies for ${props.network}.`)
     } else {
