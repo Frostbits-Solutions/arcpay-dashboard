@@ -2,9 +2,6 @@
   "files": [],
   "references": [
     {
-      "extends": "@repo/shared/config/tsconfig.node"
-    },
-    {
       "extends": "@repo/shared/config/tsconfig.app"
     }
   ]
