@@ -1,3 +1,10 @@
 {
-  "extends": "@repo/shared/config/tsconfig.node"
+  "extends": "@repo/shared/config/tsconfig.node",
+  "include": [
+    "vite.config.*",
+    "vitest.config.*",
+    "cypress.config.*",
+    "nightwatch.conf.*",
+    "playwright.config.*"
+  ]
 }

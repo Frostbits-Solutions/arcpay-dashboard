@@ -1,3 +1,7 @@
 {
-  "extends": "@repo/shared/config/tsconfig.app"
+  "extends": "@repo/shared/config/tsconfig.app",
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "baseUrl": "."
+  }
 }
