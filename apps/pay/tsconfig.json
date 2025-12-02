@@ -2,10 +2,10 @@
   "files": [],
   "references": [
     {
-      "extends": "@repo/shared/config/tsconfig.node"
+      "path": "./tsconfig.node.json"
     },
     {
-      "extends": "@repo/shared/config/tsconfig.app"
+      "path": "./tsconfig.app.json"
     }
   ]
 }

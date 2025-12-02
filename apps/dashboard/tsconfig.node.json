@@ -1,0 +1,3 @@
+{
+  "extends": "@repo/shared/config/tsconfig.node"
+}
