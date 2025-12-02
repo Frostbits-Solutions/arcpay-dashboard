@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@repo/shared": "*",
     "algosdk": "^2.7.0",
     "axios": "^1.7.9",
     "multiformats": "^13.3.1",

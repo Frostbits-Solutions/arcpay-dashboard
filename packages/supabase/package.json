@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@repo/shared": "*",
     "@supabase/supabase-js": "^2.45.4"
   },
   "devDependencies": {

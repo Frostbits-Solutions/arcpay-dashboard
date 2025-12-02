@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./utils": "./src/utils.ts"
+    "./utils": "./src/utils.ts",
+    "./config/tsconfig.app": "./tsconfig.app.json",
+    "./config/tsconfig.node": "./tsconfig.node.json",
+    "./config/eslint": "./.eslintrc.cjs",
+    "./config/prettier": "./.prettierrc.json"
   },
   "scripts": {
     "type-check": "vue-tsc --build --force",
