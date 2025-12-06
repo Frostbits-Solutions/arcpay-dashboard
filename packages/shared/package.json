@@ -7,7 +7,7 @@
     "./config/tsconfig.app": "./tsconfig.app.json",
     "./config/tsconfig.node": "./tsconfig.node.json",
     "./config/eslint": "./.eslintrc.cjs",
-    "./config/prettier": "./.prettierrc.json"
+    "./config/prettier": "./.prettierrc.js"
   },
   "scripts": {
     "type-check": "vue-tsc --build --force",
@@ -16,20 +16,20 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
-    "@rushstack/eslint-patch": "^1.10.4",
-    "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^22.6.1",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
-    "@vue/tsconfig": "^0.5.1",
-    "eslint": "^8.56.0",
-    "eslint-plugin-vue": "^9.28.0",
-    "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
-    "typescript": "~5.6.2",
-    "vue-tsc": "^2.1.6"
+    "eslint-plugin-vue": "^9.28.0",
+    "@rushstack/eslint-patch": "^1.15.0",
+    "@tsconfig/node20": "^20.1.8",
+    "@types/node": "^24.10.1",
+    "@vue/tsconfig": "^0.8.1",
+    "eslint": "^9.39.1",
+    "prettier": "^3.7.3",
+    "typescript": "~5.9.3",
+    "vue-tsc": "^3.1.5"
   }
 }
