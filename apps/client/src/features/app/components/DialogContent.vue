@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type HTMLAttributes, inject } from "vue";
+import { computed, type HTMLAttributes } from "vue";
 import {
   DialogClose,
   DialogContent,

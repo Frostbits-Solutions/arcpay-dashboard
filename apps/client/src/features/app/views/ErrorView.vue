@@ -1,17 +1,20 @@
 <script lang="ts" setup>
-import { inject } from "vue";
+import { computed, type Ref } from "vue";
 import { Button } from "@repo/ui/button";
+import useNav from "@/features/app/useNav.ts";
 
-interface ErrorProvider {
-  callback: () => void;
-  args: {
-    title: string;
-    description: string;
-  };
+interface Args {
+  title?: string;
+  description?: string;
 }
+type Callback = () => void;
 
-const { callback, args } =
-  inject<{ Error: ErrorProvider }>("appProvider")?.["Error"] || {};
+const { args, callback }: { args: Ref<Args>; callback: Callback } = useNav<
+  Args,
+  void
+>();
+const title = computed(() => args.value.title || "Success!");
+const description = computed(() => args.value.description);
 </script>
 
 <template>
@@ -51,18 +54,15 @@ const { callback, args } =
       <div
         class="animate-in slide-in-from-bottom-2 fade-in delay-75 fill-mode-both"
       >
-        <div v-if="args?.title" class="text-md font-semibold text-foreground">
-          {{ args.title }}
+        <div v-if="title" class="text-md font-semibold text-foreground">
+          {{ title }}
         </div>
-        <div
-          v-if="args?.description"
-          class="text-xs text-muted-foreground break-all"
-        >
-          {{ args.description }}
+        <div v-if="description" class="text-xs text-muted-foreground break-all">
+          {{ description }}
         </div>
       </div>
       <Button
-        class="mb-8 grow-0 w-24 bg-background"
+        class="mb-8 grow-0 w-24"
         size="lg"
         variant="secondary"
         @click="callback"

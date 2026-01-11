@@ -1,20 +1,15 @@
 <script lang="ts" setup>
-import { computed, inject, type Ref } from "vue";
+import useNav from "@/features/app/useNav";
+import { computed, type Ref } from "vue";
 
-interface LoadProvider {
-  args: {
-    title: string;
-    description: string;
-  };
+interface Args {
+  title?: string;
+  description?: string;
 }
 
-const loadProvider = inject<{ Load: Ref<LoadProvider> }>("appProvider")?.[
-  "Load"
-];
-const title = computed(() => loadProvider?.value.args?.title || "Loading");
-const description = computed(
-  () => loadProvider?.value.args?.description || "Sit tight.",
-);
+const args: Ref<Args> = useNav<Args, any>().args;
+const title = computed(() => args.value.title || "Loading...");
+const description = computed(() => args.value.description);
 </script>
 
 <template>
@@ -42,7 +37,6 @@ const description = computed(
     >
       <div>
         <div
-          v-if="title"
           v-motion-slide-bottom
           class="text-md font-semibold text-foreground"
           :key="title"
