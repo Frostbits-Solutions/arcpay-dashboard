@@ -2,27 +2,30 @@ import { readonly, ref, type Ref } from "vue";
 import { type RouteParamsRawGeneric } from "vue-router";
 import router from "@/features/app/router";
 
-type Args<T> = Record<string, T>;
-type Callback<U> = () => U;
+type Args = Record<string, any>;
+type Callback = () => void;
 
-const _args: Args<any> = ref({});
-let _callback: Callback<any> = () => {};
+const _args = ref<Args>({});
+let _callback: Callback = () => {};
 
-export default function useNav<T, U>() {
+export default function useNav<
+  A extends Args,
+  C extends Callback = () => void,
+>() {
   async function push(
     name: string,
-    args: Args<T>,
-    callback?: Callback<U>,
+    args: A,
+    callback?: C,
     params?: RouteParamsRawGeneric,
   ) {
     _args.value = args;
-    _callback = callback || (() => {});
+    _callback = callback || _callback;
     return router.push({ name, params });
   }
 
   return {
     push,
-    args: readonly(_args as Ref<Args<T>>),
-    callback: _callback as Callback<U>,
+    args: readonly(_args),
+    callback: _callback,
   };
 }

@@ -1,7 +1,8 @@
 import router from "@/features/app/router";
 import useNav from "@/features/app/useNav";
+import type { Args, Callback } from "@/features/app/types.ts";
 
-const nav = useNav();
+const nav = useNav<Args, Callback>();
 
 export async function closeDialog() {
   return router.push("/");

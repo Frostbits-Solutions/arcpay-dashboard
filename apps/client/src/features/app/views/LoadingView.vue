@@ -1,13 +1,9 @@
 <script lang="ts" setup>
 import useNav from "@/features/app/useNav";
 import { computed, type Ref } from "vue";
+import type { Args } from "@/features/app/types.ts";
 
-interface Args {
-  title?: string;
-  description?: string;
-}
-
-const args: Ref<Args> = useNav<Args, any>().args;
+const args: Ref<Args> = useNav<Args>().args;
 const title = computed(() => args.value.title || "Loading...");
 const description = computed(() => args.value.description);
 </script>
@@ -33,7 +29,7 @@ const description = computed(() => args.value.description);
       </div>
     </div>
     <div
-      class="w-full flex-1 pt-4 text-center flex flex-col items-center g2 justify-between animate-in slide-in-from-bottom-2 fade-in delay-75 fill-mode-both animate-out slide-out-to-top-2"
+      class="w-full flex-1 pt-4 text-center flex flex-col items-center gap-2 justify-between animate-in slide-in-from-bottom-2 fade-in delay-75 fill-mode-both animate-out slide-out-to-top-2"
     >
       <div>
         <div

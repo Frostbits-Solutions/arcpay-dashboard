@@ -2,16 +2,11 @@
 import { computed, type Ref } from "vue";
 import { Button } from "@repo/ui/button";
 import useNav from "@/features/app/useNav.ts";
-
-interface Args {
-  title?: string;
-  description?: string;
-}
-type Callback = () => void;
+import type { Args, Callback } from "@/features/app/types.ts";
 
 const { args, callback }: { args: Ref<Args>; callback: Callback } = useNav<
   Args,
-  void
+  Callback
 >();
 const title = computed(() => args.value.title || "Success!");
 const description = computed(() => args.value.description);
@@ -49,7 +44,7 @@ const description = computed(() => args.value.description);
       </div>
     </div>
     <div
-      class="w-full flex-1 pt-4 text-center flex flex-col items-center g2 justify-between"
+      class="w-full flex-1 pt-4 text-center flex flex-col items-center gap-2 justify-between"
     >
       <div
         class="animate-in slide-in-from-bottom-2 fade-in delay-75 fill-mode-both"
