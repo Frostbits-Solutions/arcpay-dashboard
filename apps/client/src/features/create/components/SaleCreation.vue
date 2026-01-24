@@ -31,7 +31,7 @@ defineExpose({
     <Label class="mb-1 text-xs text-muted-foreground" for="price"
       >Asking price</Label
     >
-    <div class="flex g1 items-center mt-2">
+    <div class="flex gap-1 items-center mt-2">
       <NumberField
         id="price"
         :format-options="{

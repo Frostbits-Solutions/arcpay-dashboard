@@ -110,7 +110,7 @@ onMounted(async () => {
       {{ listingParams.name }}
     </h1>
     <div class="flex justify-between items-center">
-      <div class="flex items-center g1 mt-1">
+      <div class="flex items-center gap-1 mt-1">
         <ListingStatusChip
           ref="status"
           :listing-params="listingParams"
@@ -134,7 +134,7 @@ onMounted(async () => {
     </div>
   </div>
   <div
-    class="mt-6 flex flex-col justify-between items-center sm:flex-row sm:items-stretch mb-10 g4"
+    class="mt-6 flex flex-col justify-between items-center sm:flex-row sm:items-stretch mb-10 gap-4"
   >
     <div class="flex items-center">
       <AssetThumbnail
@@ -154,7 +154,7 @@ onMounted(async () => {
             class="py-2 flex items-center justify-between -ml-[11px] mr-0.5"
             v-motion-fade-visible-once
           >
-            <div class="flex items-center w-full text-xs font-semibold g2">
+            <div class="flex items-center w-full text-xs font-semibold gap-2">
               <Jazzicon
                 :address="`0x${tx.from_address}`"
                 :diameter="20"
@@ -179,7 +179,7 @@ onMounted(async () => {
         </ol>
         <div
           v-else
-          class="h-[120px] text-md text-muted-foreground/50 text-center flex items-center justify-center g1"
+          class="h-[120px] text-md text-muted-foreground/50 text-center flex items-center justify-center gap-1"
         >
           <LoaderCircle class="w-5 h-5 text-muted-foreground/50 animate-spin" />
           No bids yet
@@ -218,7 +218,7 @@ onMounted(async () => {
     v-motion-slide-bottom
   >
     <ArrowRight class="w-6 h-6 arr-2" />
-    <span class="text flex items-center g1">
+    <span class="text flex items-center gap-1">
       Bid
       <div class="flex items-center">
         <span class="text-3xl font-extrabold tracking-tight">
@@ -245,7 +245,7 @@ onMounted(async () => {
     v-motion-slide-bottom
   >
     <ArrowRight class="w-6 h-6 arr-2" />
-    <span class="text flex items-center g1">
+    <span class="text flex items-center gap-1">
       <span class="text-lg tracking-tight"> Close auction </span>
     </span>
     <span class="circle"></span>

@@ -43,7 +43,7 @@ watch(
       {{ listingParams.name }}
     </h1>
     <div class="flex justify-between items-center">
-      <div class="flex items-center g1 mt-1">
+      <div class="flex items-center gap-1 mt-1">
         <ListingStatusChip
           ref="status"
           :listing-params="listingParams"
@@ -86,7 +86,7 @@ watch(
       v-motion-slide-bottom
     >
       <ArrowRight class="w-6 h-6 arr-2" />
-      <span class="text flex items-center g1">
+      <span class="text flex items-center gap-1">
         Pay
         <div class="flex items-center">
           <span class="text-3xl font-extrabold tracking-tight">

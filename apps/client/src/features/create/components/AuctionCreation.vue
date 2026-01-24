@@ -31,7 +31,7 @@ defineExpose({
 <template>
   <div class="mt-2">
     <Label class="text-xs text-muted-foreground" for="price">Start price</Label>
-    <div class="flex g1 items-center mt-2">
+    <div class="flex gap-1 items-center mt-2">
       <NumberField
         id="price"
         :format-options="{

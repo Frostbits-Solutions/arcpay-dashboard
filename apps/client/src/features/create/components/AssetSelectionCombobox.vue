@@ -150,7 +150,7 @@ onMounted(async () => {
                 }
               "
             >
-              <div class="flex items-center g2 min-w-0">
+              <div class="flex items-center gap-2 min-w-0">
                 <img
                   :alt="asset.id"
                   :src="asset.thumbnail"
@@ -186,7 +186,7 @@ onMounted(async () => {
             <InfiniteLoading @infinite="load">
               <template #spinner>
                 <div
-                  class="flex justify-center items-center g2 p-2 text-xs text-muted-foreground"
+                  class="flex justify-center items-center gap-2 p-2 text-xs text-muted-foreground"
                 >
                   <LoaderCircle
                     class="size-4 text-primary animate-spin text-xs"
@@ -196,13 +196,13 @@ onMounted(async () => {
               </template>
               <template #complete>
                 <span
-                  class="flex justify-center items-center g2 p-2 text-xs text-muted-foreground"
+                  class="flex justify-center items-center gap-2 p-2 text-xs text-muted-foreground"
                   >That's all for now!</span
                 >
               </template>
               <template #error>
                 <span
-                  class="flex justify-center items-center g2 p-2 text-xs text-destructive"
+                  class="flex justify-center items-center gap-2 p-2 text-xs text-destructive"
                   >Unexpected error occurred while loading your assets</span
                 >
               </template>

@@ -75,7 +75,7 @@ onMounted(() => {
       >
         <template v-if="!value"> Select currency </template>
         <template v-else-if="selectedCurrency">
-          <div class="flex items-center g1 min-w-0 px-1">
+          <div class="flex items-center gap-1 min-w-0 px-1">
             <img
               :alt="`${selectedCurrency.ticker} icon`"
               :src="selectedCurrency?.icon || defaultCurrencyIcon"
@@ -112,7 +112,7 @@ onMounted(() => {
                 }
               "
             >
-              <div class="flex items-center g1 min-w-0">
+              <div class="flex items-center gap-1 min-w-0">
                 <img
                   :alt="`${currency.ticker} icon`"
                   :src="currency?.icon || defaultCurrencyIcon"

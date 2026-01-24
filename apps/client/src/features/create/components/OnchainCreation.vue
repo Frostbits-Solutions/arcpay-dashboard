@@ -39,7 +39,7 @@ function createListing() {
 </script>
 
 <template>
-  <div class="flex flex-col g2 mt-4 md:flex-row md:g8">
+  <div class="flex flex-col gap-2 mt-4 md:flex-row md:gap-8">
     <div class="flex flex-col justify-center mx-auto">
       <AssetSelectionCombobox
         ref="assetSelectionComboboxRef"
@@ -54,21 +54,21 @@ function createListing() {
           <div class="grid g[17px] grid-cols-4 mt-2">
             <RouterLink
               :to="{ name: 'sale-creation' }"
-              class="h-[74px] text-xs cursor-pointer flex flex-col items-center justify-center g1 rounded-md border-2 border-muted bg-background text-muted-foreground hover:text-foreground"
+              class="h-[74px] text-xs cursor-pointer flex flex-col items-center justify-center gap-1 rounded-md border-2 border-muted bg-background text-muted-foreground hover:text-foreground"
             >
               <Receipt class="h-5 w-5" />
               Sale
             </RouterLink>
             <RouterLink
               :to="{ name: 'auction-creation' }"
-              class="h-[74px] text-xs cursor-pointer flex flex-col items-center justify-center g1 rounded-md border-2 border-muted bg-background text-muted-foreground hover:text-foreground"
+              class="h-[74px] text-xs cursor-pointer flex flex-col items-center justify-center gap-1 rounded-md border-2 border-muted bg-background text-muted-foreground hover:text-foreground"
             >
               <Gavel class="h-5 w-5" />
               Auction
             </RouterLink>
             <RouterLink
               :to="{ name: 'dutch-creation' }"
-              class="text-center h-[74px] text-xs cursor-pointer flex flex-col items-center justify-center g1 rounded-md border-2 border-muted bg-background text-muted-foreground hover:text-foreground"
+              class="text-center h-[74px] text-xs cursor-pointer flex flex-col items-center justify-center gap-1 rounded-md border-2 border-muted bg-background text-muted-foreground hover:text-foreground"
             >
               <HandCoins class="h-5 w-5" />
               Reverse

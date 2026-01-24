@@ -35,9 +35,9 @@ defineExpose({
     <Label class="text-xs text-muted-foreground" for="priceMin"
       >Price range</Label
     >
-    <div class="flex g1 items-top mt-2 w-[333px]">
+    <div class="flex gap-1 items-top mt-2 w-[333px]">
       <div>
-        <div class="flex items-center g2">
+        <div class="flex items-center gap-2">
           <span class="text-xs text-muted-foreground/50">Min</span>
           <NumberField
             id="priceMin"
@@ -64,7 +64,7 @@ defineExpose({
             </NumberFieldContent>
           </NumberField>
         </div>
-        <div class="flex items-center g1 mt-1">
+        <div class="flex items-center gap-1 mt-1">
           <span class="text-xs text-muted-foreground/50">Max</span>
           <NumberField
             id="priceMax"
