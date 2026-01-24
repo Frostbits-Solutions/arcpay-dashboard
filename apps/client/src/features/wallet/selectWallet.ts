@@ -1,13 +1,22 @@
-import type {WalletAccount} from "@txnlab/use-wallet";
-import type {AppProvider} from '@/lib/app/AppProvider'
-import router from '@/router'
+import type { WalletAccount } from "@txnlab/use-wallet";
+import useNav from "@/features/app/useNav";
+import type { Callback } from "@/features/wallet/types.ts";
 
-export function selectWallet(appProvider: AppProvider) {
-    return new Promise<WalletAccount>((resolve, reject) => {
-        appProvider.provide('WalletSelection', {}, (account: WalletAccount, error?: Error) => {
-            if (error) reject(error)
-            resolve(account)
-        })
-        router.push({name: 'wallet-selection'})
-    })
+const nav = useNav<{}, Callback>();
+
+export async function selectWallet() {
+  return new Promise<WalletAccount>((resolve, reject) => {
+    nav.push(
+      "wallet-selection",
+      {},
+      (account?: WalletAccount, error?: Error) => {
+        if (error) reject(error);
+        if (!account) {
+          reject(new Error("No account selected"));
+        } else {
+          resolve(account);
+        }
+      },
+    );
+  });
 }

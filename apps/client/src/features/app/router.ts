@@ -3,6 +3,7 @@ import ModalView from "./views/ModalView.vue";
 import LoadingView from "./views/LoadingView.vue";
 import ErrorView from "./views/ErrorView.vue";
 import SuccessView from "./views/SuccessView.vue";
+import walletRoutes from "@/features/wallet/routes";
 
 const router = createRouter({
   history: createMemoryHistory(),
@@ -37,7 +38,7 @@ const router = createRouter({
         },
         // createRoutes,
         // reviewRoutes,
-        // walletRoutes,
+        walletRoutes,
       ],
     },
   ],
