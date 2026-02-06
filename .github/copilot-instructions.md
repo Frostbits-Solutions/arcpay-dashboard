@@ -9,6 +9,9 @@ Add # ArcPay Dashboard - Copilot Instructions
 
 Keep instructions accurate and current. Future sessions rely on this file for project understanding.
 
+### Recent Corrections
+- **2026-02-06**: Transactions table is preserved (not dropped). It references the new `apps` and `assets` tables.
+
 ## Project Overview
 
 ArcPay Dashboard is a Turbo monorepo for managing NFT/RWA listings and transactions on Algorand-based networks. The project consists of two Vue 3 applications and shared packages.
@@ -177,11 +180,13 @@ Key tables:
 - `accounts` - Organizations/teams
 - `accounts_users_association` - User-account memberships with roles
 - `accounts_addresses` - Blockchain addresses per account
+- `accounts_assets` - Assets (currencies) enabled per account
 - `accounts_secrets` - API keys (hashed)
-- `listings` - NFT/RWA listings (sale/auction/dutch auction)
-- `transactions` - Transaction history
-- `currencies` - Supported currencies per network
+- `apps` - Applications/listings (payment/swap) on blockchain
+- `assets` - Supported assets (ASAs) per network
+- `contracts` - Smart contract bytecode (approval programs)
 - `networks` - Supported blockchain networks
+- `transactions` - Transaction history (partitioned by date)
 
 Use RPC functions for complex operations (e.g., `create_account`).
 
@@ -196,7 +201,14 @@ npx turbo run build --force
 
 ### Supabase Local Development
 
-Supabase configuration is in `supabase/config.toml`. Migrations are in `supabase/migrations/`.
+Supabase configuration is in `supabase/config.toml`. 
+
+**Schema source of truth:** The canonical database schema is defined in `supabase/schemas/*.sql` files, NOT in migration files. When updating the database schema:
+1. Edit the appropriate schema file in `supabase/schemas/`
+2. Generate a migration from the schema changes
+3. Never directly edit migration files
+
+Migration files in `supabase/migrations/` are generated artifacts and should not be manually edited.
 
 To work with local Supabase:
 ```bash

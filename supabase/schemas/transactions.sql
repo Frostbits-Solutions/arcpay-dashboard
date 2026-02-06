@@ -44,8 +44,8 @@ ALTER TYPE "public"."transactions_count" OWNER TO "postgres";
 CREATE TYPE "public"."transactions_volume" AS (
     "time" timestamp without time zone,
     "volume" float8,
-    "currency_id" text,
-    "currency_ticker" text
+    "asset_id" text,
+    "asset_ticker" text
 );
 
 ALTER TYPE "public"."transactions_volume" OWNER TO "postgres";
@@ -59,11 +59,11 @@ CREATE TABLE IF NOT EXISTS "public"."transactions" (
     "network_id" "text" NOT NULL,
     "app_id" bigint NOT NULL,
     "type" "public"."transaction_type" NOT NULL,
-    "amount" double precision,
-    "currency" bigint NOT NULL,
+    "quoted_asset_id" bigint NOT NULL,
+    "quoted_amount" double precision,
     "metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
     CONSTRAINT "transactions_pkey" PRIMARY KEY ("id", "network_id", "app_id", "from_address", "created_at"),
-    CONSTRAINT "transactions_currency_fkey" FOREIGN KEY ("currency", "network_id") REFERENCES "public"."currencies"("id", "network_id") ON DELETE CASCADE,
+    CONSTRAINT "transactions_asset_fkey" FOREIGN KEY ("quoted_asset_id", "network_id") REFERENCES "public"."assets"("id", "network_id") ON DELETE CASCADE,
     CONSTRAINT "transactions_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE CASCADE
 ) PARTITION BY RANGE (created_at);
 ALTER TABLE "public"."transactions" OWNER TO "postgres";
@@ -77,20 +77,20 @@ CREATE POLICY "Enable read access for all users" ON "public"."transactions" FOR 
 
 
 -------------------- FUNCTIONS --------------------
-CREATE OR REPLACE FUNCTION "public"."transactions"("public"."listings") RETURNS SETOF "public"."transactions"
+CREATE OR REPLACE FUNCTION "public"."transactions"("public"."apps") RETURNS SETOF "public"."transactions"
     LANGUAGE "sql" STABLE
     set search_path = ''
     AS $_$ select * from public.transactions where app_id = $1.app_id $_$;
 
-ALTER FUNCTION "public"."transactions"("public"."listings") OWNER TO "postgres";
+ALTER FUNCTION "public"."transactions"("public"."apps") OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."listings"("public"."transactions") RETURNS SETOF "public"."listings"
+CREATE OR REPLACE FUNCTION "public"."apps"("public"."transactions") RETURNS SETOF "public"."apps"
     LANGUAGE "sql" STABLE
     set search_path = ''
-    AS $_$ select * from public.listings where app_id = $1.app_id $_$;
+    AS $_$ select * from public.apps where app_id = $1.app_id $_$;
 
-ALTER FUNCTION "public"."listings"("public"."transactions") OWNER TO "postgres";
-GRANT EXECUTE ON FUNCTION "public"."listings"("public"."transactions") TO "anon", "authenticated", "service_role";
+ALTER FUNCTION "public"."apps"("public"."transactions") OWNER TO "postgres";
+GRANT EXECUTE ON FUNCTION "public"."apps"("public"."transactions") TO "anon", "authenticated", "service_role";
 
 CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "network_id" "text") RETURNS SETOF "public"."transactions_count"
     LANGUAGE "sql" STABLE
@@ -100,7 +100,7 @@ CREATE OR REPLACE FUNCTION "public"."get_hourly_transactions_timeseries"("accoun
     date_trunc('hour', t.created_at) AS time,
     count(t.id) AS count
     from "public"."transactions" t
-    left join "public"."listings" l on t.app_id = l.app_id
+    left join "public"."apps" l on t.app_id = l.app_id
     where l.account_id = $1 and t.created_at > NOW() - interval '168 hours' and t."network_id" = $2
     group by time
     order by time asc
@@ -114,12 +114,12 @@ CREATE OR REPLACE FUNCTION "public"."get_daily_sales_volume_timeseries"("account
     AS $_$
     select
     date_trunc('day', t.created_at) AS time,
-    sum(t.amount) / POWER(10,c.decimals) AS volume,
-    c.id as currency_id,
-    c.ticker as currency_ticker
+    sum(t.quoted_amount) / POWER(10,c.decimals) AS volume,
+    c.id as asset_id,
+    c.ticker as asset_ticker
     from "public"."transactions" t
-    left join "public"."currencies" c on t.currency = c.id and t."network_id" = c."network_id"
-    left join "public"."listings" l on t.app_id = l.app_id
+    left join "public"."assets" c on t.quoted_asset_id = c.id and t."network_id" = c."network_id"
+    left join "public"."apps" l on t.app_id = l.app_id
     where l.account_id = $1 and t.created_at > NOW() - interval '30 days' and t.type = 'buy' and t."network_id" = $2
     group by time, c.id, c.decimals, c.ticker
     order by time asc
@@ -161,7 +161,7 @@ END;
 $$;
 
 -- GRANT PERMISSION ON FUNCTIONS
-GRANT EXECUTE ON FUNCTION "public"."transactions"("public"."listings") TO "anon", "authenticated", "service_role";
+GRANT EXECUTE ON FUNCTION "public"."transactions"("public"."apps") TO "anon", "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "public"."get_hourly_transactions_timeseries"("account_id" "uuid", "network_id" "text") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "public"."get_daily_sales_volume_timeseries"("account_id" "uuid", "network_id" "text") TO "authenticated", "service_role";
 GRANT EXECUTE ON FUNCTION "private"."create_daily_transactions_partition"() TO "service_role";

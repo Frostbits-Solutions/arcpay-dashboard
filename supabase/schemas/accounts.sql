@@ -9,7 +9,7 @@ This table provides a comprehensive overview of permissions for different user r
 | accounts_addresses           | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
 | accounts_users_association   | No access              | No direct access          | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
 | accounts_networks_parameters | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
-| accounts_currencies          | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
+| accounts_assets              | SELECT (read-only)     | SELECT (read-only)        | SELECT only             | ALL (full CRUD access)        | ALL (full CRUD access)         |
 | accounts_secrets             | No access              | No direct access          | No access               | ALL (full CRUD access)        | ALL (full CRUD access)         |
 
 ## Function Permissions
@@ -109,23 +109,23 @@ GRANT SELECT ON TABLE "public"."accounts_networks_parameters" TO "anon";
 GRANT ALL ON TABLE "public"."accounts_networks_parameters" TO "authenticated";
 GRANT ALL ON TABLE "public"."accounts_networks_parameters" TO "service_role";
 
--------------------- ACCOUNTS CURRENCIES --------------------
-CREATE TABLE IF NOT EXISTS "public"."accounts_currencies" (
+-------------------- ACCOUNTS ASSETS --------------------
+CREATE TABLE IF NOT EXISTS "public"."accounts_assets" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "account_id" "uuid" NOT NULL,
-    "currency" bigint NOT NULL,
+    "asset_id" bigint NOT NULL,
     "network_id" "text" NOT NULL,
-    CONSTRAINT "accounts_currencies_pkey" PRIMARY KEY ("account_id", "currency", "network_id"),
-    CONSTRAINT "accounts_currencies_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
-    CONSTRAINT "accounts_currencies_currency_fkey" FOREIGN KEY ("currency", "network_id") REFERENCES "public"."currencies"("id", "network_id") ON DELETE CASCADE
+    CONSTRAINT "accounts_assets_pkey" PRIMARY KEY ("account_id", "asset_id", "network_id"),
+    CONSTRAINT "accounts_assets_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE CASCADE,
+    CONSTRAINT "accounts_assets_asset_fkey" FOREIGN KEY ("asset_id", "network_id") REFERENCES "public"."assets"("id", "network_id") ON DELETE CASCADE
 );
-ALTER TABLE "public"."accounts_currencies" OWNER TO "postgres";
+ALTER TABLE "public"."accounts_assets" OWNER TO "postgres";
 
--- RLS for accounts_currencies
-ALTER TABLE "public"."accounts_currencies" ENABLE ROW LEVEL SECURITY;
-GRANT SELECT ON TABLE "public"."accounts_currencies" TO "anon";
-GRANT ALL ON TABLE "public"."accounts_currencies" TO "authenticated";
-GRANT ALL ON TABLE "public"."accounts_currencies" TO "service_role";
+-- RLS for accounts_assets
+ALTER TABLE "public"."accounts_assets" ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON TABLE "public"."accounts_assets" TO "anon";
+GRANT ALL ON TABLE "public"."accounts_assets" TO "authenticated";
+GRANT ALL ON TABLE "public"."accounts_assets" TO "service_role";
 
 -------------------- ACCOUNTS SECRETS --------------------
 CREATE TABLE IF NOT EXISTS "public"."accounts_secrets" (
@@ -217,7 +217,7 @@ RETURNS "public"."network_subscription_parameters"
 LANGUAGE "sql" STABLE SECURITY DEFINER
 SET search_path = ''
 AS $_$
-    SELECT st.allow_secondary_listings, st.allow_custom_currencies, scp.flat_fees, scp.sales_fees, scp.secondary_flat_fees, scp.secondary_sales_fees
+    SELECT st.allow_secondary_listings, st.allow_custom_assets, scp.flat_fees, scp.sales_fees, scp.secondary_flat_fees, scp.secondary_sales_fees
     FROM "public"."subscription_tiers" st
     JOIN "public"."accounts" a ON st.id = a.subscription_id
     JOIN "public"."subscriptions_networks_parameters" scp ON st.id = scp.subscription_id AND scp.network_id = p_network_id
@@ -350,11 +350,11 @@ CREATE POLICY "Account admins can insert accounts network parameters" ON "public
 CREATE POLICY "Account admins can update accounts network parameters" ON "public"."accounts_networks_parameters" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 CREATE POLICY "Account admins can delete accounts network parameters" ON "public"."accounts_networks_parameters" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
--- accounts_currencies
-CREATE POLICY "Public can view account currencies" ON "public"."accounts_currencies" FOR SELECT USING (true);
-CREATE POLICY "Account admins can insert account currencies" ON "public"."accounts_currencies" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
-CREATE POLICY "Account admins can update account currencies" ON "public"."accounts_currencies" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
-CREATE POLICY "Account admins can delete account currencies" ON "public"."accounts_currencies" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+-- accounts_assets
+CREATE POLICY "Public can view account assets" ON "public"."accounts_assets" FOR SELECT USING (true);
+CREATE POLICY "Account admins can insert account assets" ON "public"."accounts_assets" FOR INSERT TO "authenticated" WITH CHECK ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can update account assets" ON "public"."accounts_assets" FOR UPDATE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
+CREATE POLICY "Account admins can delete account assets" ON "public"."accounts_assets" FOR DELETE TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));
 
 -- RLS for accounts_secrets
 CREATE POLICY "Account admins can select secrets" ON "public"."accounts_secrets" FOR SELECT TO "authenticated" USING ("private"."is_user_account_admin"((select "auth"."email"()), "account_id"));

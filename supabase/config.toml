@@ -40,11 +40,11 @@ max_client_conn = 100
 schema_paths = [
     "./schemas/init.sql",
     "./schemas/networks.sql",
-    "./schemas/currencies.sql",
+    "./schemas/assets.sql",
     "./schemas/subscription_tiers.sql",
     "./schemas/accounts.sql",
     "./schemas/contracts.sql",
-    "./schemas/listings.sql",
+    "./schemas/apps.sql",
     "./schemas/transactions.sql",
     "./schemas/realtime.sql",
   "./schemas/*.sql"

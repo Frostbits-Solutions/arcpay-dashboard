@@ -24,7 +24,7 @@ This table provides a comprehensive overview of permissions for different user r
 -------------------- TYPES --------------------
 CREATE TYPE "public"."network_subscription_parameters" AS (
     allow_secondary_listings boolean,
-    allow_custom_currencies boolean,
+    allow_custom_assets boolean,
     flat_fees float,
     sales_fees float,
     secondary_flat_fees float,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS "public"."subscription_tiers" (
     "name" "text" NOT NULL,
     "duration" bigint, 
     "allow_secondary_listings" boolean NOT NULL DEFAULT false,
-    "allow_custom_currencies" boolean NOT NULL DEFAULT false,
+    "allow_custom_assets" boolean NOT NULL DEFAULT false,
     CONSTRAINT "subscription_tiers_pkey" PRIMARY KEY ("id")
 );
 ALTER TABLE "public"."subscription_tiers" OWNER TO "postgres";

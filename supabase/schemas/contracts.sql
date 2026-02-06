@@ -5,7 +5,6 @@ This table provides a comprehensive overview of permissions for different user r
 
 | Table               | anon                  | authenticated          | member                 | admin                  | owner                  |
 |---------------------|----------------------|------------------------|------------------------|------------------------|------------------------|
-| contracts_versions  | SELECT (read-only)   | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     |
 | contracts           | SELECT (read-only)   | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     | SELECT (read-only)     |
 
 ## Notes:
@@ -14,7 +13,7 @@ This table provides a comprehensive overview of permissions for different user r
 - The service_role has ALL permissions on all tables (superuser)
 - RLS (Row-Level Security) policies enforce these permissions with universal read policies
 - Contracts data is typically managed through administrative processes or migrations
-- These tables serve as reference data for smart contract deployments and versioning
+- This table serves as reference data for smart contract deployments and versioning
 */
 
 -------------------- TYPES --------------------
@@ -39,23 +38,6 @@ CREATE TYPE "public"."contract_tag_enum" AS ENUM (
 );
 ALTER TYPE "public"."contract_tag_enum" OWNER TO "postgres";
 
--------------------- CONTRACTS_VERSIONS --------------------
-CREATE TABLE IF NOT EXISTS "public"."contracts_versions" (
-    "version" text NOT NULL,
-    "network_id" text NOT NULL,
-    "created_at" timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "contracts_versions_pkey" PRIMARY KEY ("version", "network_id"),
-    CONSTRAINT "contracts_versions_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE RESTRICT
-);
-ALTER TABLE "public"."contracts_versions" OWNER TO "postgres";
-
--- RLS for contracts_versions
-ALTER TABLE "public"."contracts_versions" ENABLE ROW LEVEL SECURITY;
-GRANT SELECT ON TABLE "public"."contracts_versions" TO "anon";
-GRANT SELECT ON TABLE "public"."contracts_versions" TO "authenticated";
-GRANT ALL ON TABLE "public"."contracts_versions" TO "service_role";
-CREATE POLICY "Allow public read access to all contracts versions" ON "public"."contracts_versions" FOR SELECT USING (true);
-
 -------------------- CONTRACTS --------------------
 CREATE TABLE IF NOT EXISTS "public"."contracts" (
     "tag" "public"."contract_tag_enum" NOT NULL,
@@ -63,8 +45,8 @@ CREATE TABLE IF NOT EXISTS "public"."contracts" (
     "network_id" text NOT NULL,
     "byte_code" text NOT NULL,
     "created_at" timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "contracts_pkey" PRIMARY KEY ("version", "tag", "network_id"),
-    CONSTRAINT "contracts_version_fkey" FOREIGN KEY ("version", "network_id") REFERENCES "public"."contracts_versions"("version", "network_id") ON DELETE CASCADE
+    CONSTRAINT "contracts_pkey" PRIMARY KEY ("tag", "version", "network_id"),
+    CONSTRAINT "contracts_network_id_fkey" FOREIGN KEY ("network_id") REFERENCES "public"."networks"("id") ON DELETE CASCADE
 );
 ALTER TABLE "public"."contracts" OWNER TO "postgres";
 
